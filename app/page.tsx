@@ -18,10 +18,9 @@ import { SmartSchedulingDisplay } from '@/components/smart-scheduling-display';
 import { AIIntelligenceDisplay } from '@/components/ai-intelligence-display';
 import { LLMIntegrationDisplay } from '@/components/llm-integration-display';
 import { WellnessIntelligenceDisplay } from '@/components/wellness-intelligence-display';
-import {
-  HeroBackground,
-  SessionCardBackground,
-} from '@/components/hero-background';
+import { HeroBackground } from '@/components/hero-background';
+import { SessionTypeShowcase } from '@/components/session-type-showcase';
+import { ThemedSessionCard } from '@/components/themed-session-card';
 import { useUser } from '@/lib/contexts/user-context';
 import { useDatabase } from '@/lib/hooks/use-database';
 
@@ -319,7 +318,7 @@ export default function Dashboard() {
 
       <Tabs defaultValue='dashboard' className='w-full'>
         <TabsList
-          className='grid w-full grid-cols-8 mb-6 h-12'
+          className='grid w-full grid-cols-9 mb-6 h-12'
           role='tablist'
           aria-label='Main navigation'
         >
@@ -331,6 +330,9 @@ export default function Dashboard() {
           </TabsTrigger>
           <TabsTrigger value='progress' className='text-base font-medium'>
             Progress
+          </TabsTrigger>
+          <TabsTrigger value='themes' className='text-base font-medium'>
+            Themes
           </TabsTrigger>
           <TabsTrigger value='smart' className='text-base font-medium'>
             Smart
@@ -866,30 +868,18 @@ export default function Dashboard() {
           </section>
 
           <section aria-labelledby='training-title'>
-            <SessionCardBackground sessionType='strength' className='h-64'>
-              <div className='text-center space-y-6'>
-                <div className='text-6xl mb-4' role='img' aria-label='Rocket'>
-                  🚀
-                </div>
-                <h2
-                  id='training-title'
-                  className='text-2xl font-bold leading-tight'
-                >
-                  Ready to train?
-                </h2>
-                <p className='text-lg leading-relaxed'>
-                  Next up: Lower-Body Strength
-                </p>
-                <Button
-                  size='lg'
-                  className='w-full h-16 text-lg font-semibold transition-all duration-200 hover:scale-102 shadow-lg'
-                  aria-label="Start today's lower-body strength training session"
-                  onClick={() => handleStartSession('lower-body-strength')}
-                >
-                  <Play /> Start Today's Session
-                </Button>
-              </div>
-            </SessionCardBackground>
+            <ThemedSessionCard
+              sessionType='strength'
+              title='Ready to train?'
+              description='Next up: Lower-Body Strength Training - Build power and muscle with progressive resistance training'
+              duration='45-60 min'
+              difficulty='intermediate'
+              isCompleted={false}
+              isLocked={false}
+              onStart={() => handleStartSession('lower-body-strength')}
+              onViewDetails={() => console.log('View session details')}
+              className='h-64'
+            />
           </section>
 
           {!simpleMode && (
@@ -1141,6 +1131,14 @@ export default function Dashboard() {
             performanceForecast={null}
             userId='default-user'
             currentPhase='build'
+          />
+        </TabsContent>
+
+        <TabsContent value='themes' className='space-y-6'>
+          <SessionTypeShowcase
+            onSessionSelect={sessionType => {
+              console.log('Selected session type:', sessionType);
+            }}
           />
         </TabsContent>
 

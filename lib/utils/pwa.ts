@@ -18,7 +18,7 @@ export interface PendingData {
 class PWAManager {
   private registration: ServiceWorkerRegistration | null = null;
   private isOnline = navigator.onLine;
-  private listeners: Array<(status: PWAStatus) => void> = [];
+  private listeners: Array<() => void> = [];
 
   constructor() {
     this.init();
@@ -36,8 +36,10 @@ class PWAManager {
     }
 
     // Listen for online/offline events
-    window.addEventListener('online', this.handleOnline.bind(this));
-    window.addEventListener('offline', this.handleOffline.bind(this));
+    if (typeof window !== 'undefined') {
+      window.addEventListener('online', this.handleOnline.bind(this));
+      window.addEventListener('offline', this.handleOffline.bind(this));
+    }
 
     // Listen for service worker updates
     if (this.registration) {
@@ -88,6 +90,7 @@ class PWAManager {
    * Check if app is installed as PWA
    */
   isInstalled(): boolean {
+    if (typeof window === 'undefined') return false;
     return (
       window.matchMedia('(display-mode: standalone)').matches ||
       (window.navigator as any).standalone === true
@@ -106,6 +109,7 @@ class PWAManager {
    * Get last sync timestamp
    */
   getLastSync(): Date | null {
+    if (typeof window === 'undefined') return null;
     const lastSync = localStorage.getItem('lastSync');
     return lastSync ? new Date(lastSync) : null;
   }
@@ -113,7 +117,7 @@ class PWAManager {
   /**
    * Subscribe to PWA status changes
    */
-  subscribe(listener: (status: PWAStatus) => void) {
+  subscribe(listener: () => void) {
     this.listeners.push(listener);
     return () => {
       const index = this.listeners.indexOf(listener);
@@ -136,7 +140,9 @@ class PWAManager {
       this.registration.waiting.postMessage({ type: 'SKIP_WAITING' });
 
       // Reload the page
-      window.location.reload();
+      if (typeof window !== 'undefined') {
+        window.location.reload();
+      }
       return true;
     } catch (error) {
       console.error('Error installing PWA:', error);
@@ -159,7 +165,9 @@ class PWAManager {
       await this.registration.sync.register('progress-sync');
 
       // Update last sync time
-      localStorage.setItem('lastSync', new Date().toISOString());
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('lastSync', new Date().toISOString());
+      }
       this.notifyListeners();
     } catch (error) {
       console.error('Error triggering background sync:', error);
@@ -228,7 +236,7 @@ class PWAManager {
   private async syncData(data: PendingData): Promise<void> {
     try {
       let endpoint = '';
-      let method = 'POST';
+      const method = 'POST';
 
       switch (data.type) {
         case 'session':

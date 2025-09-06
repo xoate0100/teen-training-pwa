@@ -26,6 +26,13 @@ export default [
         URLSearchParams: 'readonly',
         RequestInit: 'readonly',
         setTimeout: 'readonly',
+        window: 'readonly',
+        navigator: 'readonly',
+        localStorage: 'readonly',
+        indexedDB: 'readonly',
+        Notification: 'readonly',
+        ServiceWorkerRegistration: 'readonly',
+        NotificationOptions: 'readonly',
       },
     },
     plugins: {

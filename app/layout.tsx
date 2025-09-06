@@ -1,18 +1,13 @@
 import type React from 'react';
 import type { Metadata } from 'next';
-import { GeistSans, GeistMono } from 'geist/font';
+import { Inter } from 'next/font/google';
 import { Suspense } from 'react';
 import './globals.css';
 import { PWAProvider } from '@/components/pwa-provider';
 
-const geistSans = GeistSans({
+const inter = Inter({
   subsets: ['latin'],
-  variable: '--font-geist-sans',
-});
-
-const geistMono = GeistMono({
-  subsets: ['latin'],
-  variable: '--font-geist-mono',
+  variable: '--font-inter',
 });
 
 export const metadata: Metadata = {
@@ -20,14 +15,19 @@ export const metadata: Metadata = {
   description: 'Athletic training program for young athletes',
   generator: 'v0.app',
   manifest: '/manifest.json',
-  themeColor: '#3b82f6',
-  viewport:
-    'width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no',
   appleWebApp: {
     capable: true,
     statusBarStyle: 'default',
     title: 'Teen Training PWA',
   },
+};
+
+export const viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
+  themeColor: '#3b82f6',
 };
 
 export default function RootLayout({
@@ -36,10 +36,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html
-      lang='en'
-      className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-    >
+    <html lang='en' className={`${inter.variable} antialiased`}>
       <body>
         <PWAProvider>
           <Suspense fallback={null}>{children}</Suspense>

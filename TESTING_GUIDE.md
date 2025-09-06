@@ -43,19 +43,19 @@ npm run lint
 
 ## 📋 **Available Scripts**
 
-| Command | Description |
-|---------|-------------|
-| `npm run test` | Run tests in watch mode |
-| `npm run test:ui` | Run tests with interactive UI |
-| `npm run test:run` | Run tests once |
-| `npm run test:coverage` | Run tests with coverage report |
-| `npm run test:e2e` | Run end-to-end tests |
-| `npm run test:e2e:ui` | Run E2E tests with UI |
-| `npm run test:all` | Run both unit and E2E tests |
-| `npm run format` | Format all code with Prettier |
-| `npm run format:check` | Check code formatting |
-| `npm run lint` | Lint code with ESLint |
-| `npm run lint:fix` | Fix linting issues automatically |
+| Command                 | Description                      |
+| ----------------------- | -------------------------------- |
+| `npm run test`          | Run tests in watch mode          |
+| `npm run test:ui`       | Run tests with interactive UI    |
+| `npm run test:run`      | Run tests once                   |
+| `npm run test:coverage` | Run tests with coverage report   |
+| `npm run test:e2e`      | Run end-to-end tests             |
+| `npm run test:e2e:ui`   | Run E2E tests with UI            |
+| `npm run test:all`      | Run both unit and E2E tests      |
+| `npm run format`        | Format all code with Prettier    |
+| `npm run format:check`  | Check code formatting            |
+| `npm run lint`          | Lint code with ESLint            |
+| `npm run lint:fix`      | Fix linting issues automatically |
 
 ## 🔬 **Testing Types**
 
@@ -64,15 +64,16 @@ npm run lint
 **Location**: `test/` directory
 
 **Example**:
+
 ```typescript
 // test/utils.test.ts
-import { describe, it, expect } from 'vitest'
+import { describe, it, expect } from 'vitest';
 
 describe('Math Utils', () => {
   it('should add two numbers correctly', () => {
-    expect(add(2, 3)).toBe(5)
-  })
-})
+    expect(add(2, 3)).toBe(5);
+  });
+});
 ```
 
 ### 2. **Component Tests** (React Testing Library)
@@ -80,6 +81,7 @@ describe('Math Utils', () => {
 **Location**: `test/` directory
 
 **Example**:
+
 ```typescript
 // test/components.test.tsx
 import { render, screen } from '@testing-library/react'
@@ -98,22 +100,24 @@ describe('Button Component', () => {
 **Location**: `test/` directory
 
 **Example**:
+
 ```typescript
 // test/utils.test.ts
-import * as fc from 'fast-check'
+import * as fc from 'fast-check';
 
 describe('Property-based Tests', () => {
   it('addition should be commutative', () => {
     fc.assert(
       fc.property(fc.integer(), fc.integer(), (a, b) => {
-        expect(add(a, b)).toBe(add(b, a))
+        expect(add(a, b)).toBe(add(b, a));
       })
-    )
-  })
-})
+    );
+  });
+});
 ```
 
 **Why Property-Based Testing?**
+
 - Automatically generates test cases
 - Finds edge cases you didn't think of
 - Discovers bugs like the `-0` vs `0` issue we found
@@ -124,14 +128,15 @@ describe('Property-based Tests', () => {
 **Location**: `e2e/` directory
 
 **Example**:
+
 ```typescript
 // e2e/example.spec.ts
-import { test, expect } from '@playwright/test'
+import { test, expect } from '@playwright/test';
 
 test('should load the homepage', async ({ page }) => {
-  await page.goto('/')
-  await expect(page).toHaveTitle(/Teen Training Program/)
-})
+  await page.goto('/');
+  await expect(page).toHaveTitle(/Teen Training Program/);
+});
 ```
 
 ## 🛠 **Code Quality Tools**
@@ -141,6 +146,7 @@ test('should load the homepage', async ({ page }) => {
 **Configuration**: `.eslintrc.json`
 
 **Features**:
+
 - Catches bugs and code issues
 - Enforces coding standards
 - Integrates with Prettier
@@ -151,6 +157,7 @@ test('should load the homepage', async ({ page }) => {
 **Configuration**: `.prettierrc`
 
 **Features**:
+
 - Consistent code formatting
 - Automatic code style enforcement
 - Integrates with ESLint
@@ -160,6 +167,7 @@ test('should load the homepage', async ({ page }) => {
 **Configuration**: `tsconfig.json`
 
 **Features**:
+
 - Static type checking
 - Catches type-related bugs
 - Better IDE support
@@ -168,10 +176,11 @@ test('should load the homepage', async ({ page }) => {
 ## 🔧 **Configuration Files**
 
 ### Vitest Configuration (`vitest.config.ts`)
+
 ```typescript
-import { defineConfig } from 'vitest/config'
-import react from '@vitejs/plugin-react'
-import path from 'path'
+import { defineConfig } from 'vitest/config';
+import react from '@vitejs/plugin-react';
+import path from 'path';
 
 export default defineConfig({
   plugins: [react()],
@@ -187,12 +196,13 @@ export default defineConfig({
       '@': path.resolve(__dirname, './'),
     },
   },
-})
+});
 ```
 
 ### Playwright Configuration (`playwright.config.ts`)
+
 ```typescript
-import { defineConfig, devices } from '@playwright/test'
+import { defineConfig, devices } from '@playwright/test';
 
 export default defineConfig({
   testDir: './e2e',
@@ -210,24 +220,27 @@ export default defineConfig({
     { name: 'firefox', use: { ...devices['Desktop Firefox'] } },
     { name: 'webkit', use: { ...devices['Desktop Safari'] } },
   ],
-})
+});
 ```
 
 ## 🎯 **Best Practices**
 
 ### 1. **Writing Tests**
+
 - Write tests for utility functions first
 - Test component behavior, not implementation
 - Use descriptive test names
 - Keep tests simple and focused
 
 ### 2. **Property-Based Testing**
+
 - Use for mathematical operations
 - Test invariants and properties
 - Let fast-check find edge cases
 - Fix bugs that property tests find
 
 ### 3. **Code Quality**
+
 - Run `npm run format` before committing
 - Fix linting errors immediately
 - Use TypeScript strict mode
@@ -250,11 +263,13 @@ npm run test:coverage
 ## 🔍 **Debugging Tests**
 
 ### Vitest UI
+
 ```bash
 npm run test:ui
 ```
 
 ### Playwright UI
+
 ```bash
 npm run test:e2e:ui
 ```

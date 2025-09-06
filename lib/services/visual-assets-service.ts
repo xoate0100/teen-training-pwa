@@ -93,22 +93,44 @@ export class VisualAssetsService {
   // Achievement Visuals (placeholder for now)
   static readonly ACHIEVEMENT_ASSETS: VisualAsset[] = [
     {
-      id: 'achievement-badge',
-      name: 'Achievement Badge',
-      path: '/images/achievements/badge.svg',
-      alt: 'Achievement badge icon',
+      id: 'strength-warrior',
+      name: 'Strength Warrior Badge',
+      path: '/images/achievements/strength-warrior.svg',
+      alt: 'Strength training achievement badge',
       dimensions: { width: 64, height: 64 },
       category: 'achievement',
-      description: 'Generic achievement badge icon',
+      description:
+        'Blue circular badge with dumbbell icon for strength training achievements',
     },
     {
-      id: 'streak-fire',
-      name: 'Streak Fire Icon',
-      path: '/images/achievements/streak-fire.svg',
-      alt: 'Fire icon for streaks',
-      dimensions: { width: 32, height: 32 },
+      id: 'volleyball-champion',
+      name: 'Volleyball Champion Badge',
+      path: '/images/achievements/volleyball-champion.svg',
+      alt: 'Volleyball achievement badge',
+      dimensions: { width: 64, height: 64 },
       category: 'achievement',
-      description: 'Fire icon representing workout streaks',
+      description:
+        'Red circular badge with volleyball icon for volleyball achievements',
+    },
+    {
+      id: 'explosive-power',
+      name: 'Explosive Power Badge',
+      path: '/images/achievements/explosive-power.svg',
+      alt: 'Plyometric training achievement badge',
+      dimensions: { width: 64, height: 64 },
+      category: 'achievement',
+      description:
+        'Green circular badge with lightning bolt icon for plyometric achievements',
+    },
+    {
+      id: 'fire-streak',
+      name: 'Fire Streak Badge',
+      path: '/images/achievements/fire-streak.svg',
+      alt: 'Streak achievement badge',
+      dimensions: { width: 64, height: 64 },
+      category: 'achievement',
+      description:
+        'Orange circular badge with fire icon for streak achievements',
     },
   ];
 

@@ -21,6 +21,7 @@ import { WellnessIntelligenceDisplay } from '@/components/wellness-intelligence-
 import { HeroBackground } from '@/components/hero-background';
 import { SessionTypeShowcase } from '@/components/session-type-showcase';
 import { ThemedSessionCard } from '@/components/themed-session-card';
+import { GamificationDashboard } from '@/components/gamification-dashboard';
 import { useUser } from '@/lib/contexts/user-context';
 import { useDatabase } from '@/lib/hooks/use-database';
 
@@ -318,7 +319,7 @@ export default function Dashboard() {
 
       <Tabs defaultValue='dashboard' className='w-full'>
         <TabsList
-          className='grid w-full grid-cols-9 mb-6 h-12'
+          className='grid w-full grid-cols-10 mb-6 h-12'
           role='tablist'
           aria-label='Main navigation'
         >
@@ -333,6 +334,9 @@ export default function Dashboard() {
           </TabsTrigger>
           <TabsTrigger value='themes' className='text-base font-medium'>
             Themes
+          </TabsTrigger>
+          <TabsTrigger value='achievements' className='text-base font-medium'>
+            Achievements
           </TabsTrigger>
           <TabsTrigger value='smart' className='text-base font-medium'>
             Smart
@@ -1140,6 +1144,10 @@ export default function Dashboard() {
               console.log('Selected session type:', sessionType);
             }}
           />
+        </TabsContent>
+
+        <TabsContent value='achievements' className='space-y-6'>
+          <GamificationDashboard sessions={[]} checkIns={[]} />
         </TabsContent>
 
         <TabsContent value='wellness' className='space-y-6'>

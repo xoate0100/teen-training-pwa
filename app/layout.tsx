@@ -4,6 +4,7 @@ import { Inter } from 'next/font/google';
 import { Suspense } from 'react';
 import './globals.css';
 import { PWAProvider } from '@/components/pwa-provider';
+import { UserProvider } from '@/lib/contexts/user-context';
 
 const inter = Inter({
   subsets: ['latin'],
@@ -39,7 +40,9 @@ export default function RootLayout({
     <html lang='en' className={`${inter.variable} antialiased`}>
       <body>
         <PWAProvider>
-          <Suspense fallback={null}>{children}</Suspense>
+          <UserProvider>
+            <Suspense fallback={null}>{children}</Suspense>
+          </UserProvider>
         </PWAProvider>
       </body>
     </html>

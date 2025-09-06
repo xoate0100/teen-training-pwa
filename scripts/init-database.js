@@ -35,14 +35,21 @@ async function runSQLFile(filePath) {
     const sql = fs.readFileSync(filePath, 'utf8');
     console.log(`📄 Running SQL file: ${path.basename(filePath)}`);
 
-    const { data, error } = await supabase.rpc('exec_sql', { sql });
+    // Split SQL into individual statements and execute them
+    const statements = sql
+      .split(';')
+      .map(stmt => stmt.trim())
+      .filter(stmt => stmt.length > 0 && !stmt.startsWith('--'));
 
-    if (error) {
-      console.error(
-        `❌ Error running ${path.basename(filePath)}:`,
-        error.message
-      );
-      return false;
+    for (const statement of statements) {
+      if (statement.trim()) {
+        const { error } = await supabase.rpc('exec_sql', { sql: statement });
+        if (error) {
+          console.error(`❌ Error executing statement:`, error.message);
+          console.error(`Statement: ${statement.substring(0, 100)}...`);
+          return false;
+        }
+      }
     }
 
     console.log(`✅ Successfully executed ${path.basename(filePath)}`);
@@ -56,9 +63,10 @@ async function runSQLFile(filePath) {
 async function checkDatabaseConnection() {
   try {
     console.log('🔌 Testing database connection...');
+    // Test with a simple query that doesn't require existing tables
     const { data, error } = await supabase
-      .from('users')
-      .select('count')
+      .from('pg_tables')
+      .select('tablename')
       .limit(1);
 
     if (error) {

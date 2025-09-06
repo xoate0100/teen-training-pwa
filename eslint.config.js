@@ -56,6 +56,14 @@ export default [
     },
   },
   {
-    ignores: ['node_modules/**', '.next/**', 'dist/**', 'build/**'],
+    ignores: [
+      'node_modules/**',
+      '.next/**',
+      'dist/**',
+      'build/**',
+      'scripts/**',
+      'test-results/**',
+      'playwright-report/**',
+    ],
   },
 ];

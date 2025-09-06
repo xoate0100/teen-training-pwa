@@ -8,12 +8,9 @@ import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Slider } from '@/components/ui/slider';
+import { ProfileSwitcher } from '@/components/profile-switcher';
+import { useUser } from '@/lib/contexts/user-context';
 
-const Calendar = () => (
-  <span role='img' aria-label='Calendar'>
-    📅
-  </span>
-);
 const Trophy = () => (
   <span role='img' aria-label='Trophy'>
     🏆
@@ -34,24 +31,14 @@ const Heart = () => (
     ❤️
   </span>
 );
-const Moon = () => (
-  <span role='img' aria-label='Moon'>
-    🌙
-  </span>
-);
-const Utensils = () => (
-  <span role='img' aria-label='Utensils'>
-    🍽️
-  </span>
-);
 const Play = () => (
   <span role='img' aria-label='Play'>
     ▶️
   </span>
 );
-const CheckCircle = () => (
-  <span role='img' aria-label='Check Circle'>
-    ✅
+const Check = () => (
+  <span role='img' aria-label='Check'>
+    ✓
   </span>
 );
 const Star = () => (
@@ -67,21 +54,6 @@ const TrendingUp = () => (
 const Award = () => (
   <span role='img' aria-label='Award'>
     🏅
-  </span>
-);
-const Clock = () => (
-  <span role='img' aria-label='Clock'>
-    🕐
-  </span>
-);
-const Check = () => (
-  <span role='img' aria-label='Check'>
-    ✓
-  </span>
-);
-const Settings = () => (
-  <span role='img' aria-label='Settings'>
-    ⚙️
   </span>
 );
 const Eye = () => (
@@ -107,8 +79,8 @@ const ChevronUp = () => (
 
 export default function Dashboard() {
   const router = useRouter();
+  const { currentUser, isLoading: userLoading } = useUser();
   const [announcements, setAnnouncements] = useState('');
-  const [selectedDay, setSelectedDay] = useState('monday');
   const [mood, setMood] = useState(4);
   const [energy, setEnergy] = useState([7]);
   const [sleepHours, setSleepHours] = useState(8);
@@ -185,6 +157,34 @@ export default function Dashboard() {
     { name: 'Consistency King', icon: Star, earned: true },
   ];
 
+  // Show loading state while user data is being fetched
+  if (userLoading) {
+    return (
+      <div className='min-h-screen bg-background p-4 pb-20 flex items-center justify-center'>
+        <div className='text-center space-y-4'>
+          <div className='w-16 h-16 bg-primary/20 rounded-full animate-pulse mx-auto' />
+          <p className='text-muted-foreground'>Loading user data...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Show message if no user is selected
+  if (!currentUser) {
+    return (
+      <div className='min-h-screen bg-background p-4 pb-20 flex items-center justify-center'>
+        <div className='text-center space-y-4 max-w-md'>
+          <div className='text-6xl'>👤</div>
+          <h2 className='text-2xl font-bold'>No User Selected</h2>
+          <p className='text-muted-foreground'>
+            Please select a user from the profile switcher to continue.
+          </p>
+          <ProfileSwitcher />
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className='min-h-screen bg-background p-4 pb-20'>
       <div aria-live='polite' aria-atomic='true' className='sr-only'>
@@ -198,21 +198,28 @@ export default function Dashboard() {
               Teen Training Hub
             </h1>
             <p className='text-base text-muted-foreground leading-relaxed'>
-              Week 6 of 11 • Let's crush today! 💪
+              {currentUser
+                ? `Welcome back, ${currentUser.full_name}! • Week ${currentUser.current_week || 1} of 11 • Let's crush today! 💪`
+                : 'Loading...'}
             </p>
           </div>
-          <Button
-            variant='outline'
-            size='sm'
-            onClick={() => setSimpleMode(!simpleMode)}
-            className='flex items-center gap-2 h-12 px-4'
-            aria-label={
-              simpleMode ? 'Switch to full view mode' : 'Switch to simple mode'
-            }
-          >
-            {simpleMode ? <Eye /> : <EyeOff />}
-            {simpleMode ? 'Full View' : 'Simple Mode'}
-          </Button>
+          <div className='flex items-center gap-3'>
+            <Button
+              variant='outline'
+              size='sm'
+              onClick={() => setSimpleMode(!simpleMode)}
+              className='flex items-center gap-2 h-12 px-4'
+              aria-label={
+                simpleMode
+                  ? 'Switch to full view mode'
+                  : 'Switch to simple mode'
+              }
+            >
+              {simpleMode ? <Eye /> : <EyeOff />}
+              {simpleMode ? 'Full View' : 'Simple Mode'}
+            </Button>
+            <ProfileSwitcher />
+          </div>
         </div>
 
         {simpleMode && (

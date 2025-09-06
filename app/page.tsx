@@ -16,6 +16,7 @@ import { OfflineStatus } from '@/components/offline-status';
 import { WeekCalculationDisplay } from '@/components/week-calculation-display';
 import { SmartSchedulingDisplay } from '@/components/smart-scheduling-display';
 import { AIIntelligenceDisplay } from '@/components/ai-intelligence-display';
+import { LLMIntegrationDisplay } from '@/components/llm-integration-display';
 import { useUser } from '@/lib/contexts/user-context';
 import { useDatabase } from '@/lib/hooks/use-database';
 
@@ -311,7 +312,7 @@ export default function Dashboard() {
 
       <Tabs defaultValue='dashboard' className='w-full'>
         <TabsList
-          className='grid w-full grid-cols-6 mb-6 h-12'
+          className='grid w-full grid-cols-7 mb-6 h-12'
           role='tablist'
           aria-label='Main navigation'
         >
@@ -329,6 +330,9 @@ export default function Dashboard() {
           </TabsTrigger>
           <TabsTrigger value='ai' className='text-base font-medium'>
             AI
+          </TabsTrigger>
+          <TabsTrigger value='coaching' className='text-base font-medium'>
+            Coaching
           </TabsTrigger>
           <TabsTrigger value='profile' className='text-base font-medium'>
             Profile
@@ -1117,6 +1121,18 @@ export default function Dashboard() {
             progressMetrics={[]}
             currentPhase="build"
             availableEquipment={['bodyweight', 'barbell', 'weights', 'bench']}
+          />
+        </TabsContent>
+
+        <TabsContent value='coaching' className='space-y-6'>
+          <LLMIntegrationDisplay 
+            sessions={[]}
+            checkIns={[]}
+            progressMetrics={[]}
+            behaviorInsights={null}
+            performanceForecast={null}
+            userId="default-user"
+            currentPhase="build"
           />
         </TabsContent>
       </Tabs>

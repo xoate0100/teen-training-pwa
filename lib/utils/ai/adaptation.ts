@@ -1,9 +1,16 @@
 import OpenAI from 'openai';
-import { DailyCheckIn, SetLog, Session } from '@/lib/types/database';
+import { SetLog, Session } from '@/lib/types/database';
 
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
+let openai: OpenAI | null = null;
+
+function getOpenAI(): OpenAI | null {
+  if (!openai && process.env.OPENAI_API_KEY) {
+    openai = new OpenAI({
+      apiKey: process.env.OPENAI_API_KEY,
+    });
+  }
+  return openai;
+}
 
 export interface AdaptationRecommendation {
   intensity_adjustment: number; // -1 to 1 scale
@@ -30,6 +37,19 @@ export async function analyzeWellnessAndAdapt(
   recentSessions: Session[],
   recentSetLogs: SetLog[]
 ): Promise<AdaptationRecommendation> {
+  // Return default recommendations if OpenAI is not configured
+  const openaiClient = getOpenAI();
+  if (!openaiClient) {
+    return {
+      intensity_adjustment: 0,
+      rest_time_adjustment: 1.0,
+      exercise_substitutions: [],
+      motivational_message:
+        'Keep up the great work! Listen to your body and adjust as needed.',
+      safety_notes: ['Always warm up properly', 'Stop if you feel pain'],
+    };
+  }
+
   try {
     const prompt = `
 You are an AI training coach for teenage athletes. Analyze the following data and provide adaptation recommendations:
@@ -64,7 +84,7 @@ Consider:
 - Safety first - always prioritize injury prevention
 `;
 
-    const response = await openai.chat.completions.create({
+    const response = await openaiClient.chat.completions.create({
       model: 'gpt-4',
       messages: [
         {
@@ -125,6 +145,12 @@ export async function generateMotivationalMessage(performanceData: {
   upcoming_goals: string[];
   current_challenges: string[];
 }): Promise<string> {
+  // Return default message if OpenAI is not configured
+  const openaiClient = getOpenAI();
+  if (!openaiClient) {
+    return "Keep pushing forward! You're doing great!";
+  }
+
   try {
     const prompt = `
 Generate a personalized motivational message for a teenage athlete based on:
@@ -142,7 +168,7 @@ Make it:
 - Positive and motivating tone
 `;
 
-    const response = await openai.chat.completions.create({
+    const response = await openaiClient.chat.completions.create({
       model: 'gpt-4',
       messages: [
         {
@@ -176,6 +202,12 @@ export async function generateFormCues(
   exerciseName: string,
   commonMistakes: string[] = []
 ): Promise<string[]> {
+  // Return default cues if OpenAI is not configured
+  const openaiClient = getOpenAI();
+  if (!openaiClient) {
+    return ['Keep good form', 'Breathe properly', 'Control the movement'];
+  }
+
   try {
     const prompt = `
 Generate 3-5 key form cues for the exercise: ${exerciseName}
@@ -191,7 +223,7 @@ Provide cues that are:
 Format as a simple list, one cue per line.
 `;
 
-    const response = await openai.chat.completions.create({
+    const response = await openaiClient.chat.completions.create({
       model: 'gpt-4',
       messages: [
         {

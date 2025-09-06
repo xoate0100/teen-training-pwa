@@ -142,11 +142,11 @@ _Dependencies: Phase 1 | Timeline: 2-3 weeks_
 
 ### 3.1 Visual Assets Implementation
 
-- [ ] **3.1.1** Implement hero backgrounds and imagery
-  - [ ] Main dashboard hero with diverse teen athletes
-  - [ ] Session launch backgrounds by type
-  - [ ] Progress celebration imagery
-  - [ ] Motivational quote backgrounds
+- [x] **3.1.1** Implement hero backgrounds and imagery
+  - [x] Main dashboard hero with diverse teen athletes
+  - [x] Session launch backgrounds by type
+  - [x] Progress celebration imagery
+  - [x] Motivational quote backgrounds
 - [ ] **3.1.2** Create session type visual themes
   - [ ] Strength training visual identity
   - [ ] Volleyball skills imagery

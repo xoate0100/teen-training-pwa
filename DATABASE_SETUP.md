@@ -3,6 +3,7 @@
 ## 🚀 Quick Start
 
 ### Prerequisites
+
 1. **Supabase Account** - Sign up at [supabase.com](https://supabase.com)
 2. **Node.js** - Version 18 or higher
 3. **Environment Variables** - Configured in `.env.local`
@@ -57,6 +58,7 @@ npm run db:init
 ```
 
 This will:
+
 - ✅ Create all database tables
 - ✅ Set up Row Level Security (RLS) policies
 - ✅ Create performance indexes
@@ -79,17 +81,17 @@ npm run test:api
 
 ### Core Tables
 
-| Table | Purpose | Key Features |
-|-------|---------|--------------|
-| `users` | User profiles | Age validation (13-19), profile data JSON |
-| `daily_check_ins` | Wellness tracking | Mood, energy, sleep, soreness tracking |
-| `exercises` | Exercise library | Built-in + custom exercises, difficulty levels |
-| `sessions` | Workout sessions | 11-week program, AM/PM sessions |
-| `session_exercises` | Session exercises | Order, sets, reps, weight, rest time |
-| `set_logs` | Set completions | RPE, weight, reps, individual set data |
-| `progress_metrics` | Performance data | Broad jump, sprint times, accuracy |
-| `achievements` | Gamification | Streaks, milestones, badges |
-| `safety_alerts` | Safety monitoring | Fatigue, form, load, injury risk alerts |
+| Table               | Purpose           | Key Features                                   |
+| ------------------- | ----------------- | ---------------------------------------------- |
+| `users`             | User profiles     | Age validation (13-19), profile data JSON      |
+| `daily_check_ins`   | Wellness tracking | Mood, energy, sleep, soreness tracking         |
+| `exercises`         | Exercise library  | Built-in + custom exercises, difficulty levels |
+| `sessions`          | Workout sessions  | 11-week program, AM/PM sessions                |
+| `session_exercises` | Session exercises | Order, sets, reps, weight, rest time           |
+| `set_logs`          | Set completions   | RPE, weight, reps, individual set data         |
+| `progress_metrics`  | Performance data  | Broad jump, sprint times, accuracy             |
+| `achievements`      | Gamification      | Streaks, milestones, badges                    |
+| `safety_alerts`     | Safety monitoring | Fatigue, form, load, injury risk alerts        |
 
 ### Security Features
 
@@ -103,16 +105,19 @@ npm run test:api
 The database comes pre-populated with:
 
 ### Exercises (12 total)
+
 - **Lower Body**: Bodyweight Squat, Goblet Squat, Jump Squat, Lateral Bounds
 - **Upper Body**: Push-up, Dumbbell Row, Pull-up
 - **Core**: Plank, Mountain Climbers
 - **Sport-Specific**: Volleyball Serve, Broad Jump, 10-Yard Sprint
 
 ### Sample Users
+
 - **Test User**: 16-year-old volleyball player (intermediate)
 - **Demo Athlete**: 17-year-old basketball player (beginner)
 
 ### Sample Data
+
 - **Check-ins**: 5 days of wellness data
 - **Sessions**: Week 1 training sessions
 - **Set Logs**: Completed workout data with RPE
@@ -125,12 +130,14 @@ The database comes pre-populated with:
 If you prefer to set up the database manually:
 
 ### 1. Run Schema
+
 1. Go to your Supabase project dashboard
 2. Navigate to **SQL Editor**
 3. Copy the contents of `lib/database/schema.sql`
 4. Paste and execute the SQL
 
 ### 2. Add Sample Data
+
 1. Copy the contents of `lib/database/seed-data.sql`
 2. Paste and execute in the SQL Editor
 
@@ -139,21 +146,25 @@ If you prefer to set up the database manually:
 ### Common Issues
 
 #### "Missing environment variables"
+
 - Ensure `.env.local` file exists in project root
 - Check that all required variables are set
 - Restart the development server after changes
 
 #### "Database connection failed"
+
 - Verify Supabase project is active
 - Check that API keys are correct
 - Ensure project URL is properly formatted
 
 #### "Permission denied" errors
+
 - Verify service role key is used for admin operations
 - Check RLS policies are properly configured
 - Ensure user authentication is working
 
 #### "Table doesn't exist" errors
+
 - Run the schema setup again
 - Check that all tables were created successfully
 - Verify you're using the correct database

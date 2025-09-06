@@ -1,25 +1,25 @@
-import OpenAI from 'openai'
-import { DailyCheckIn, SetLog, Session } from '@/lib/types/database'
+import OpenAI from 'openai';
+import { DailyCheckIn, SetLog, Session } from '@/lib/types/database';
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
-})
+});
 
 export interface AdaptationRecommendation {
-  intensity_adjustment: number // -1 to 1 scale
-  rest_time_adjustment: number // multiplier
-  exercise_substitutions: string[]
-  motivational_message: string
-  safety_notes: string[]
+  intensity_adjustment: number; // -1 to 1 scale
+  rest_time_adjustment: number; // multiplier
+  exercise_substitutions: string[];
+  motivational_message: string;
+  safety_notes: string[];
 }
 
 export interface WellnessData {
-  mood: number
-  energy_level: number
-  sleep_hours: number
-  muscle_soreness: number
-  recent_rpe_trend: number[]
-  recent_workout_frequency: number
+  mood: number;
+  energy_level: number;
+  sleep_hours: number;
+  muscle_soreness: number;
+  recent_rpe_trend: number[];
+  recent_workout_frequency: number;
 }
 
 /**
@@ -62,68 +62,69 @@ Consider:
 - High RPE trend (>7) = reduce intensity
 - Low mood (<3) = motivational focus, lighter session
 - Safety first - always prioritize injury prevention
-`
+`;
 
     const response = await openai.chat.completions.create({
-      model: "gpt-4",
+      model: 'gpt-4',
       messages: [
         {
-          role: "system",
-          content: "You are an expert youth athletic training coach with 20+ years experience. Focus on safety, proper progression, and maintaining motivation for teenage athletes."
+          role: 'system',
+          content:
+            'You are an expert youth athletic training coach with 20+ years experience. Focus on safety, proper progression, and maintaining motivation for teenage athletes.',
         },
         {
-          role: "user",
-          content: prompt
-        }
+          role: 'user',
+          content: prompt,
+        },
       ],
       temperature: 0.7,
-      max_tokens: 500
-    })
+      max_tokens: 500,
+    });
 
-    const content = response.choices[0]?.message?.content
+    const content = response.choices[0]?.message?.content;
     if (!content) {
-      throw new Error('No response from OpenAI')
+      throw new Error('No response from OpenAI');
     }
 
     // Parse the JSON response
-    const recommendation = JSON.parse(content) as AdaptationRecommendation
+    const recommendation = JSON.parse(content) as AdaptationRecommendation;
 
     // Validate the response structure
-    if (typeof recommendation.intensity_adjustment !== 'number' ||
-        typeof recommendation.rest_time_adjustment !== 'number' ||
-        !Array.isArray(recommendation.exercise_substitutions) ||
-        typeof recommendation.motivational_message !== 'string' ||
-        !Array.isArray(recommendation.safety_notes)) {
-      throw new Error('Invalid response format from OpenAI')
+    if (
+      typeof recommendation.intensity_adjustment !== 'number' ||
+      typeof recommendation.rest_time_adjustment !== 'number' ||
+      !Array.isArray(recommendation.exercise_substitutions) ||
+      typeof recommendation.motivational_message !== 'string' ||
+      !Array.isArray(recommendation.safety_notes)
+    ) {
+      throw new Error('Invalid response format from OpenAI');
     }
 
-    return recommendation
-
+    return recommendation;
   } catch (error) {
-    console.error('Error in AI adaptation analysis:', error)
-    
+    console.error('Error in AI adaptation analysis:', error);
+
     // Return safe default recommendations
     return {
       intensity_adjustment: 0,
       rest_time_adjustment: 1.0,
       exercise_substitutions: [],
-      motivational_message: "Keep up the great work! Listen to your body and adjust as needed.",
-      safety_notes: ["Always warm up properly", "Stop if you feel pain"]
-    }
+      motivational_message:
+        'Keep up the great work! Listen to your body and adjust as needed.',
+      safety_notes: ['Always warm up properly', 'Stop if you feel pain'],
+    };
   }
 }
 
 /**
  * Generate personalized motivational messages based on performance trends
  */
-export async function generateMotivationalMessage(
-  performanceData: {
-    streak_days: number
-    recent_improvements: string[]
-    upcoming_goals: string[]
-    current_challenges: string[]
-  }
-): Promise<string> {
+export async function generateMotivationalMessage(performanceData: {
+  streak_days: number;
+  recent_improvements: string[];
+  upcoming_goals: string[];
+  current_challenges: string[];
+}): Promise<string> {
   try {
     const prompt = `
 Generate a personalized motivational message for a teenage athlete based on:
@@ -139,29 +140,32 @@ Make it:
 - Specific to their achievements
 - 1-2 sentences max
 - Positive and motivating tone
-`
+`;
 
     const response = await openai.chat.completions.create({
-      model: "gpt-4",
+      model: 'gpt-4',
       messages: [
         {
-          role: "system",
-          content: "You are a motivational youth sports coach. Write encouraging, age-appropriate messages for teenage athletes."
+          role: 'system',
+          content:
+            'You are a motivational youth sports coach. Write encouraging, age-appropriate messages for teenage athletes.',
         },
         {
-          role: "user",
-          content: prompt
-        }
+          role: 'user',
+          content: prompt,
+        },
       ],
       temperature: 0.8,
-      max_tokens: 100
-    })
+      max_tokens: 100,
+    });
 
-    return response.choices[0]?.message?.content || "Keep pushing forward! You're doing great!"
-
+    return (
+      response.choices[0]?.message?.content ||
+      "Keep pushing forward! You're doing great!"
+    );
   } catch (error) {
-    console.error('Error generating motivational message:', error)
-    return "Keep pushing forward! You're doing great!"
+    console.error('Error generating motivational message:', error);
+    return "Keep pushing forward! You're doing great!";
   }
 }
 
@@ -185,34 +189,36 @@ Provide cues that are:
 - Age-appropriate for teens
 
 Format as a simple list, one cue per line.
-`
+`;
 
     const response = await openai.chat.completions.create({
-      model: "gpt-4",
+      model: 'gpt-4',
       messages: [
         {
-          role: "system",
-          content: "You are an expert strength and conditioning coach. Provide clear, concise form cues for exercises."
+          role: 'system',
+          content:
+            'You are an expert strength and conditioning coach. Provide clear, concise form cues for exercises.',
         },
         {
-          role: "user",
-          content: prompt
-        }
+          role: 'user',
+          content: prompt,
+        },
       ],
       temperature: 0.6,
-      max_tokens: 200
-    })
+      max_tokens: 200,
+    });
 
-    const content = response.choices[0]?.message?.content
-    if (!content) return ["Keep good form", "Breathe properly", "Control the movement"]
+    const content = response.choices[0]?.message?.content;
+    if (!content)
+      return ['Keep good form', 'Breathe properly', 'Control the movement'];
 
-    return content.split('\n')
+    return content
+      .split('\n')
       .map(cue => cue.trim())
       .filter(cue => cue.length > 0)
-      .slice(0, 5) // Limit to 5 cues
-
+      .slice(0, 5); // Limit to 5 cues
   } catch (error) {
-    console.error('Error generating form cues:', error)
-    return ["Keep good form", "Breathe properly", "Control the movement"]
+    console.error('Error generating form cues:', error);
+    return ['Keep good form', 'Breathe properly', 'Control the movement'];
   }
 }

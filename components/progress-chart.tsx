@@ -23,6 +23,7 @@ import {
   Crown,
 } from 'lucide-react';
 import { useEffect, useState } from 'react';
+import { useDatabase } from '@/lib/hooks/use-database';
 
 interface ProgressData {
   week: string;
@@ -47,6 +48,7 @@ interface SessionData {
 }
 
 export function ProgressChart() {
+  const { sessions, checkIns, isLoading } = useDatabase();
   const [progressData, setProgressData] = useState<ProgressData[]>([]);
   const [recentSessions, setRecentSessions] = useState<SessionData[]>([]);
   const [weeklyStats, setWeeklyStats] = useState({
@@ -69,14 +71,9 @@ export function ProgressChart() {
   >([]);
 
   useEffect(() => {
-    const loadProgressData = () => {
-      const sessions = JSON.parse(
-        localStorage.getItem('trainingSessions') || '[]'
-      );
-      const checkIns = JSON.parse(
-        localStorage.getItem('dailyCheckIns') || '[]'
-      );
+    if (isLoading || !sessions || !checkIns) return;
 
+    const loadProgressData = () => {
       setRecentSessions(sessions.slice(-7)); // Last 7 sessions
 
       // Calculate weekly progress from actual session data
@@ -96,13 +93,7 @@ export function ProgressChart() {
     };
 
     loadProgressData();
-
-    // Listen for storage changes to update in real-time
-    const handleStorageChange = () => loadProgressData();
-    window.addEventListener('storage', handleStorageChange);
-
-    return () => window.removeEventListener('storage', handleStorageChange);
-  }, []);
+  }, [sessions, checkIns, isLoading]);
 
   const calculateWeeklyProgress = (sessions: SessionData[]): ProgressData[] => {
     // Group sessions by week and calculate averages
@@ -115,10 +106,11 @@ export function ProgressChart() {
       const weekEnd = new Date(weekStart);
       weekEnd.setDate(weekStart.getDate() + 6);
 
-      const weekSessions = sessions.filter(session => {
-        const sessionDate = new Date(session.date);
-        return sessionDate >= weekStart && sessionDate <= weekEnd;
-      });
+      // Filter sessions for this week (available for future calculations)
+      // const weekSessions = sessions.filter(session => {
+      //   const sessionDate = new Date(session.date);
+      //   return sessionDate >= weekStart && sessionDate <= weekEnd;
+      // });
 
       // Calculate metrics based on actual session data or use baseline + progression
       const baselineJump = 15 + (week - 1) * 0.5;
@@ -269,6 +261,22 @@ export function ProgressChart() {
 
     return baseAchievements;
   };
+
+  if (isLoading) {
+    return (
+      <div className='space-y-6'>
+        <div className='flex justify-between items-center'>
+          <h2 className='text-2xl font-bold'>Progress Tracking</h2>
+        </div>
+        <div className='flex items-center justify-center h-64'>
+          <div className='text-center space-y-4'>
+            <div className='w-16 h-16 bg-primary/20 rounded-full animate-pulse mx-auto' />
+            <p className='text-muted-foreground'>Loading progress data...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className='space-y-8'>

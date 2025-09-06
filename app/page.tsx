@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -11,6 +11,7 @@ import { Slider } from '@/components/ui/slider';
 import { ProfileSwitcher } from '@/components/profile-switcher';
 import { UserOnboarding } from '@/components/user-onboarding';
 import { useUser } from '@/lib/contexts/user-context';
+import { useDatabase } from '@/lib/hooks/use-database';
 
 const Trophy = () => (
   <span role='img' aria-label='Trophy'>
@@ -86,6 +87,7 @@ export default function Dashboard() {
     users,
     refreshUsers,
   } = useUser();
+  const { saveCheckIn, checkIns } = useDatabase();
   const [announcements, setAnnouncements] = useState('');
   const [mood, setMood] = useState(4);
   const [energy, setEnergy] = useState([7]);
@@ -108,14 +110,43 @@ export default function Dashboard() {
 
   const sleepPresets = [6, 7, 8, 9];
 
-  const handleCheckInSubmit = () => {
-    setCheckInCompleted(true);
-    setShowCelebration(true);
-    setAnnouncements('Daily check-in completed successfully!');
-    setTimeout(() => {
-      setShowCelebration(false);
-      setAnnouncements('');
-    }, 2000);
+  // Check if today's check-in is already completed
+  useEffect(() => {
+    if (checkIns && checkIns.length > 0) {
+      const today = new Date().toISOString().split('T')[0];
+      const todayCheckIn = checkIns.find(checkIn => checkIn.date === today);
+      if (todayCheckIn) {
+        setCheckInCompleted(true);
+        setMood(todayCheckIn.mood);
+        setEnergy([todayCheckIn.energy]);
+        setSleepHours(todayCheckIn.sleep);
+        setMuscleSoreness([todayCheckIn.soreness]);
+      }
+    }
+  }, [checkIns]);
+
+  const handleCheckInSubmit = async () => {
+    try {
+      const today = new Date().toISOString().split('T')[0];
+      await saveCheckIn({
+        date: today,
+        mood,
+        energy: energy[0],
+        sleep: sleepHours,
+        soreness: muscleSoreness[0],
+      });
+
+      setCheckInCompleted(true);
+      setShowCelebration(true);
+      setAnnouncements('Daily check-in completed successfully!');
+      setTimeout(() => {
+        setShowCelebration(false);
+        setAnnouncements('');
+      }, 2000);
+    } catch (error) {
+      console.error('Error saving check-in:', error);
+      setAnnouncements('Failed to save check-in. Please try again.');
+    }
   };
 
   const handleStartSession = (sessionType?: string) => {

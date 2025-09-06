@@ -1,6 +1,7 @@
 # Teen Training PWA - API Documentation
 
 ## 📋 Table of Contents
+
 - [Overview](#overview)
 - [Authentication](#authentication)
 - [Base URL](#base-url)
@@ -16,6 +17,7 @@
 The Teen Training PWA API provides a comprehensive set of endpoints for managing training sessions, user data, exercises, and AI-powered features. All endpoints are built with Next.js API routes and use Supabase for data persistence.
 
 ### Key Features
+
 - **RESTful API Design**: Standard HTTP methods and status codes
 - **TypeScript Support**: Full type safety across all endpoints
 - **Real-time Updates**: Supabase real-time subscriptions
@@ -28,6 +30,7 @@ The Teen Training PWA API provides a comprehensive set of endpoints for managing
 ## 🔐 Authentication
 
 ### Supabase Authentication
+
 All API endpoints use Supabase for authentication. Include the user's JWT token in the Authorization header:
 
 ```http
@@ -35,17 +38,20 @@ Authorization: Bearer <user_jwt_token>
 ```
 
 ### Getting User Token
+
 ```javascript
 // Client-side
-const { data: { session } } = await supabase.auth.getSession()
-const token = session?.access_token
+const {
+  data: { session },
+} = await supabase.auth.getSession();
+const token = session?.access_token;
 
 // Use in API calls
 fetch('/api/sessions', {
   headers: {
-    'Authorization': `Bearer ${token}`
-  }
-})
+    Authorization: `Bearer ${token}`,
+  },
+});
 ```
 
 ---
@@ -60,6 +66,7 @@ fetch('/api/sessions', {
 ## ⚠️ Error Handling
 
 ### Standard Error Response
+
 ```json
 {
   "error": "Error message",
@@ -69,6 +76,7 @@ fetch('/api/sessions', {
 ```
 
 ### HTTP Status Codes
+
 - `200` - Success
 - `201` - Created
 - `400` - Bad Request
@@ -84,14 +92,17 @@ fetch('/api/sessions', {
 ### Session Management
 
 #### GET /api/sessions
+
 Get all training sessions for the authenticated user.
 
 **Query Parameters:**
+
 - `limit` (optional): Number of sessions to return (default: 10)
 - `offset` (optional): Number of sessions to skip (default: 0)
 - `status` (optional): Filter by session status (`completed`, `in_progress`, `scheduled`)
 
 **Response:**
+
 ```json
 {
   "sessions": [
@@ -115,9 +126,11 @@ Get all training sessions for the authenticated user.
 ```
 
 #### POST /api/sessions
+
 Create a new training session.
 
 **Request Body:**
+
 ```json
 {
   "program_id": "uuid",
@@ -137,6 +150,7 @@ Create a new training session.
 ```
 
 **Response:**
+
 ```json
 {
   "session": {
@@ -154,9 +168,11 @@ Create a new training session.
 ```
 
 #### GET /api/sessions/[id]
+
 Get a specific training session by ID.
 
 **Response:**
+
 ```json
 {
   "session": {
@@ -195,9 +211,11 @@ Get a specific training session by ID.
 ```
 
 #### PUT /api/sessions/[id]
+
 Update a training session.
 
 **Request Body:**
+
 ```json
 {
   "status": "completed",
@@ -207,9 +225,11 @@ Update a training session.
 ```
 
 #### DELETE /api/sessions/[id]
+
 Delete a training session.
 
 **Response:**
+
 ```json
 {
   "message": "Session deleted successfully"
@@ -219,15 +239,18 @@ Delete a training session.
 ### Check-ins
 
 #### GET /api/check-ins
+
 Get daily check-ins for the authenticated user.
 
 **Query Parameters:**
+
 - `limit` (optional): Number of check-ins to return (default: 30)
 - `offset` (optional): Number of check-ins to skip (default: 0)
 - `start_date` (optional): Start date filter (ISO 8601)
 - `end_date` (optional): End date filter (ISO 8601)
 
 **Response:**
+
 ```json
 {
   "check_ins": [
@@ -250,9 +273,11 @@ Get daily check-ins for the authenticated user.
 ```
 
 #### POST /api/check-ins
+
 Create a new daily check-in.
 
 **Request Body:**
+
 ```json
 {
   "date": "2024-01-01",
@@ -267,6 +292,7 @@ Create a new daily check-in.
 ```
 
 **Response:**
+
 ```json
 {
   "check_in": {
@@ -288,9 +314,11 @@ Create a new daily check-in.
 ### Exercises
 
 #### GET /api/exercises
+
 Get the exercise library with filtering and pagination.
 
 **Query Parameters:**
+
 - `limit` (optional): Number of exercises to return (default: 20)
 - `offset` (optional): Number of exercises to skip (default: 0)
 - `category` (optional): Filter by exercise category
@@ -300,6 +328,7 @@ Get the exercise library with filtering and pagination.
 - `search` (optional): Search by exercise name
 
 **Response:**
+
 ```json
 {
   "exercises": [
@@ -321,9 +350,11 @@ Get the exercise library with filtering and pagination.
 ```
 
 #### POST /api/exercises
+
 Create a custom exercise.
 
 **Request Body:**
+
 ```json
 {
   "name": "Custom Exercise",
@@ -338,9 +369,11 @@ Create a custom exercise.
 ```
 
 #### GET /api/exercises/sync
+
 Sync exercises from external sources (ExerciseDB).
 
 **Response:**
+
 ```json
 {
   "message": "Exercises synced successfully",
@@ -350,13 +383,16 @@ Sync exercises from external sources (ExerciseDB).
 ```
 
 #### GET /api/exercises/videos
+
 Search for exercise demonstration videos.
 
 **Query Parameters:**
+
 - `exercise_name` (required): Name of the exercise to search for
 - `limit` (optional): Number of videos to return (default: 5)
 
 **Response:**
+
 ```json
 {
   "videos": [
@@ -375,9 +411,11 @@ Search for exercise demonstration videos.
 ### AI & Adaptation
 
 #### POST /api/ai/adaptation
+
 Get AI-powered training recommendations based on user data.
 
 **Request Body:**
+
 ```json
 {
   "user_id": "uuid",
@@ -398,6 +436,7 @@ Get AI-powered training recommendations based on user data.
 ```
 
 **Response:**
+
 ```json
 {
   "recommendations": {
@@ -423,9 +462,11 @@ Get AI-powered training recommendations based on user data.
 ### Safety Monitoring
 
 #### POST /api/safety/monitor
+
 Get real-time safety assessment and alerts.
 
 **Request Body:**
+
 ```json
 {
   "user_id": "uuid",
@@ -446,6 +487,7 @@ Get real-time safety assessment and alerts.
 ```
 
 **Response:**
+
 ```json
 {
   "safety_assessment": {
@@ -463,12 +505,15 @@ Get real-time safety assessment and alerts.
 ### Program Management
 
 #### GET /api/program
+
 Get the user's training program.
 
 **Query Parameters:**
+
 - `week` (optional): Specific week to retrieve (default: current week)
 
 **Response:**
+
 ```json
 {
   "program": {
@@ -494,9 +539,11 @@ Get the user's training program.
 ```
 
 #### POST /api/program
+
 Generate a new training program for the user.
 
 **Request Body:**
+
 ```json
 {
   "user_id": "uuid",
@@ -512,6 +559,7 @@ Generate a new training program for the user.
 ## 📊 Data Models
 
 ### User
+
 ```typescript
 interface User {
   id: string;
@@ -527,6 +575,7 @@ interface User {
 ```
 
 ### Session
+
 ```typescript
 interface Session {
   id: string;
@@ -545,6 +594,7 @@ interface Session {
 ```
 
 ### Exercise
+
 ```typescript
 interface Exercise {
   id: string;
@@ -562,6 +612,7 @@ interface Exercise {
 ```
 
 ### Check-in
+
 ```typescript
 interface CheckIn {
   id: string;
@@ -590,7 +641,7 @@ const sessionResponse = await fetch('/api/sessions', {
   method: 'POST',
   headers: {
     'Content-Type': 'application/json',
-    'Authorization': `Bearer ${token}`
+    Authorization: `Bearer ${token}`,
   },
   body: JSON.stringify({
     program_id: 'program-uuid',
@@ -603,42 +654,45 @@ const sessionResponse = await fetch('/api/sessions', {
         sets: 3,
         reps: 10,
         weight: 50,
-        rest_seconds: 90
-      }
-    ]
-  })
+        rest_seconds: 90,
+      },
+    ],
+  }),
 });
 
 const { session } = await sessionResponse.json();
 
 // 2. Log a set
-const setResponse = await fetch(`/api/sessions/${session.id}/exercises/${exerciseId}/sets`, {
-  method: 'POST',
-  headers: {
-    'Content-Type': 'application/json',
-    'Authorization': `Bearer ${token}`
-  },
-  body: JSON.stringify({
-    set_number: 1,
-    reps: 10,
-    weight: 50,
-    rpe: 7,
-    notes: 'Felt good'
-  })
-});
+const setResponse = await fetch(
+  `/api/sessions/${session.id}/exercises/${exerciseId}/sets`,
+  {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify({
+      set_number: 1,
+      reps: 10,
+      weight: 50,
+      rpe: 7,
+      notes: 'Felt good',
+    }),
+  }
+);
 
 // 3. Complete the session
 const completeResponse = await fetch(`/api/sessions/${session.id}`, {
   method: 'PUT',
   headers: {
     'Content-Type': 'application/json',
-    'Authorization': `Bearer ${token}`
+    Authorization: `Bearer ${token}`,
   },
   body: JSON.stringify({
     status: 'completed',
     completed_at: new Date().toISOString(),
-    total_duration: 3600
-  })
+    total_duration: 3600,
+  }),
 });
 ```
 
@@ -650,7 +704,7 @@ const checkInResponse = await fetch('/api/check-ins', {
   method: 'POST',
   headers: {
     'Content-Type': 'application/json',
-    'Authorization': `Bearer ${token}`
+    Authorization: `Bearer ${token}`,
   },
   body: JSON.stringify({
     date: '2024-01-01',
@@ -660,8 +714,8 @@ const checkInResponse = await fetch('/api/check-ins', {
     muscle_soreness: 3,
     stress_level: 4,
     hydration_level: 7,
-    notes: 'Feeling great today!'
-  })
+    notes: 'Feeling great today!',
+  }),
 });
 
 const { check_in } = await checkInResponse.json();
@@ -675,7 +729,7 @@ const aiResponse = await fetch('/api/ai/adaptation', {
   method: 'POST',
   headers: {
     'Content-Type': 'application/json',
-    'Authorization': `Bearer ${token}`
+    Authorization: `Bearer ${token}`,
   },
   body: JSON.stringify({
     user_id: 'user-uuid',
@@ -685,14 +739,14 @@ const aiResponse = await fetch('/api/ai/adaptation', {
       energy_level: 8,
       sleep_hours: 8.5,
       muscle_soreness: 3,
-      stress_level: 4
+      stress_level: 4,
     },
     performance_data: {
       recent_rpe: [7, 8, 6],
       completion_rate: 0.95,
-      injury_risk: 'low'
-    }
-  })
+      injury_risk: 'low',
+    },
+  }),
 });
 
 const { recommendations } = await aiResponse.json();
@@ -703,6 +757,7 @@ const { recommendations } = await aiResponse.json();
 ## 🔧 Testing
 
 ### Test API Endpoints
+
 ```bash
 # Run the test suite
 npm run test:api
@@ -713,10 +768,12 @@ curl -X GET http://localhost:3000/api/sessions \
 ```
 
 ### Postman Collection
+
 Import the provided Postman collection for easy API testing:
+
 - [Download Collection](postman/Teen-Training-PWA.postman_collection.json)
 
 ---
 
-*Last Updated: December 2024*
-*API Version: 1.0.0*
+_Last Updated: December 2024_
+_API Version: 1.0.0_

@@ -1,6 +1,7 @@
 # Teen Training PWA - Deployment Guide
 
 ## 📋 Table of Contents
+
 - [Overview](#overview)
 - [Pre-deployment Checklist](#pre-deployment-checklist)
 - [Environment Setup](#environment-setup)
@@ -18,6 +19,7 @@
 This guide covers the complete deployment process for the Teen Training PWA, from initial setup to production monitoring. The application is designed to be deployed on modern hosting platforms with support for Next.js, PostgreSQL, and PWA features.
 
 ### Deployment Architecture
+
 ```
 ┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
 │   Frontend      │    │   Backend       │    │   Database      │
@@ -40,6 +42,7 @@ This guide covers the complete deployment process for the Teen Training PWA, fro
 ## ✅ Pre-deployment Checklist
 
 ### Code Quality
+
 - [ ] All tests passing (`npm run test:api`)
 - [ ] No linting errors (`npm run lint`)
 - [ ] Build successful (`npm run build`)
@@ -47,6 +50,7 @@ This guide covers the complete deployment process for the Teen Training PWA, fro
 - [ ] All environment variables documented
 
 ### Database
+
 - [ ] Supabase project created
 - [ ] Database schema applied
 - [ ] Seed data loaded
@@ -54,12 +58,14 @@ This guide covers the complete deployment process for the Teen Training PWA, fro
 - [ ] Backup strategy in place
 
 ### External Services
+
 - [ ] OpenAI API key obtained
 - [ ] ExerciseDB API key (optional)
 - [ ] YouTube API key (optional)
 - [ ] All API keys tested
 
 ### PWA Features
+
 - [ ] Service worker registered
 - [ ] Manifest.json configured
 - [ ] Offline functionality tested
@@ -96,11 +102,13 @@ NODE_ENV=production
 ### Environment Variable Security
 
 #### Development
+
 - Store in `.env.local` (gitignored)
 - Never commit API keys to version control
 - Use different keys for dev/staging/production
 
 #### Production
+
 - Use platform-specific secret management
 - Rotate keys regularly
 - Monitor API usage and costs
@@ -110,16 +118,19 @@ NODE_ENV=production
 ## 🚀 Vercel Deployment (Recommended)
 
 ### 1. Install Vercel CLI
+
 ```bash
 npm install -g vercel
 ```
 
 ### 2. Login to Vercel
+
 ```bash
 vercel login
 ```
 
 ### 3. Deploy from Git Repository
+
 ```bash
 # Link to existing project
 vercel link
@@ -129,6 +140,7 @@ vercel --prod
 ```
 
 ### 4. Configure Environment Variables
+
 1. Go to Vercel Dashboard
 2. Select your project
 3. Go to Settings → Environment Variables
@@ -136,6 +148,7 @@ vercel --prod
 5. Redeploy the project
 
 ### 5. Configure Build Settings
+
 ```json
 {
   "buildCommand": "npm run build",
@@ -146,6 +159,7 @@ vercel --prod
 ```
 
 ### 6. Custom Domain (Optional)
+
 1. Go to Project Settings → Domains
 2. Add your custom domain
 3. Configure DNS records
@@ -158,11 +172,13 @@ vercel --prod
 ### Netlify
 
 #### 1. Connect Repository
+
 1. Go to [netlify.com](https://netlify.com)
 2. Connect your GitHub repository
 3. Configure build settings
 
 #### 2. Build Configuration
+
 ```toml
 # netlify.toml
 [build]
@@ -179,6 +195,7 @@ vercel --prod
 ```
 
 #### 3. Environment Variables
+
 - Go to Site Settings → Environment Variables
 - Add all required variables
 - Redeploy the site
@@ -186,11 +203,13 @@ vercel --prod
 ### Railway
 
 #### 1. Deploy from GitHub
+
 1. Go to [railway.app](https://railway.app)
 2. Connect your GitHub repository
 3. Select the project
 
 #### 2. Configure Environment
+
 ```bash
 # Add environment variables
 railway variables set NEXT_PUBLIC_SUPABASE_URL=your_url
@@ -198,6 +217,7 @@ railway variables set OPENAI_API_KEY=your_key
 ```
 
 #### 3. Deploy
+
 ```bash
 railway up
 ```
@@ -205,11 +225,13 @@ railway up
 ### AWS Amplify
 
 #### 1. Connect Repository
+
 1. Go to AWS Amplify Console
 2. Connect your GitHub repository
 3. Configure build settings
 
 #### 2. Build Configuration
+
 ```yaml
 # amplify.yml
 version: 1
@@ -237,12 +259,14 @@ frontend:
 ### Supabase Production Setup
 
 #### 1. Create Production Project
+
 1. Go to [supabase.com](https://supabase.com)
 2. Create a new project
 3. Choose a region close to your users
 4. Set up billing (if needed)
 
 #### 2. Apply Database Schema
+
 ```bash
 # Using the provided script
 npm run db:init
@@ -252,6 +276,7 @@ npm run db:init
 ```
 
 #### 3. Configure Row Level Security
+
 ```sql
 -- Enable RLS on all tables
 ALTER TABLE users ENABLE ROW LEVEL SECURITY;
@@ -264,6 +289,7 @@ CREATE POLICY "Users can view own data" ON users
 ```
 
 #### 4. Set Up Backups
+
 1. Go to Settings → Database
 2. Enable automatic backups
 3. Configure backup retention
@@ -272,6 +298,7 @@ CREATE POLICY "Users can view own data" ON users
 ### Database Migration Strategy
 
 #### Development to Production
+
 1. Export schema from development
 2. Apply to production database
 3. Migrate data (if needed)
@@ -279,6 +306,7 @@ CREATE POLICY "Users can view own data" ON users
 5. Test all functionality
 
 #### Version Control
+
 ```bash
 # Create migration files
 mkdir migrations
@@ -293,6 +321,7 @@ touch migrations/002_add_indexes.sql
 ### Custom Domain Setup
 
 #### 1. DNS Configuration
+
 ```dns
 # A record
 @ 300 IN A 76.76.19.61
@@ -305,11 +334,13 @@ api 300 IN CNAME api.your-domain.com
 ```
 
 #### 2. SSL Certificate
+
 - Most platforms provide automatic SSL
 - Use Let's Encrypt for custom setups
 - Monitor certificate expiration
 
 #### 3. CDN Configuration
+
 ```javascript
 // next.config.js
 module.exports = {
@@ -339,6 +370,7 @@ module.exports = {
 ### Application Monitoring
 
 #### Vercel Analytics
+
 ```javascript
 // Enable in next.config.js
 module.exports = {
@@ -349,6 +381,7 @@ module.exports = {
 ```
 
 #### Custom Monitoring
+
 ```javascript
 // lib/monitoring.js
 export function trackEvent(event, properties) {
@@ -362,12 +395,14 @@ export function trackEvent(event, properties) {
 ### Database Monitoring
 
 #### Supabase Dashboard
+
 - Monitor query performance
 - Track API usage
 - Set up alerts for errors
 - Monitor storage usage
 
 #### Custom Alerts
+
 ```sql
 -- Set up database alerts
 CREATE OR REPLACE FUNCTION check_database_health()
@@ -383,6 +418,7 @@ $$ LANGUAGE plpgsql;
 ### Performance Monitoring
 
 #### Core Web Vitals
+
 ```javascript
 // lib/analytics.js
 export function reportWebVitals(metric) {
@@ -392,6 +428,7 @@ export function reportWebVitals(metric) {
 ```
 
 #### API Performance
+
 ```javascript
 // Monitor API response times
 const start = Date.now();
@@ -407,6 +444,7 @@ console.log(`API call took ${duration}ms`);
 ### Common Deployment Issues
 
 #### Build Failures
+
 ```bash
 # Check build logs
 vercel logs your-deployment-url
@@ -418,6 +456,7 @@ npm install
 ```
 
 #### Environment Variable Issues
+
 ```bash
 # Verify variables are set
 vercel env ls
@@ -427,6 +466,7 @@ npm run dev
 ```
 
 #### Database Connection Issues
+
 ```javascript
 // Test database connection
 import { createClient } from '@supabase/supabase-js';
@@ -443,6 +483,7 @@ console.log('Database connection:', error ? 'Failed' : 'Success');
 ### Performance Issues
 
 #### Bundle Size Optimization
+
 ```bash
 # Analyze bundle size
 npm run build
@@ -453,6 +494,7 @@ npm install next-optimized-images
 ```
 
 #### Database Optimization
+
 ```sql
 -- Add indexes for common queries
 CREATE INDEX idx_sessions_user_id ON sessions(user_id);
@@ -463,6 +505,7 @@ CREATE INDEX idx_check_ins_date ON daily_check_ins(date);
 ### PWA Issues
 
 #### Service Worker Problems
+
 ```javascript
 // Check service worker registration
 if ('serviceWorker' in navigator) {
@@ -473,6 +516,7 @@ if ('serviceWorker' in navigator) {
 ```
 
 #### Offline Functionality
+
 ```javascript
 // Test offline functionality
 window.addEventListener('online', () => {
@@ -493,6 +537,7 @@ window.addEventListener('offline', () => {
 ### Health Checks
 
 #### Automated Health Checks
+
 ```javascript
 // pages/api/health.js
 export default function handler(req, res) {
@@ -501,14 +546,15 @@ export default function handler(req, res) {
     timestamp: new Date().toISOString(),
     uptime: process.uptime(),
     database: 'connected', // Check database connection
-    apis: 'functional' // Check external APIs
+    apis: 'functional', // Check external APIs
   };
-  
+
   res.status(200).json(health);
 }
 ```
 
 #### Monitoring Setup
+
 1. Set up uptime monitoring
 2. Configure error tracking
 3. Set up performance monitoring
@@ -517,6 +563,7 @@ export default function handler(req, res) {
 ### Maintenance
 
 #### Regular Tasks
+
 - [ ] Monitor API usage and costs
 - [ ] Update dependencies monthly
 - [ ] Review and rotate API keys
@@ -524,6 +571,7 @@ export default function handler(req, res) {
 - [ ] Monitor performance metrics
 
 #### Security Updates
+
 - [ ] Keep dependencies updated
 - [ ] Monitor security advisories
 - [ ] Regular security audits
@@ -534,6 +582,7 @@ export default function handler(req, res) {
 ## 🎉 Success Metrics
 
 ### Deployment Success Criteria
+
 - [ ] Application loads in <3 seconds
 - [ ] All API endpoints responding
 - [ ] Database queries <100ms average
@@ -543,6 +592,7 @@ export default function handler(req, res) {
 - [ ] Mobile responsiveness verified
 
 ### Performance Targets
+
 - **Lighthouse Score**: >90 across all metrics
 - **First Contentful Paint**: <1.5s
 - **Largest Contentful Paint**: <2.5s
@@ -551,5 +601,5 @@ export default function handler(req, res) {
 
 ---
 
-*Last Updated: December 2024*
-*Deployment Version: 1.0.0*
+_Last Updated: December 2024_
+_Deployment Version: 1.0.0_

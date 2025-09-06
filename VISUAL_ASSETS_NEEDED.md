@@ -5,6 +5,7 @@
 ### **Header/Hero Section (3 assets)**
 
 **Asset 1.1: Main Dashboard Hero Background**
+
 - **Description**: Wide panoramic shot of diverse 11-12 year old athletes in a modern gym setting, mix of volleyball and strength training activities
 - **Specific Content**: 2-3 teens doing bodyweight exercises (push-ups, squats), 2-3 teens with volleyballs (serving position, celebration), bright gym lighting
 - **File Format**: JPG
@@ -14,6 +15,7 @@
 - **Technical**: Horizontal composition, action in center-left, space for text overlay on right
 
 **Asset 1.2: Session Launch Hero Background**
+
 - **Description**: Close-up action shot of teen athlete mid-volleyball spike with intense focus expression
 - **Specific Content**: Single teen (diverse representation) jumping for volleyball spike, net visible, gym background blurred
 - **File Format**: JPG
@@ -23,6 +25,7 @@
 - **Technical**: Vertical composition suitable for card format, darker edges for text overlay
 
 **Asset 1.3: Progress Section Hero Background**
+
 - **Description**: Group celebration shot of teen volleyball team after successful play
 - **Specific Content**: 4-5 diverse teens in team huddle/high-five moment, genuine smiles, volleyball court setting
 - **File Format**: JPG
@@ -34,6 +37,7 @@
 ### **Session Type Backgrounds (4 assets)**
 
 **Asset 1.4: Strength Training Background**
+
 - **Description**: Teen using proper form with light dumbbells in clean gym environment
 - **Specific Content**: Single teen (11-12 years) performing dumbbell exercise, proper form demonstration, modern gym equipment visible
 - **File Format**: JPG
@@ -43,6 +47,7 @@
 - **Technical**: Side angle showing proper form, minimal background distractions
 
 **Asset 1.5: Volleyball Skills Background**
+
 - **Description**: Teen practicing volleyball serve technique on indoor court
 - **Specific Content**: Teen in serving position, volleyball court lines visible, net in background, focused expression
 - **File Format**: JPG
@@ -52,6 +57,7 @@
 - **Technical**: Action captured at peak of serve motion
 
 **Asset 1.6: Plyometric Training Background**
+
 - **Description**: Teen performing box jump or lateral bound exercise
 - **Specific Content**: Teen mid-jump showing explosive movement, gym floor visible, safety equipment present
 - **File Format**: JPG
@@ -61,6 +67,7 @@
 - **Technical**: Freeze motion at peak of jump, dynamic composition
 
 **Asset 1.7: Recovery Session Background**
+
 - **Description**: Teen doing stretching or foam rolling in calm gym environment
 - **Specific Content**: Teen performing recovery exercise, peaceful expression, clean gym setting, recovery equipment visible
 - **File Format**: JPG
@@ -74,6 +81,7 @@
 ### **Subtle Background Textures**
 
 **Asset 2.1: Volleyball Court Texture**
+
 - **Description**: Close-up texture of volleyball court flooring with subtle line markings
 - **Specific Content**: Clean gym floor texture, faint court lines, minimal wear patterns
 - **File Format**: PNG (with transparency)
@@ -83,6 +91,7 @@
 - **Technical**: Seamlessly tileable, high resolution for crisp display
 
 **Asset 2.2: Athletic Equipment Pattern**
+
 - **Description**: Subtle repeating pattern of volleyball and dumbbell silhouettes
 - **Specific Content**: Small volleyball and dumbbell icons in geometric arrangement
 - **File Format**: SVG
@@ -92,6 +101,7 @@
 - **Technical**: Vector format for scalability, 15% opacity maximum
 
 **Asset 2.3: Energy Burst Pattern**
+
 - **Description**: Abstract radiating lines pattern suggesting movement and energy
 - **Specific Content**: Geometric burst pattern with varying line weights
 - **File Format**: SVG
@@ -101,6 +111,7 @@
 - **Technical**: Scalable vector, multiple color variants needed
 
 **Asset 2.4: Mesh Gradient Texture**
+
 - **Description**: Subtle mesh gradient in brand colors (purple to pink)
 - **Specific Content**: Smooth color transition with slight noise texture
 - **File Format**: PNG
@@ -110,6 +121,7 @@
 - **Technical**: High quality gradient, web-optimized file size
 
 **Asset 2.5: Geometric Sports Pattern**
+
 - **Description**: Hexagonal pattern with sports equipment icons
 - **Specific Content**: Hexagon grid with alternating volleyball, dumbbell, and stopwatch icons
 - **File Format**: SVG
@@ -119,6 +131,7 @@
 - **Technical**: Perfect geometric alignment, scalable
 
 **Asset 2.6: Motion Lines Texture**
+
 - **Description**: Dynamic speed lines suggesting movement and progress
 - **Specific Content**: Diagonal lines of varying thickness creating motion effect
 - **File Format**: SVG
@@ -132,6 +145,7 @@
 ### **Badge Designs**
 
 **Asset 3.1: First Session Badge**
+
 - **Description**: Circular badge with "1st Session" text and beginner-friendly design
 - **Specific Content**: Number "1" prominently displayed, volleyball icon, metallic bronze effect
 - **File Format**: PNG (with transparency)
@@ -141,6 +155,7 @@
 - **Technical**: High contrast for readability, transparent background
 
 **Asset 3.2: Week Warrior Badge**
+
 - **Description**: Shield-shaped badge for completing first week
 - **Specific Content**: Shield outline, "Week 1" text, small crown icon, silver metallic effect
 - **File Format**: PNG (with transparency)
@@ -150,6 +165,7 @@
 - **Technical**: Detailed metallic texture, drop shadow effect
 
 **Asset 3.3: Strength Champion Badge**
+
 - **Description**: Hexagonal badge for strength training milestones
 - **Specific Content**: Dumbbell icon, "Strength" text, gold metallic effect with gems
 - **File Format**: PNG (with transparency)
@@ -159,6 +175,7 @@
 - **Technical**: Luxury appearance, multiple highlight effects
 
 **Asset 3.4: Volleyball Star Badge**
+
 - **Description**: Star-shaped badge for volleyball skill achievements
 - **Specific Content**: Volleyball in center, "Volleyball Star" text, holographic effect
 - **File Format**: PNG (with transparency)
@@ -168,6 +185,7 @@
 - **Technical**: Gradient effects simulating holographic material
 
 **Asset 3.5: Consistency King/Queen Badge**
+
 - **Description**: Crown-shaped badge for attendance streaks
 - **Specific Content**: Royal crown design, "Consistent" text, purple royal theme
 - **File Format**: PNG (with transparency)
@@ -177,6 +195,7 @@
 - **Technical**: Rich purple gradients, gold accent details
 
 **Asset 3.6: Progress Pioneer Badge**
+
 - **Description**: Arrow-shaped badge for improvement milestones
 - **Specific Content**: Upward arrow, "Progress" text, dynamic energy effects
 - **File Format**: PNG (with transparency)
@@ -188,6 +207,7 @@
 ### **Celebration Graphics**
 
 **Asset 3.7: Level Up Animation Frame 1**
+
 - **Description**: Burst effect with "LEVEL UP!" text for achievement animations
 - **Specific Content**: Radiating light rays, bold text, particle effects
 - **File Format**: PNG (with transparency)
@@ -197,6 +217,7 @@
 - **Technical**: High contrast, suitable for animation sequence
 
 **Asset 3.8: Level Up Animation Frame 2**
+
 - **Description**: Expanded burst with floating particles
 - **Specific Content**: Larger light burst, scattered star particles, fading text
 - **File Format**: PNG (with transparency)
@@ -206,6 +227,7 @@
 - **Technical**: Coordinated with frame 1, smooth transition
 
 **Asset 3.9: Level Up Animation Frame 3**
+
 - **Description**: Settling particles with subtle glow
 - **Specific Content**: Small floating particles, soft glow effect, minimal text
 - **File Format**: PNG (with transparency)
@@ -215,6 +237,7 @@
 - **Technical**: Fade-out ready, loop-compatible
 
 **Asset 3.10: XP Gain Graphic**
+
 - **Description**: "+50 XP" style floating text with energy effect
 - **Specific Content**: Bold "+XP" text with energy aura, upward motion suggestion
 - **File Format**: PNG (with transparency)
@@ -224,6 +247,7 @@
 - **Technical**: Multiple XP value variants needed (+10, +25, +50, +100)
 
 **Asset 3.11: Streak Fire Icon**
+
 - **Description**: Flame icon representing training streaks
 - **Specific Content**: Stylized flame with number overlay capability
 - **File Format**: SVG
@@ -233,6 +257,7 @@
 - **Technical**: Scalable vector, color customizable
 
 **Asset 3.12: Trophy Collection Display**
+
 - **Description**: Trophy shelf background for achievement display
 - **Specific Content**: Wooden shelf with trophy silhouettes, spotlight effects
 - **File Format**: PNG
@@ -246,6 +271,7 @@
 ### **Primary Equipment Icons**
 
 **Asset 4.1: Volleyball Icon**
+
 - **Description**: Clean volleyball with traditional panel lines
 - **Specific Content**: Standard volleyball design, proper proportions, clear panel definition
 - **File Format**: SVG
@@ -255,6 +281,7 @@
 - **Technical**: Scalable vector, single color and multi-color variants
 
 **Asset 4.2: Dumbbell Icon**
+
 - **Description**: Adjustable dumbbell with weight plates
 - **Specific Content**: Realistic dumbbell proportions, weight plate details
 - **File Format**: SVG
@@ -264,6 +291,7 @@
 - **Technical**: Detailed enough for recognition, simple enough for small sizes
 
 **Asset 4.3: Stopwatch Icon**
+
 - **Description**: Digital stopwatch with clear display
 - **Specific Content**: Modern stopwatch design, visible buttons, clear face
 - **File Format**: SVG
@@ -273,6 +301,7 @@
 - **Technical**: Clear at all sizes, animation-ready
 
 **Asset 4.4: Measuring Tape Icon**
+
 - **Description**: Flexible measuring tape partially extended
 - **Specific Content**: Tape measure with visible measurements, realistic curl
 - **File Format**: SVG
@@ -282,6 +311,7 @@
 - **Technical**: Recognizable shape, clear measurement details
 
 **Asset 4.5: Water Bottle Icon**
+
 - **Description**: Sports water bottle with squeeze design
 - **Specific Content**: Athletic water bottle, clear cap, ergonomic shape
 - **File Format**: SVG
@@ -293,6 +323,7 @@
 ### **Exercise Category Icons**
 
 **Asset 4.6: Jumping Figure Icon**
+
 - **Description**: Stick figure in jumping/plyometric position
 - **Specific Content**: Human figure mid-jump, arms raised, dynamic pose
 - **File Format**: SVG
@@ -302,6 +333,7 @@
 - **Technical**: Clear movement indication, scalable design
 
 **Asset 4.7: Stretching Figure Icon**
+
 - **Description**: Stick figure in stretching position
 - **Specific Content**: Human figure in side stretch, calm pose
 - **File Format**: SVG
@@ -311,6 +343,7 @@
 - **Technical**: Clear pose recognition, calming appearance
 
 **Asset 4.8: Running Figure Icon**
+
 - **Description**: Stick figure in running motion
 - **Specific Content**: Human figure mid-stride, forward lean, speed lines
 - **File Format**: SVG
@@ -320,6 +353,7 @@
 - **Technical**: Motion blur effects, directional design
 
 **Asset 4.9: Strength Figure Icon**
+
 - **Description**: Stick figure lifting weights overhead
 - **Specific Content**: Human figure with barbell overhead, stable stance
 - **File Format**: SVG
@@ -329,6 +363,7 @@
 - **Technical**: Clear strength indication, balanced composition
 
 **Asset 4.10: Team Figure Icon**
+
 - **Description**: Multiple stick figures in team formation
 - **Specific Content**: 3-4 connected figures suggesting teamwork
 - **File Format**: SVG
@@ -340,6 +375,7 @@
 ### **Progress & Data Icons**
 
 **Asset 4.11: Chart Up Icon**
+
 - **Description**: Bar chart with upward trending bars
 - **Specific Content**: 4-5 bars increasing in height, grid background
 - **File Format**: SVG
@@ -349,6 +385,7 @@
 - **Technical**: Clear trend indication, data-focused design
 
 **Asset 4.12: Target Icon**
+
 - **Description**: Bullseye target with arrow in center
 - **Specific Content**: Concentric circles, arrow hitting bullseye
 - **File Format**: SVG
@@ -358,6 +395,7 @@
 - **Technical**: Clear center focus, achievement suggestion
 
 **Asset 4.13: Calendar Icon**
+
 - **Description**: Monthly calendar with highlighted dates
 - **Specific Content**: Grid calendar, some dates marked/highlighted
 - **File Format**: SVG
@@ -367,6 +405,7 @@
 - **Technical**: Clear date grid, highlighting capability
 
 **Asset 4.14: Medal Icon**
+
 - **Description**: First place medal with ribbon
 - **Specific Content**: Circular medal, "1st" marking, flowing ribbon
 - **File Format**: SVG
@@ -376,6 +415,7 @@
 - **Technical**: Premium appearance, celebration-ready
 
 **Asset 4.15: Lightning Bolt Icon**
+
 - **Description**: Dynamic lightning bolt suggesting energy/power
 - **Specific Content**: Jagged lightning shape, energy radiating lines
 - **File Format**: SVG
@@ -389,6 +429,7 @@
 ### **Quote Background Graphics**
 
 **Asset 5.1: "Champions Train" Quote Background**
+
 - **Description**: Inspirational background for "Champions are made in training" quote
 - **Specific Content**: Subtle gym equipment silhouettes, motivational color gradient
 - **File Format**: JPG
@@ -398,6 +439,7 @@
 - **Technical**: Dark overlay areas for text readability
 
 **Asset 5.2: "Every Rep Counts" Quote Background**
+
 - **Description**: Close-up of hands gripping equipment with motivational overlay space
 - **Specific Content**: Hands on dumbbell or volleyball, determination focus
 - **File Format**: JPG
@@ -407,6 +449,7 @@
 - **Technical**: Shallow depth of field, text space preserved
 
 **Asset 5.3: "Team Spirit" Quote Background**
+
 - **Description**: Silhouettes of team celebration against bright background
 - **Specific Content**: Multiple teen silhouettes in celebration pose, bright sky/gym lighting
 - **File Format**: JPG
@@ -416,6 +459,7 @@
 - **Technical**: High contrast silhouettes, bright background for text
 
 **Asset 5.4: "Progress Not Perfection" Quote Background**
+
 - **Description**: Before/after style imagery suggesting improvement journey
 - **Specific Content**: Subtle progression imagery, growth-focused composition
 - **File Format**: JPG
@@ -427,6 +471,7 @@
 ### **Celebration & Success Graphics**
 
 **Asset 5.5: Success Burst Graphic**
+
 - **Description**: Explosive celebration graphic with stars and energy
 - **Specific Content**: Central burst with radiating stars, energy particles
 - **File Format**: PNG (with transparency)
@@ -436,6 +481,7 @@
 - **Technical**: Transparent background, animation-ready
 
 **Asset 5.6: Victory Podium Graphic**
+
 - **Description**: Winner's podium with spotlight effect
 - **Specific Content**: Three-tier podium, dramatic lighting, trophy silhouettes
 - **File Format**: PNG (with transparency)
@@ -445,6 +491,7 @@
 - **Technical**: Dramatic lighting effects, premium appearance
 
 **Asset 5.7: High-Five Celebration**
+
 - **Description**: Stylized hands in high-five gesture with energy effects
 - **Specific Content**: Two hands meeting, energy burst at contact point
 - **File Format**: PNG (with transparency)
@@ -454,6 +501,7 @@
 - **Technical**: Clear gesture recognition, energy effects
 
 **Asset 5.8: Goal Achievement Graphic**
+
 - **Description**: Target with arrow and "GOAL!" text explosion
 - **Specific Content**: Bullseye target, arrow impact, explosive text effect
 - **File Format**: PNG (with transparency)
@@ -467,6 +515,7 @@
 ### **Loading & Transition Elements**
 
 **Asset 6.1: Volleyball Bounce Animation Frames (3 frames)**
+
 - **Description**: Volleyball bouncing animation for loading states
 - **Specific Content**: Volleyball in 3 positions - up, middle, down with motion blur
 - **File Format**: PNG (with transparency)
@@ -476,6 +525,7 @@
 - **Technical**: Frame-by-frame animation ready, consistent volleyball design
 
 **Asset 6.2: Dumbbell Lift Animation Frames (3 frames)**
+
 - **Description**: Dumbbell lifting motion for strength loading animations
 - **Specific Content**: Dumbbell in 3 positions - down, middle, up
 - **File Format**: PNG (with transparency)
@@ -485,6 +535,7 @@
 - **Technical**: Natural lifting arc, consistent dumbbell design
 
 **Asset 6.3: Progress Bar Fill Texture**
+
 - **Description**: Textured fill for progress bars suggesting energy/power
 - **Specific Content**: Gradient texture with subtle energy pattern
 - **File Format**: PNG
@@ -496,6 +547,7 @@
 ### **Button & Interface Enhancements**
 
 **Asset 6.4: Primary Button Background Texture**
+
 - **Description**: Subtle texture for primary action buttons
 - **Specific Content**: Slight gradient with energy pattern, button-shaped
 - **File Format**: PNG
@@ -505,6 +557,7 @@
 - **Technical**: 9-slice compatible, corner preservation
 
 **Asset 6.5: Card Hover Effect Overlay**
+
 - **Description**: Subtle glow effect for card hover states
 - **Specific Content**: Soft glow border, slight shadow enhancement
 - **File Format**: PNG (with transparency)
@@ -514,6 +567,7 @@
 - **Technical**: Transparent center, edge glow only
 
 **Asset 6.6: Success Checkmark Animation**
+
 - **Description**: Animated checkmark for completion confirmations
 - **Specific Content**: Checkmark drawing animation, 3 frames
 - **File Format**: SVG (animated)
@@ -525,6 +579,7 @@
 ### **Data Visualization Enhancements**
 
 **Asset 6.7: Chart Grid Background**
+
 - **Description**: Subtle grid pattern for chart backgrounds
 - **Specific Content**: Light grid lines, athletic theme integration
 - **File Format**: SVG
@@ -534,6 +589,7 @@
 - **Technical**: Scalable grid, consistent spacing
 
 **Asset 6.8: Metric Increase Arrow**
+
 - **Description**: Upward trending arrow for positive metrics
 - **Specific Content**: Bold upward arrow with slight curve, success coloring
 - **File Format**: SVG
@@ -543,6 +599,7 @@
 - **Technical**: Multiple sizes, color variants
 
 **Asset 6.9: Metric Decrease Arrow**
+
 - **Description**: Downward trending arrow for metrics that should decrease (fatigue, etc.)
 - **Specific Content**: Downward arrow, appropriate for "good decrease" metrics
 - **File Format**: SVG
@@ -552,6 +609,7 @@
 - **Technical**: Context-appropriate coloring, clear direction
 
 **Asset 6.10: Data Point Highlight**
+
 - **Description**: Glowing dot for highlighting specific data points
 - **Specific Content**: Circular highlight with subtle glow, attention-drawing
 - **File Format**: PNG (with transparency)
@@ -563,30 +621,35 @@
 ## **Technical Specifications Summary**
 
 ### **File Format Guidelines:**
+
 - **JPG**: Photographic backgrounds, complex imagery (80-90% quality)
 - **PNG**: Graphics with transparency, detailed illustrations (24-bit with alpha)
 - **SVG**: Icons, simple graphics, scalable elements (optimized code)
 - **GIF**: Simple animations (only if SVG animation not suitable)
 
 ### **Dimension Standards:**
+
 - **Mobile First**: All assets must work at smallest size first
 - **Retina Ready**: Provide 2x versions for high-DPI displays
 - **Responsive**: Consider how assets scale across device sizes
 - **Performance**: Optimize file sizes without quality loss
 
 ### **Color Specifications:**
+
 - **Primary Brand**: Purple/Magenta (#8B5CF6 to #EC4899)
 - **Secondary**: Complementary blues and greens for variety
 - **Neutral**: Grays for backgrounds and subtle elements
 - **Accent**: Bright colors for celebrations and achievements
 
 ### **Accessibility Requirements:**
+
 - **Contrast**: Minimum 4.5:1 ratio for text overlays
 - **Alt Text Ready**: All images must support descriptive alt text
 - **Color Independence**: Information not conveyed by color alone
 - **Motion Sensitivity**: Provide static alternatives for animations
 
 ### **Implementation Priority:**
+
 1. **Phase 1**: Hero backgrounds and essential textures (Assets 1.1-2.6)
 2. **Phase 2**: Achievement graphics and icons (Assets 3.1-4.15)
 3. **Phase 3**: Motivational and interactive elements (Assets 5.1-6.10)

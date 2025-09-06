@@ -1,6 +1,7 @@
 # Teen Training PWA - App Setup & Configuration Guide
 
 ## 📋 Table of Contents
+
 - [Overview](#overview)
 - [Prerequisites](#prerequisites)
 - [Quick Start](#quick-start)
@@ -29,12 +30,14 @@ The Teen Training PWA is a comprehensive athletic training application designed 
 ## 🔧 Prerequisites
 
 ### Required Software
+
 - **Node.js**: Version 18.0 or higher
 - **npm**: Version 8.0 or higher (comes with Node.js)
 - **Git**: For version control
 - **Code Editor**: VS Code, Cursor, or similar
 
 ### Required Accounts
+
 - **Supabase Account**: For database and authentication
 - **OpenAI Account**: For AI-powered features
 - **ExerciseDB API Key**: For exercise library (optional)
@@ -45,17 +48,20 @@ The Teen Training PWA is a comprehensive athletic training application designed 
 ## 🚀 Quick Start
 
 ### 1. Clone the Repository
+
 ```bash
 git clone https://github.com/xoate0100/teen-training-pwa.git
 cd teen-training-pwa
 ```
 
 ### 2. Install Dependencies
+
 ```bash
 npm install
 ```
 
 ### 3. Environment Setup
+
 ```bash
 # Copy the environment template
 cp .env.example .env.local
@@ -65,12 +71,14 @@ cp .env.example .env.local
 ```
 
 ### 4. Database Initialization
+
 ```bash
 # Set up the database schema and seed data
 npm run db:init
 ```
 
 ### 5. Start Development Server
+
 ```bash
 npm run dev
 ```
@@ -107,6 +115,7 @@ NEXT_PUBLIC_APP_URL=http://localhost:3000
 ### Getting API Keys
 
 #### Supabase Setup
+
 1. Go to [supabase.com](https://supabase.com)
 2. Create a new project
 3. Go to Settings → API
@@ -114,6 +123,7 @@ NEXT_PUBLIC_APP_URL=http://localhost:3000
 5. Copy the service_role key (keep this secret!)
 
 #### OpenAI Setup
+
 1. Go to [platform.openai.com](https://platform.openai.com)
 2. Create an account or sign in
 3. Go to API Keys section
@@ -121,11 +131,13 @@ NEXT_PUBLIC_APP_URL=http://localhost:3000
 5. Copy the key (starts with `sk-`)
 
 #### ExerciseDB API (Optional)
+
 1. Go to [exercisedb.com](https://exercisedb.com)
 2. Sign up for an account
 3. Get your API key from the dashboard
 
 #### YouTube API (Optional)
+
 1. Go to [Google Cloud Console](https://console.cloud.google.com)
 2. Create a new project or select existing
 3. Enable YouTube Data API v3
@@ -137,6 +149,7 @@ NEXT_PUBLIC_APP_URL=http://localhost:3000
 ## 🗄️ Database Setup
 
 ### Automatic Setup (Recommended)
+
 ```bash
 # This will create all tables, indexes, and seed data
 npm run db:init
@@ -145,22 +158,26 @@ npm run db:init
 ### Manual Setup
 
 #### 1. Create Supabase Project
+
 1. Go to [supabase.com](https://supabase.com)
 2. Create a new project
 3. Wait for the project to be ready
 
 #### 2. Run Database Schema
+
 1. Go to the SQL Editor in your Supabase dashboard
 2. Copy the contents of `lib/database/schema.sql`
 3. Paste and run the SQL script
 
 #### 3. Seed Initial Data
+
 1. Copy the contents of `lib/database/seed-data.sql`
 2. Paste and run the SQL script
 
 ### Database Structure
 
 The database includes 9 core tables:
+
 - **users**: User profiles and authentication
 - **sessions**: Training session data
 - **session_exercises**: Exercises within sessions
@@ -185,6 +202,7 @@ npm run test:api
 ### Available API Endpoints
 
 #### Session Management
+
 - `GET /api/sessions` - List all sessions
 - `POST /api/sessions` - Create new session
 - `GET /api/sessions/[id]` - Get specific session
@@ -192,20 +210,24 @@ npm run test:api
 - `DELETE /api/sessions/[id]` - Delete session
 
 #### Check-ins
+
 - `GET /api/check-ins` - List check-ins
 - `POST /api/check-ins` - Create check-in
 
 #### Exercises
+
 - `GET /api/exercises` - List exercises
 - `POST /api/exercises` - Create custom exercise
 - `GET /api/exercises/sync` - Sync external exercises
 - `GET /api/exercises/videos` - Search exercise videos
 
 #### AI & Adaptation
+
 - `POST /api/ai/adaptation` - Get AI recommendations
 - `POST /api/safety/monitor` - Safety monitoring
 
 #### Program Management
+
 - `GET /api/program` - Get training program
 - `POST /api/program` - Generate new program
 
@@ -214,6 +236,7 @@ npm run test:api
 ## 💻 Development Setup
 
 ### Project Structure
+
 ```
 teen-training-pwa/
 ├── app/                    # Next.js app directory
@@ -260,11 +283,13 @@ npm run test:api   # Test API endpoints
 ### Code Organization
 
 #### Frontend Components
+
 - **UI Components**: Reusable UI elements in `components/ui/`
 - **Feature Components**: Business logic components in `components/`
 - **Pages**: Next.js pages in `app/` directory
 
 #### Backend Services
+
 - **API Routes**: Next.js API routes in `app/api/`
 - **Database**: Schema and utilities in `lib/database/`
 - **External APIs**: Integration services in `lib/api/`
@@ -277,6 +302,7 @@ npm run test:api   # Test API endpoints
 ### Vercel Deployment (Recommended)
 
 #### 1. Connect to Vercel
+
 ```bash
 # Install Vercel CLI
 npm i -g vercel
@@ -286,13 +312,16 @@ vercel
 ```
 
 #### 2. Configure Environment Variables
+
 In your Vercel dashboard:
+
 1. Go to Project Settings
 2. Navigate to Environment Variables
 3. Add all required environment variables
 4. Redeploy the project
 
 #### 3. Custom Domain (Optional)
+
 1. Go to Project Settings → Domains
 2. Add your custom domain
 3. Configure DNS settings
@@ -300,12 +329,14 @@ In your Vercel dashboard:
 ### Other Deployment Options
 
 #### Netlify
+
 1. Connect your GitHub repository
 2. Set build command: `npm run build`
 3. Set publish directory: `.next`
 4. Add environment variables
 
 #### Railway
+
 1. Connect your GitHub repository
 2. Set environment variables
 3. Deploy automatically
@@ -328,6 +359,7 @@ In your Vercel dashboard:
 ### Common Issues
 
 #### Database Connection Issues
+
 ```bash
 # Check Supabase connection
 npm run test:api
@@ -337,11 +369,13 @@ echo $NEXT_PUBLIC_SUPABASE_URL
 ```
 
 #### API Key Issues
+
 - Verify API keys are correct
 - Check API key permissions
 - Ensure keys are in `.env.local` file
 
 #### Build Issues
+
 ```bash
 # Clear Next.js cache
 rm -rf .next
@@ -355,6 +389,7 @@ npm run build
 ```
 
 #### PWA Issues
+
 - Check service worker registration
 - Verify manifest.json configuration
 - Test offline functionality
@@ -372,6 +407,7 @@ DEBUG=teen-training:* npm run dev
 ### Logs and Monitoring
 
 #### Development Logs
+
 ```bash
 # View development logs
 npm run dev 2>&1 | tee dev.log
@@ -381,6 +417,7 @@ tail -f dev.log | grep "API"
 ```
 
 #### Production Monitoring
+
 - Vercel Analytics (if using Vercel)
 - Supabase Dashboard for database metrics
 - OpenAI usage dashboard for API costs
@@ -390,18 +427,21 @@ tail -f dev.log | grep "API"
 ## 📞 Support
 
 ### Documentation
+
 - **MVP Readiness**: `MVP_READINESS.md`
 - **Database Setup**: `DATABASE_SETUP.md`
 - **Backend Setup**: `BACKEND_SETUP.md`
 - **Design Principles**: `DESIGN_PRINCIPLES.md`
 
 ### Getting Help
+
 1. Check the troubleshooting section above
 2. Review the documentation files
 3. Check GitHub issues
 4. Contact the development team
 
 ### Contributing
+
 1. Fork the repository
 2. Create a feature branch
 3. Make your changes
@@ -435,6 +475,6 @@ After successful setup:
 
 ---
 
-*Last Updated: December 2024*
-*Version: 1.0.0*
-*Status: Production Ready*
+_Last Updated: December 2024_
+_Version: 1.0.0_
+_Status: Production Ready_

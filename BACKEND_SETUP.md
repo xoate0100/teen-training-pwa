@@ -41,6 +41,7 @@ You need to create a Supabase project and run the database schema:
    - Note down your project URL and API keys
 
 2. **Update Environment Variables:**
+
    ```bash
    # Update .env.local with your Supabase credentials
    NEXT_PUBLIC_SUPABASE_URL=your_supabase_url_here
@@ -67,11 +68,13 @@ You need to create a Supabase project and run the database schema:
 ### 3. External API Integrations
 
 #### ExerciseDB API (Optional)
+
 ```bash
 EXERCISEDB_API_KEY=your_exercisedb_api_key_here
 ```
 
 #### YouTube API for Exercise Demonstrations
+
 ```bash
 YOUTUBE_API_KEY=your_youtube_api_key_here
 ```
@@ -100,12 +103,14 @@ YOUTUBE_API_KEY=your_youtube_api_key_here
 ## 🤖 AI Integration Features
 
 ### Adaptation Engine
+
 - Analyzes wellness data and performance trends
 - Provides intensity and rest time adjustments
 - Suggests exercise substitutions
 - Generates motivational messages
 
 ### Safety Monitoring
+
 - Real-time fatigue level analysis
 - Form quality assessment
 - Load progression tracking
@@ -115,6 +120,7 @@ YOUTUBE_API_KEY=your_youtube_api_key_here
 ## 📈 Program Logic
 
 ### 11-Week Periodization
+
 - **Weeks 1-2**: Foundation phase
 - **Weeks 3-4**: Strength building
 - **Week 5**: Deload week
@@ -124,6 +130,7 @@ YOUTUBE_API_KEY=your_youtube_api_key_here
 - **Week 11**: Peak performance
 
 ### Weekly Schedule Matrix
+
 - 6 days per week (Monday-Saturday)
 - AM sessions: Strength and conditioning
 - PM sessions: Power and skills (weeks 9-11)
@@ -132,6 +139,7 @@ YOUTUBE_API_KEY=your_youtube_api_key_here
 ## 🔒 Safety Features
 
 ### Monitoring Systems
+
 - Fatigue level tracking
 - Form quality assessment
 - Load progression limits
@@ -139,6 +147,7 @@ YOUTUBE_API_KEY=your_youtube_api_key_here
 - Age-appropriate recommendations
 
 ### Alert System
+
 - Real-time safety alerts
 - Severity levels (low, medium, high, critical)
 - Automatic session modifications
@@ -149,11 +158,13 @@ YOUTUBE_API_KEY=your_youtube_api_key_here
 Once you've set up the environment variables:
 
 1. **Start the development server:**
+
    ```bash
    npm run dev
    ```
 
 2. **Test API endpoints:**
+
    ```bash
    # Test sessions endpoint
    curl http://localhost:3000/api/sessions?user_id=test-user

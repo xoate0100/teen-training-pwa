@@ -1,5 +1,5 @@
-@import "tailwindcss";
-@import "tw-animate-css";
+@import 'tailwindcss';
+@import 'tw-animate-css';
 
 @custom-variant dark (&:is(.dark *));
 
@@ -10,18 +10,28 @@
   --card: oklch(0.985 0.017 342.55); /* #fdf2f8 - Card backgrounds */
   --card-foreground: oklch(0.556 0.014 258.338); /* #475569 - Text on cards */
   --popover: oklch(1 0 0); /* #ffffff - Popover background */
-  --popover-foreground: oklch(0.556 0.014 258.338); /* #475569 - Text in popovers */
-  --primary: oklch(0.472 0.214 343.85); /* #be123c - Action buttons (rose-600) */
+  --popover-foreground: oklch(
+    0.556 0.014 258.338
+  ); /* #475569 - Text in popovers */
+  --primary: oklch(
+    0.472 0.214 343.85
+  ); /* #be123c - Action buttons (rose-600) */
   --primary-foreground: oklch(1 0 0); /* #ffffff - Text on primary elements */
   --secondary: oklch(0.656 0.216 322.75); /* #ec4899 - Accents and highlights */
-  --secondary-foreground: oklch(1 0 0); /* #ffffff - Text on secondary elements */
+  --secondary-foreground: oklch(
+    1 0 0
+  ); /* #ffffff - Text on secondary elements */
   --muted: oklch(0.976 0.006 247.858); /* #f1f5f9 - Muted backgrounds */
   --muted-foreground: oklch(0.556 0.014 258.338); /* #475569 - Muted text */
   --accent: oklch(0.656 0.216 322.75); /* #ec4899 - Gamification elements */
   --accent-foreground: oklch(1 0 0); /* #ffffff - Text on accent elements */
   --destructive: oklch(0.608 0.204 70.417); /* #d97706 - Warning elements */
-  --destructive-foreground: oklch(1 0 0); /* #ffffff - Text on destructive elements */
-  --border: oklch(0.556 0.016 251.843); /* #6b7280 - Borders for cards and inputs */
+  --destructive-foreground: oklch(
+    1 0 0
+  ); /* #ffffff - Text on destructive elements */
+  --border: oklch(
+    0.556 0.016 251.843
+  ); /* #6b7280 - Borders for cards and inputs */
   --input: oklch(1 0 0); /* #ffffff - Input background */
   --ring: oklch(0.656 0.216 322.75); /* #ec4899 - Focus ring color */
   --chart-1: oklch(0.472 0.214 343.85); /* #be123c - First color for charts */
@@ -31,11 +41,19 @@
   --chart-5: oklch(0.556 0.014 258.338); /* #475569 - Fifth color for charts */
   --radius: 0.5rem; /* Rounded corners */
   --sidebar: oklch(0.985 0.017 342.55); /* #fdf2f8 - Sidebar background */
-  --sidebar-foreground: oklch(0.556 0.014 258.338); /* #475569 - Text in sidebar */
-  --sidebar-primary: oklch(0.472 0.214 343.85); /* #be123c - Primary sidebar elements */
-  --sidebar-primary-foreground: oklch(1 0 0); /* #ffffff - Text on primary sidebar elements */
+  --sidebar-foreground: oklch(
+    0.556 0.014 258.338
+  ); /* #475569 - Text in sidebar */
+  --sidebar-primary: oklch(
+    0.472 0.214 343.85
+  ); /* #be123c - Primary sidebar elements */
+  --sidebar-primary-foreground: oklch(
+    1 0 0
+  ); /* #ffffff - Text on primary sidebar elements */
   --sidebar-accent: oklch(0.656 0.216 322.75); /* #ec4899 - Accent in sidebar */
-  --sidebar-accent-foreground: oklch(1 0 0); /* #ffffff - Text on sidebar accents */
+  --sidebar-accent-foreground: oklch(
+    1 0 0
+  ); /* #ffffff - Text on sidebar accents */
   --sidebar-border: oklch(0.556 0.016 251.843); /* #6b7280 - Sidebar borders */
   --sidebar-ring: oklch(0.656 0.216 322.75); /* #ec4899 - Sidebar focus ring */
 }
@@ -77,7 +95,9 @@
 
 /* Added custom CSS variables for session type colors */
 :root {
-  --session-strength: oklch(0.472 0.214 343.85); /* Rose for strength sessions */
+  --session-strength: oklch(
+    0.472 0.214 343.85
+  ); /* Rose for strength sessions */
   --session-conditioning: oklch(0.656 0.216 322.75); /* Pink for conditioning */
   --session-recovery: oklch(0.608 0.204 70.417); /* Orange for recovery */
   --session-skills: oklch(0.556 0.014 258.338); /* Slate for skills */

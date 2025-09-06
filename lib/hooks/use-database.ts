@@ -6,6 +6,8 @@ import {
   SessionData,
   CheckInData,
   ProgressMetrics,
+  Achievement,
+  Notification,
 } from '@/lib/services/database-service';
 import { useUser } from '@/lib/contexts/user-context';
 import { toast } from 'sonner';
@@ -15,6 +17,8 @@ export function useDatabase() {
   const [sessions, setSessions] = useState<SessionData[]>([]);
   const [checkIns, setCheckIns] = useState<CheckInData[]>([]);
   const [progressMetrics, setProgressMetrics] = useState<ProgressMetrics[]>([]);
+  const [achievements, setAchievements] = useState<Achievement[]>([]);
+  const [notifications, setNotifications] = useState<Notification[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -26,15 +30,25 @@ export function useDatabase() {
       setIsLoading(true);
       setError(null);
 
-      const [sessionsData, checkInsData, metricsData] = await Promise.all([
+      const [
+        sessionsData,
+        checkInsData,
+        metricsData,
+        achievementsData,
+        notificationsData,
+      ] = await Promise.all([
         databaseService.getSessions(currentUser.id),
         databaseService.getCheckIns(currentUser.id),
         databaseService.getProgressMetrics(currentUser.id),
+        databaseService.getAchievements(currentUser.id),
+        databaseService.getNotifications(currentUser.id),
       ]);
 
       setSessions(sessionsData);
       setCheckIns(checkInsData);
       setProgressMetrics(metricsData);
+      setAchievements(achievementsData);
+      setNotifications(notificationsData);
     } catch (err) {
       console.error('Error loading data:', err);
       setError(err instanceof Error ? err.message : 'Failed to load data');
@@ -63,9 +77,28 @@ export function useDatabase() {
       currentUser.id
     );
 
+    const achievementsSubscription = databaseService.subscribeToAchievements(
+      newAchievements => setAchievements(newAchievements),
+      currentUser.id
+    );
+
+    const notificationsSubscription = databaseService.subscribeToNotifications(
+      newNotifications => setNotifications(newNotifications),
+      currentUser.id
+    );
+
+    const progressMetricsSubscription =
+      databaseService.subscribeToProgressMetrics(
+        newMetrics => setProgressMetrics(newMetrics),
+        currentUser.id
+      );
+
     return () => {
       sessionsSubscription?.unsubscribe();
       checkInsSubscription?.unsubscribe();
+      achievementsSubscription?.unsubscribe();
+      notificationsSubscription?.unsubscribe();
+      progressMetricsSubscription?.unsubscribe();
     };
   }, [currentUser]);
 
@@ -158,6 +191,76 @@ export function useDatabase() {
     []
   );
 
+  // Achievement operations
+  const saveAchievement = useCallback(
+    async (achievement: Omit<Achievement, 'user_id'>) => {
+      try {
+        const savedAchievement =
+          await databaseService.saveAchievement(achievement);
+        setAchievements(prev => {
+          const existingIndex = prev.findIndex(
+            a => a.id === savedAchievement.id
+          );
+          if (existingIndex >= 0) {
+            const newAchievements = [...prev];
+            newAchievements[existingIndex] = savedAchievement;
+            return newAchievements;
+          }
+          return [savedAchievement, ...prev];
+        });
+        toast.success('Achievement unlocked! 🎉');
+        return savedAchievement;
+      } catch (err) {
+        console.error('Error saving achievement:', err);
+        toast.error('Failed to save achievement');
+        throw err;
+      }
+    },
+    []
+  );
+
+  // Notification operations
+  const createNotification = useCallback(
+    async (notification: Omit<Notification, 'user_id'>) => {
+      try {
+        const savedNotification =
+          await databaseService.createNotification(notification);
+        setNotifications(prev => [savedNotification, ...prev]);
+        return savedNotification;
+      } catch (err) {
+        console.error('Error creating notification:', err);
+        toast.error('Failed to create notification');
+        throw err;
+      }
+    },
+    []
+  );
+
+  const markNotificationAsRead = useCallback(async (notificationId: string) => {
+    try {
+      await databaseService.markNotificationAsRead(notificationId);
+      setNotifications(prev =>
+        prev.map(n => (n.id === notificationId ? { ...n, read: true } : n))
+      );
+    } catch (err) {
+      console.error('Error marking notification as read:', err);
+      toast.error('Failed to mark notification as read');
+      throw err;
+    }
+  }, []);
+
+  const markAllNotificationsAsRead = useCallback(async () => {
+    try {
+      await databaseService.markAllNotificationsAsRead();
+      setNotifications(prev => prev.map(n => ({ ...n, read: true })));
+      toast.success('All notifications marked as read');
+    } catch (err) {
+      console.error('Error marking all notifications as read:', err);
+      toast.error('Failed to mark all notifications as read');
+      throw err;
+    }
+  }, []);
+
   // Data migration
   const migrateFromLocalStorage = useCallback(async () => {
     try {
@@ -181,6 +284,8 @@ export function useDatabase() {
     sessions,
     checkIns,
     progressMetrics,
+    achievements,
+    notifications,
     isLoading,
     error,
 
@@ -193,6 +298,14 @@ export function useDatabase() {
 
     // Progress metrics operations
     saveProgressMetric,
+
+    // Achievement operations
+    saveAchievement,
+
+    // Notification operations
+    createNotification,
+    markNotificationAsRead,
+    markAllNotificationsAsRead,
 
     // Utility operations
     migrateFromLocalStorage,

@@ -48,6 +48,32 @@ export interface ProgressMetrics {
   updated_at?: string;
 }
 
+export interface Achievement {
+  id?: string;
+  user_id: string;
+  achievement_type: string;
+  title: string;
+  description: string;
+  icon: string;
+  unlocked_at: string;
+  progress: number;
+  max_progress: number;
+  created_at?: string;
+  updated_at?: string;
+}
+
+export interface Notification {
+  id?: string;
+  user_id: string;
+  type: 'achievement' | 'reminder' | 'progress' | 'system';
+  title: string;
+  message: string;
+  read: boolean;
+  data?: Record<string, any>;
+  created_at?: string;
+  updated_at?: string;
+}
+
 export class DatabaseService {
   private supabase = createSupabaseClient();
 
@@ -222,6 +248,126 @@ export class DatabaseService {
     return data || [];
   }
 
+  // Achievement Management
+  async saveAchievement(
+    achievement: Omit<Achievement, 'user_id'>
+  ): Promise<Achievement> {
+    const {
+      data: { user },
+    } = await this.supabase.auth.getUser();
+    if (!user) throw new Error('User not authenticated');
+
+    const achievementData = {
+      ...achievement,
+      user_id: user.id,
+    };
+
+    const { data, error } = await this.supabase
+      .from('achievements')
+      .upsert(achievementData, { onConflict: 'id' })
+      .select()
+      .single();
+
+    if (error) throw error;
+    return data;
+  }
+
+  async getAchievements(userId?: string): Promise<Achievement[]> {
+    const {
+      data: { user },
+    } = await this.supabase.auth.getUser();
+    const targetUserId = userId || user?.id;
+
+    if (!targetUserId) throw new Error('User not authenticated');
+
+    const { data, error } = await this.supabase
+      .from('achievements')
+      .select('*')
+      .eq('user_id', targetUserId)
+      .order('unlocked_at', { ascending: false });
+
+    if (error) throw error;
+    return data || [];
+  }
+
+  // Notification Management
+  async createNotification(
+    notification: Omit<Notification, 'user_id'>
+  ): Promise<Notification> {
+    const {
+      data: { user },
+    } = await this.supabase.auth.getUser();
+    if (!user) throw new Error('User not authenticated');
+
+    const notificationData = {
+      ...notification,
+      user_id: user.id,
+    };
+
+    const { data, error } = await this.supabase
+      .from('notifications')
+      .insert(notificationData)
+      .select()
+      .single();
+
+    if (error) throw error;
+    return data;
+  }
+
+  async getNotifications(
+    userId?: string,
+    unreadOnly = false
+  ): Promise<Notification[]> {
+    const {
+      data: { user },
+    } = await this.supabase.auth.getUser();
+    const targetUserId = userId || user?.id;
+
+    if (!targetUserId) throw new Error('User not authenticated');
+
+    let query = this.supabase
+      .from('notifications')
+      .select('*')
+      .eq('user_id', targetUserId);
+
+    if (unreadOnly) {
+      query = query.eq('read', false);
+    }
+
+    const { data, error } = await query.order('created_at', {
+      ascending: false,
+    });
+
+    if (error) throw error;
+    return data || [];
+  }
+
+  async markNotificationAsRead(notificationId: string): Promise<void> {
+    const { error } = await this.supabase
+      .from('notifications')
+      .update({ read: true })
+      .eq('id', notificationId);
+
+    if (error) throw error;
+  }
+
+  async markAllNotificationsAsRead(userId?: string): Promise<void> {
+    const {
+      data: { user },
+    } = await this.supabase.auth.getUser();
+    const targetUserId = userId || user?.id;
+
+    if (!targetUserId) throw new Error('User not authenticated');
+
+    const { error } = await this.supabase
+      .from('notifications')
+      .update({ read: true })
+      .eq('user_id', targetUserId)
+      .eq('read', false);
+
+    if (error) throw error;
+  }
+
   // Real-time subscriptions
   subscribeToSessions(
     // eslint-disable-next-line no-unused-vars
@@ -253,6 +399,30 @@ export class DatabaseService {
       .subscribe();
   }
 
+  // Subscribe to specific session changes
+  subscribeToSession(
+    sessionId: string,
+    // eslint-disable-next-line no-unused-vars
+    callback: (_session: SessionData | null) => void
+  ) {
+    return this.supabase
+      .channel(`session_${sessionId}`)
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'sessions',
+          filter: `id=eq.${sessionId}`,
+        },
+        async () => {
+          const session = await this.getSession(sessionId);
+          callback(session);
+        }
+      )
+      .subscribe();
+  }
+
   subscribeToCheckIns(
     // eslint-disable-next-line no-unused-vars
     callback: (_checkIns: CheckInData[]) => void,
@@ -278,6 +448,99 @@ export class DatabaseService {
         async () => {
           const updatedCheckIns = await this.getCheckIns(targetUserId);
           callback(updatedCheckIns);
+        }
+      )
+      .subscribe();
+  }
+
+  // Subscribe to achievements
+  subscribeToAchievements(
+    // eslint-disable-next-line no-unused-vars
+    callback: (_achievements: Achievement[]) => void,
+    userId?: string
+  ) {
+    const {
+      data: { user },
+    } = this.supabase.auth.getUser();
+    const targetUserId = userId || user?.id;
+
+    if (!targetUserId) return null;
+
+    return this.supabase
+      .channel('achievements_changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'achievements',
+          filter: `user_id=eq.${targetUserId}`,
+        },
+        async () => {
+          const achievements = await this.getAchievements(targetUserId);
+          callback(achievements);
+        }
+      )
+      .subscribe();
+  }
+
+  // Subscribe to notifications
+  subscribeToNotifications(
+    // eslint-disable-next-line no-unused-vars
+    callback: (_notifications: Notification[]) => void,
+    userId?: string
+  ) {
+    const {
+      data: { user },
+    } = this.supabase.auth.getUser();
+    const targetUserId = userId || user?.id;
+
+    if (!targetUserId) return null;
+
+    return this.supabase
+      .channel('notifications_changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'notifications',
+          filter: `user_id=eq.${targetUserId}`,
+        },
+        async () => {
+          const notifications = await this.getNotifications(targetUserId);
+          callback(notifications);
+        }
+      )
+      .subscribe();
+  }
+
+  // Subscribe to progress metrics
+  subscribeToProgressMetrics(
+    // eslint-disable-next-line no-unused-vars
+    callback: (_metrics: ProgressMetrics[]) => void,
+    userId?: string
+  ) {
+    const {
+      data: { user },
+    } = this.supabase.auth.getUser();
+    const targetUserId = userId || user?.id;
+
+    if (!targetUserId) return null;
+
+    return this.supabase
+      .channel('progress_metrics_changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'progress_metrics',
+          filter: `user_id=eq.${targetUserId}`,
+        },
+        async () => {
+          const metrics = await this.getProgressMetrics(targetUserId);
+          callback(metrics);
         }
       )
       .subscribe();

@@ -10,6 +10,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Slider } from '@/components/ui/slider';
 import { ProfileSwitcher } from '@/components/profile-switcher';
 import { UserOnboarding } from '@/components/user-onboarding';
+import { RealTimeNotifications } from '@/components/real-time-notifications';
+import { RealTimeAchievements } from '@/components/real-time-achievements';
 import { useUser } from '@/lib/contexts/user-context';
 import { useDatabase } from '@/lib/hooks/use-database';
 
@@ -260,6 +262,7 @@ export default function Dashboard() {
               {simpleMode ? <Eye /> : <EyeOff />}
               {simpleMode ? 'Full View' : 'Simple Mode'}
             </Button>
+            <RealTimeNotifications />
             <ProfileSwitcher />
           </div>
         </div>
@@ -1053,6 +1056,7 @@ export default function Dashboard() {
               ))}
             </CardContent>
           </Card>
+          <RealTimeAchievements />
         </TabsContent>
 
         <TabsContent value='profile' className='space-y-6'>

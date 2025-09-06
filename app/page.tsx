@@ -12,6 +12,7 @@ import { ProfileSwitcher } from '@/components/profile-switcher';
 import { UserOnboarding } from '@/components/user-onboarding';
 import { RealTimeNotifications } from '@/components/real-time-notifications';
 import { RealTimeAchievements } from '@/components/real-time-achievements';
+import { OfflineStatus } from '@/components/offline-status';
 import { useUser } from '@/lib/contexts/user-context';
 import { useDatabase } from '@/lib/hooks/use-database';
 
@@ -263,6 +264,7 @@ export default function Dashboard() {
               {simpleMode ? 'Full View' : 'Simple Mode'}
             </Button>
             <RealTimeNotifications />
+            <OfflineStatus />
             <ProfileSwitcher />
           </div>
         </div>

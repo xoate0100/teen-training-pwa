@@ -1,6 +1,13 @@
 'use client';
 
 import { createSupabaseClient } from '@/lib/supabase/client';
+import {
+  validateSession,
+  validateCheckIn,
+  formatValidationError,
+} from '@/lib/validation/schemas';
+import { DataIntegrityChecker } from '@/lib/validation/data-integrity';
+import { OfflineHandler } from '@/lib/offline/offline-handler';
 
 // Types matching the existing storage interface
 export interface SessionData {
@@ -91,6 +98,30 @@ export class DatabaseService {
       user_id: user.id,
     };
 
+    // Validate data
+    const validation = validateSession(sessionData);
+    if (!validation.success) {
+      throw new Error(
+        `Validation failed: ${formatValidationError(validation.error)}`
+      );
+    }
+
+    // Check data integrity
+    const integrityCheck = DataIntegrityChecker.checkSession(validation.data);
+    if (!integrityCheck.isValid) {
+      throw new Error(
+        `Data integrity check failed: ${integrityCheck.errors.join(', ')}`
+      );
+    }
+
+    // Handle offline mode
+    if (!OfflineHandler.isOnline()) {
+      OfflineHandler.queueForSync('session', sessionData);
+      throw new Error(
+        'Offline mode: Data queued for sync when connection is restored'
+      );
+    }
+
     const { data, error } = await this.supabase
       .from('sessions')
       .upsert(sessionData, { onConflict: 'id' })
@@ -155,6 +186,30 @@ export class DatabaseService {
       ...checkIn,
       user_id: user.id,
     };
+
+    // Validate data
+    const validation = validateCheckIn(checkInData);
+    if (!validation.success) {
+      throw new Error(
+        `Validation failed: ${formatValidationError(validation.error)}`
+      );
+    }
+
+    // Check data integrity
+    const integrityCheck = DataIntegrityChecker.checkCheckIn(validation.data);
+    if (!integrityCheck.isValid) {
+      throw new Error(
+        `Data integrity check failed: ${integrityCheck.errors.join(', ')}`
+      );
+    }
+
+    // Handle offline mode
+    if (!OfflineHandler.isOnline()) {
+      OfflineHandler.queueForSync('checkIn', checkInData);
+      throw new Error(
+        'Offline mode: Data queued for sync when connection is restored'
+      );
+    }
 
     const { data, error } = await this.supabase
       .from('daily_check_ins')

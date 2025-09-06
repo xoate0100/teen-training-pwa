@@ -22,6 +22,10 @@ import { HeroBackground } from '@/components/hero-background';
 import { SessionTypeShowcase } from '@/components/session-type-showcase';
 import { ThemedSessionCard } from '@/components/themed-session-card';
 import { GamificationDashboard } from '@/components/gamification-dashboard';
+import { ThemeProvider } from '@/components/theme-provider';
+import { ThemeSelector } from '@/components/theme-selector';
+import { MicroInteractionDemo } from '@/components/micro-interactions';
+import { ImmersiveFeedbackDemo } from '@/components/immersive-feedback';
 import { useUser } from '@/lib/contexts/user-context';
 import { useDatabase } from '@/lib/hooks/use-database';
 
@@ -319,7 +323,7 @@ export default function Dashboard() {
 
       <Tabs defaultValue='dashboard' className='w-full'>
         <TabsList
-          className='grid w-full grid-cols-10 mb-6 h-12'
+          className='grid w-full grid-cols-11 mb-6 h-12'
           role='tablist'
           aria-label='Main navigation'
         >
@@ -337,6 +341,9 @@ export default function Dashboard() {
           </TabsTrigger>
           <TabsTrigger value='achievements' className='text-base font-medium'>
             Achievements
+          </TabsTrigger>
+          <TabsTrigger value='interactive' className='text-base font-medium'>
+            Interactive
           </TabsTrigger>
           <TabsTrigger value='smart' className='text-base font-medium'>
             Smart
@@ -1148,6 +1155,45 @@ export default function Dashboard() {
 
         <TabsContent value='achievements' className='space-y-6'>
           <GamificationDashboard sessions={[]} checkIns={[]} />
+        </TabsContent>
+
+        <TabsContent value='interactive' className='space-y-6'>
+          <ThemeProvider>
+            <div className='space-y-8'>
+              <div>
+                <h2 className='text-2xl font-bold text-gray-900 mb-4'>
+                  Interactive UI Enhancements
+                </h2>
+                <p className='text-gray-600'>
+                  Experience dynamic theming, micro-interactions, and immersive
+                  feedback
+                </p>
+              </div>
+
+              <div className='grid grid-cols-1 lg:grid-cols-2 gap-8'>
+                <div>
+                  <h3 className='text-xl font-semibold text-gray-900 mb-4'>
+                    Theme Customization
+                  </h3>
+                  <ThemeSelector showPreview={true} />
+                </div>
+
+                <div>
+                  <h3 className='text-xl font-semibold text-gray-900 mb-4'>
+                    Micro-Interactions
+                  </h3>
+                  <MicroInteractionDemo />
+                </div>
+              </div>
+
+              <div>
+                <h3 className='text-xl font-semibold text-gray-900 mb-4'>
+                  Immersive Feedback
+                </h3>
+                <ImmersiveFeedbackDemo />
+              </div>
+            </div>
+          </ThemeProvider>
         </TabsContent>
 
         <TabsContent value='wellness' className='space-y-6'>

@@ -58,21 +58,21 @@ _Dependencies: None | Timeline: 2-3 weeks_
 
 ### 1.3 Smart Week Calculation System
 
-- [ ] **1.3.1** Implement intelligent week/day calculation
-  - [ ] Program start date tracking
-  - [ ] Dynamic week progression calculation
-  - [ ] Missed session handling
-  - [ ] Deload week automation
-- [ ] **1.3.2** Create program phase detection
-  - [ ] Current phase identification
-  - [ ] Phase transition logic
-  - [ ] Intensity and volume adjustments
-  - [ ] Phase-specific recommendations
-- [ ] **1.3.3** Build session scheduling intelligence
-  - [ ] Next session prediction
-  - [ ] Optimal training time suggestions
-  - [ ] Recovery day recommendations
-  - [ ] Schedule conflict detection
+- [x] **1.3.1** Implement intelligent week/day calculation
+  - [x] Program start date tracking
+  - [x] Dynamic week progression calculation
+  - [x] Missed session handling
+  - [x] Deload week automation
+- [x] **1.3.2** Create program phase detection
+  - [x] Current phase identification
+  - [x] Phase transition logic
+  - [x] Intensity and volume adjustments
+  - [x] Phase-specific recommendations
+- [x] **1.3.3** Build session scheduling intelligence
+  - [x] Next session prediction
+  - [x] Optimal training time suggestions
+  - [x] Recovery day recommendations
+  - [x] Schedule conflict detection
 
 ---
 

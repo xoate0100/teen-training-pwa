@@ -15,6 +15,7 @@ import { RealTimeAchievements } from '@/components/real-time-achievements';
 import { OfflineStatus } from '@/components/offline-status';
 import { WeekCalculationDisplay } from '@/components/week-calculation-display';
 import { SmartSchedulingDisplay } from '@/components/smart-scheduling-display';
+import { AIIntelligenceDisplay } from '@/components/ai-intelligence-display';
 import { useUser } from '@/lib/contexts/user-context';
 import { useDatabase } from '@/lib/hooks/use-database';
 
@@ -310,7 +311,7 @@ export default function Dashboard() {
 
       <Tabs defaultValue='dashboard' className='w-full'>
         <TabsList
-          className='grid w-full grid-cols-5 mb-6 h-12'
+          className='grid w-full grid-cols-6 mb-6 h-12'
           role='tablist'
           aria-label='Main navigation'
         >
@@ -325,6 +326,9 @@ export default function Dashboard() {
           </TabsTrigger>
           <TabsTrigger value='smart' className='text-base font-medium'>
             Smart
+          </TabsTrigger>
+          <TabsTrigger value='ai' className='text-base font-medium'>
+            AI
           </TabsTrigger>
           <TabsTrigger value='profile' className='text-base font-medium'>
             Profile
@@ -1104,6 +1108,16 @@ export default function Dashboard() {
             <WeekCalculationDisplay />
             <SmartSchedulingDisplay />
           </div>
+        </TabsContent>
+
+        <TabsContent value='ai' className='space-y-6'>
+          <AIIntelligenceDisplay 
+            sessions={[]}
+            checkIns={[]}
+            progressMetrics={[]}
+            currentPhase="build"
+            availableEquipment={['bodyweight', 'barbell', 'weights', 'bench']}
+          />
         </TabsContent>
       </Tabs>
     </div>

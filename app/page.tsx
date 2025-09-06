@@ -9,6 +9,7 @@ import { Progress } from '@/components/ui/progress';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Slider } from '@/components/ui/slider';
 import { ProfileSwitcher } from '@/components/profile-switcher';
+import { UserOnboarding } from '@/components/user-onboarding';
 import { useUser } from '@/lib/contexts/user-context';
 
 const Trophy = () => (
@@ -79,7 +80,12 @@ const ChevronUp = () => (
 
 export default function Dashboard() {
   const router = useRouter();
-  const { currentUser, isLoading: userLoading } = useUser();
+  const {
+    currentUser,
+    isLoading: userLoading,
+    users,
+    refreshUsers,
+  } = useUser();
   const [announcements, setAnnouncements] = useState('');
   const [mood, setMood] = useState(4);
   const [energy, setEnergy] = useState([7]);
@@ -167,6 +173,11 @@ export default function Dashboard() {
         </div>
       </div>
     );
+  }
+
+  // Show onboarding if no users exist
+  if (!userLoading && users.length === 0) {
+    return <UserOnboarding onComplete={refreshUsers} />;
   }
 
   // Show message if no user is selected

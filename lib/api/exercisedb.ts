@@ -1,8 +1,8 @@
-// ExerciseDB API integration for accessing 5000+ exercises
-// This service provides access to a comprehensive exercise database
+// ExerciseDB API integration using Vercel Bypass Token
+// This service provides access to a comprehensive exercise database via Vercel-protected API
 
 export interface ExerciseDBExercise {
-  id: number;
+  id: string;
   name: string;
   description: string;
   category: string;
@@ -29,7 +29,7 @@ export interface ExerciseDBSearchParams {
 }
 
 export interface ExerciseDBResponse {
-  exercises: ExerciseDBExercise[];
+  data: ExerciseDBExercise[];
   total: number;
   page: number;
   limit: number;
@@ -37,14 +37,15 @@ export interface ExerciseDBResponse {
 }
 
 class ExerciseDBService {
-  private apiKey: string;
-  private baseUrl: string = 'https://api.exercisedb.io/v1';
+  private bypassToken: string;
+  private baseUrl: string =
+    'https://epicexercisedb-qo18rbbm7-xoate0100s-projects.vercel.app';
   private cache: Map<string, ExerciseDBResponse> = new Map();
   private cacheExpiry: Map<string, number> = new Map();
   private readonly CACHE_DURATION = 24 * 60 * 60 * 1000; // 24 hours
 
-  constructor(apiKey: string) {
-    this.apiKey = apiKey;
+  constructor(bypassToken: string) {
+    this.bypassToken = bypassToken;
   }
 
   private getCacheKey(params: ExerciseDBSearchParams): string {
@@ -66,6 +67,49 @@ class ExerciseDBService {
       return this.cache.get(key) || null;
     }
     return null;
+  }
+
+  /**
+   * Make authenticated requests to the ExerciseDB API using Vercel bypass token
+   */
+  private async request(
+    endpoint: string,
+    options: RequestInit = {}
+  ): Promise<any> {
+    const url = `${this.baseUrl}${endpoint}?x-vercel-set-bypass-cookie=true&x-vercel-protection-bypass=${this.bypassToken}`;
+
+    const response = await fetch(url, {
+      ...options,
+      headers: {
+        'Content-Type': 'application/json',
+        'User-Agent': 'TeenTrainingPWA/1.0',
+        ...options.headers,
+      },
+    });
+
+    if (response.status === 401) {
+      throw new Error(
+        'Invalid bypass token. Please check your VERCEL_BYPASS_TOKEN.'
+      );
+    }
+
+    if (response.status === 403) {
+      throw new Error('Access denied. Token may be expired or revoked.');
+    }
+
+    if (response.status === 500) {
+      // API is having internal issues, return empty data gracefully
+      console.warn('ExerciseDB API returned 500 error, returning empty data');
+      return { data: [], total: 0, page: 1, limit: 20, total_pages: 0 };
+    }
+
+    if (!response.ok) {
+      throw new Error(
+        `API request failed: ${response.status} ${response.statusText}`
+      );
+    }
+
+    return response.json();
   }
 
   /**
@@ -94,31 +138,15 @@ class ExerciseDBService {
       if (params.page) searchParams.append('page', params.page.toString());
       if (params.limit) searchParams.append('limit', params.limit.toString());
 
-      const response = await fetch(
-        `${this.baseUrl}/exercises?${searchParams}`,
-        {
-          headers: {
-            Authorization: `Bearer ${this.apiKey}`,
-            'Content-Type': 'application/json',
-          },
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error(
-          `ExerciseDB API error: ${response.status} ${response.statusText}`
-        );
-      }
-
-      const data = await response.json();
+      const data = await this.request(`/api/v1/exercises?${searchParams}`);
 
       // Transform the response to match our interface
       const transformedData: ExerciseDBResponse = {
-        exercises: data.exercises.map((ex: any) => this.transformExercise(ex)),
-        total: data.total,
+        data: data.data?.map((ex: any) => this.transformExercise(ex)) || [],
+        total: data.total || 0,
         page: data.page || 1,
         limit: data.limit || 20,
-        total_pages: Math.ceil(data.total / (data.limit || 20)),
+        total_pages: Math.ceil((data.total || 0) / (data.limit || 20)),
       };
 
       this.setCache(cacheKey, transformedData);
@@ -132,27 +160,14 @@ class ExerciseDBService {
   /**
    * Get a specific exercise by ID
    */
-  async getExerciseById(id: number): Promise<ExerciseDBExercise | null> {
+  async getExerciseById(id: string): Promise<ExerciseDBExercise | null> {
     try {
-      const response = await fetch(`${this.baseUrl}/exercises/${id}`, {
-        headers: {
-          Authorization: `Bearer ${this.apiKey}`,
-          'Content-Type': 'application/json',
-        },
-      });
-
-      if (!response.ok) {
-        if (response.status === 404) {
-          return null;
-        }
-        throw new Error(
-          `ExerciseDB API error: ${response.status} ${response.statusText}`
-        );
-      }
-
-      const data = await response.json();
+      const data = await this.request(`/api/v1/exercises/${id}`);
       return this.transformExercise(data);
     } catch (error) {
+      if (error.message.includes('404')) {
+        return null;
+      }
       console.error(`Error fetching exercise ${id} from ExerciseDB:`, error);
       throw error;
     }
@@ -166,7 +181,7 @@ class ExerciseDBService {
     limit: number = 50
   ): Promise<ExerciseDBExercise[]> {
     const response = await this.searchExercises({ category, limit });
-    return response.exercises;
+    return response.data;
   }
 
   /**
@@ -180,7 +195,7 @@ class ExerciseDBService {
       muscle_group: muscleGroup,
       limit,
     });
-    return response.exercises;
+    return response.data;
   }
 
   /**
@@ -191,7 +206,7 @@ class ExerciseDBService {
     limit: number = 50
   ): Promise<ExerciseDBExercise[]> {
     const response = await this.searchExercises({ equipment, limit });
-    return response.exercises;
+    return response.data;
   }
 
   /**
@@ -202,7 +217,7 @@ class ExerciseDBService {
     limit: number = 50
   ): Promise<ExerciseDBExercise[]> {
     const response = await this.searchExercises({ difficulty, limit });
-    return response.exercises;
+    return response.data;
   }
 
   /**
@@ -213,83 +228,171 @@ class ExerciseDBService {
     limit: number = 20
   ): Promise<ExerciseDBExercise[]> {
     const response = await this.searchExercises({ search: searchTerm, limit });
-    return response.exercises;
+    return response.data;
   }
 
   /**
-   * Get all available categories
+   * Get all available muscles
    */
-  async getCategories(): Promise<string[]> {
+  async getMuscles(): Promise<string[]> {
     try {
-      const response = await fetch(`${this.baseUrl}/categories`, {
-        headers: {
-          Authorization: `Bearer ${this.apiKey}`,
-          'Content-Type': 'application/json',
-        },
-      });
-
-      if (!response.ok) {
-        throw new Error(
-          `ExerciseDB API error: ${response.status} ${response.statusText}`
-        );
-      }
-
-      const data = await response.json();
-      return data.categories || [];
+      const data = await this.request('/api/v1/muscles');
+      return data.data || [];
     } catch (error) {
-      console.error('Error fetching categories from ExerciseDB:', error);
-      throw error;
+      console.error('Error fetching muscles from ExerciseDB:', error);
+      // Return fallback muscle groups
+      return [
+        'chest',
+        'back',
+        'shoulders',
+        'biceps',
+        'triceps',
+        'forearms',
+        'abs',
+        'obliques',
+        'quadriceps',
+        'hamstrings',
+        'glutes',
+        'calves',
+        'traps',
+        'lats',
+        'rhomboids',
+        'deltoids',
+      ];
     }
   }
 
   /**
-   * Get all available muscle groups
+   * Get all available body parts
    */
-  async getMuscleGroups(): Promise<string[]> {
+  async getBodyParts(): Promise<string[]> {
     try {
-      const response = await fetch(`${this.baseUrl}/muscle-groups`, {
-        headers: {
-          Authorization: `Bearer ${this.apiKey}`,
-          'Content-Type': 'application/json',
-        },
-      });
-
-      if (!response.ok) {
-        throw new Error(
-          `ExerciseDB API error: ${response.status} ${response.statusText}`
-        );
-      }
-
-      const data = await response.json();
-      return data.muscle_groups || [];
+      const data = await this.request('/api/v1/bodyparts');
+      return data.data || [];
     } catch (error) {
-      console.error('Error fetching muscle groups from ExerciseDB:', error);
-      throw error;
+      console.error('Error fetching body parts from ExerciseDB:', error);
+      // Return fallback body parts
+      return [
+        'chest',
+        'back',
+        'shoulders',
+        'arms',
+        'legs',
+        'core',
+        'full body',
+      ];
     }
   }
 
   /**
    * Get all available equipment
    */
-  async getEquipment(): Promise<string[]> {
+  async getEquipments(): Promise<string[]> {
     try {
-      const response = await fetch(`${this.baseUrl}/equipment`, {
-        headers: {
-          Authorization: `Bearer ${this.apiKey}`,
-          'Content-Type': 'application/json',
-        },
-      });
-
-      if (!response.ok) {
-        throw new Error(
-          `ExerciseDB API error: ${response.status} ${response.statusText}`
-        );
-      }
-
-      const data = await response.json();
-      return data.equipment || [];
+      const data = await this.request('/api/v1/equipments');
+      return data.data || [];
     } catch (error) {
       console.error('Error fetching equipment from ExerciseDB:', error);
+      // Return fallback equipment
+      return [
+        'none',
+        'dumbbells',
+        'barbell',
+        'kettlebell',
+        'resistance_bands',
+        'pull_up_bar',
+        'bench',
+        'mat',
+        'medicine_ball',
+        'stability_ball',
+        'cable_machine',
+        'treadmill',
+        'bike',
+        'rower',
+      ];
+    }
+  }
+
+  /**
+   * Get exercises by muscle name
+   */
+  async getExercisesByMuscle(
+    muscleName: string,
+    params: ExerciseDBSearchParams = {}
+  ): Promise<ExerciseDBExercise[]> {
+    try {
+      const searchParams = new URLSearchParams();
+      Object.entries(params).forEach(([key, value]) => {
+        if (value !== undefined) {
+          searchParams.append(key, value.toString());
+        }
+      });
+
+      const data = await this.request(
+        `/api/v1/muscles/${muscleName}/exercises?${searchParams}`
+      );
+      return data.data?.map((ex: any) => this.transformExercise(ex)) || [];
+    } catch (error) {
+      console.error(
+        `Error fetching exercises for muscle ${muscleName}:`,
+        error
+      );
+      throw error;
+    }
+  }
+
+  /**
+   * Get exercises by body part
+   */
+  async getExercisesByBodyPart(
+    bodyPart: string,
+    params: ExerciseDBSearchParams = {}
+  ): Promise<ExerciseDBExercise[]> {
+    try {
+      const searchParams = new URLSearchParams();
+      Object.entries(params).forEach(([key, value]) => {
+        if (value !== undefined) {
+          searchParams.append(key, value.toString());
+        }
+      });
+
+      const data = await this.request(
+        `/api/v1/bodyparts/${bodyPart}/exercises?${searchParams}`
+      );
+      return data.data?.map((ex: any) => this.transformExercise(ex)) || [];
+    } catch (error) {
+      console.error(
+        `Error fetching exercises for body part ${bodyPart}:`,
+        error
+      );
+      throw error;
+    }
+  }
+
+  /**
+   * Get exercises by equipment
+   */
+  async getExercisesByEquipmentName(
+    equipment: string,
+    params: ExerciseDBSearchParams = {}
+  ): Promise<ExerciseDBExercise[]> {
+    try {
+      const searchParams = new URLSearchParams();
+      Object.entries(params).forEach(([key, value]) => {
+        if (value !== undefined) {
+          searchParams.append(key, value.toString());
+        }
+      });
+
+      const data = await this.request(
+        `/api/v1/equipments/${equipment}/exercises?${searchParams}`
+      );
+      return data.data?.map((ex: any) => this.transformExercise(ex)) || [];
+    } catch (error) {
+      console.error(
+        `Error fetching exercises for equipment ${equipment}:`,
+        error
+      );
       throw error;
     }
   }
@@ -299,17 +402,19 @@ class ExerciseDBService {
    */
   private transformExercise(exercise: any): ExerciseDBExercise {
     return {
-      id: exercise.id,
-      name: exercise.name,
-      description: exercise.description || '',
-      category: exercise.category || 'General',
-      muscle_groups: exercise.muscle_groups || [],
-      equipment: exercise.equipment || [],
-      difficulty_level: this.mapDifficultyLevel(exercise.difficulty_level),
+      id: exercise.id || exercise._id || '',
+      name: exercise.name || '',
+      description: exercise.description || exercise.instructions?.[0] || '',
+      category: exercise.category || exercise.bodyPart || 'General',
+      muscle_groups: exercise.muscle_groups || exercise.secondaryMuscles || [],
+      equipment: exercise.equipment || [exercise.equipment] || [],
+      difficulty_level: this.mapDifficultyLevel(
+        exercise.difficulty_level || exercise.level
+      ),
       instructions: exercise.instructions || [],
-      video_url: exercise.video_url,
-      image_url: exercise.image_url,
-      alternative_names: exercise.alternative_names || [],
+      video_url: exercise.video_url || exercise.gifUrl,
+      image_url: exercise.image_url || exercise.gifUrl,
+      alternative_names: exercise.alternative_names || exercise.aliases || [],
       tips: exercise.tips || [],
       common_mistakes: exercise.common_mistakes || [],
       variations: exercise.variations || [],
@@ -403,9 +508,9 @@ class ExerciseDBService {
   }
 }
 
-// Export singleton instance
+// Export singleton instance with Vercel bypass token
 export const exerciseDBService = new ExerciseDBService(
-  process.env.EXERCISEDB_API_KEY || ''
+  process.env.VERCEL_BYPASS_TOKEN || 'J8oXkb6jpVtfdtHUztv6ib4kZJI8Z8pN'
 );
 
 // Export the class for testing

@@ -28,7 +28,7 @@ export async function GET(request: NextRequest) {
         page,
         limit,
       });
-      results = response.exercises;
+      results = response.data;
     } else if (source === 'youtube') {
       if (search) {
         const response = await youtubeService.searchExerciseVideos({
@@ -82,7 +82,7 @@ export async function GET_CATEGORIES(request: NextRequest) {
     let categories = [];
 
     if (source === 'exercisedb') {
-      categories = await exerciseDBService.getCategories();
+      categories = await exerciseDBService.getBodyParts();
     } else if (source === 'youtube') {
       // YouTube doesn't have predefined categories, return common exercise categories
       categories = [
@@ -134,7 +134,7 @@ export async function GET_MUSCLE_GROUPS(request: NextRequest) {
     let muscleGroups = [];
 
     if (source === 'exercisedb') {
-      muscleGroups = await exerciseDBService.getMuscleGroups();
+      muscleGroups = await exerciseDBService.getMuscles();
     } else if (source === 'youtube') {
       // Return common muscle groups for YouTube searches
       muscleGroups = [
@@ -190,7 +190,7 @@ export async function GET_EQUIPMENT(request: NextRequest) {
     let equipment = [];
 
     if (source === 'exercisedb') {
-      equipment = await exerciseDBService.getEquipment();
+      equipment = await exerciseDBService.getEquipments();
     } else if (source === 'youtube') {
       // Return common equipment for YouTube searches
       equipment = [

@@ -18,6 +18,10 @@ import { SmartSchedulingDisplay } from '@/components/smart-scheduling-display';
 import { AIIntelligenceDisplay } from '@/components/ai-intelligence-display';
 import { LLMIntegrationDisplay } from '@/components/llm-integration-display';
 import { WellnessIntelligenceDisplay } from '@/components/wellness-intelligence-display';
+import {
+  HeroBackground,
+  SessionCardBackground,
+} from '@/components/hero-background';
 import { useUser } from '@/lib/contexts/user-context';
 import { useDatabase } from '@/lib/hooks/use-database';
 
@@ -241,51 +245,53 @@ export default function Dashboard() {
         {announcements}
       </div>
 
-      <header className='mb-6'>
-        <div className='flex justify-between items-start mb-4'>
-          <div>
-            <h1 className='text-2xl font-bold text-foreground mb-2 leading-tight'>
-              Teen Training Hub
-            </h1>
-            <p className='text-base text-muted-foreground leading-relaxed'>
-              {currentUser
-                ? `Welcome back, ${currentUser.full_name}! • Week ${currentUser.current_week || 1} of 11 • Let's crush today! 💪`
-                : 'Loading...'}
-            </p>
-          </div>
-          <div className='flex items-center gap-3'>
-            <Button
-              variant='outline'
-              size='sm'
-              onClick={() => setSimpleMode(!simpleMode)}
-              className='flex items-center gap-2 h-12 px-4'
-              aria-label={
-                simpleMode
-                  ? 'Switch to full view mode'
-                  : 'Switch to simple mode'
-              }
-            >
-              {simpleMode ? <Eye /> : <EyeOff />}
-              {simpleMode ? 'Full View' : 'Simple Mode'}
-            </Button>
-            <RealTimeNotifications />
-            <OfflineStatus />
-            <ProfileSwitcher />
-          </div>
-        </div>
-
-        {simpleMode && (
-          <div
-            className='bg-primary/10 border-2 border-primary/30 rounded-lg p-4 mb-4'
-            role='banner'
-          >
-            <div className='flex items-center gap-3 text-primary font-semibold'>
-              <Target />
-              <span>Today's Focus: Check-in → Train → Progress</span>
+      <HeroBackground context='dashboard' className='mb-6 rounded-lg'>
+        <header className='p-6'>
+          <div className='flex justify-between items-start mb-4'>
+            <div>
+              <h1 className='text-3xl font-bold text-white mb-2 leading-tight drop-shadow-lg'>
+                Teen Training Hub
+              </h1>
+              <p className='text-lg text-white/90 leading-relaxed drop-shadow-md'>
+                {currentUser
+                  ? `Welcome back, ${currentUser.full_name}! • Week ${currentUser.current_week || 1} of 11 • Let's crush today! 💪`
+                  : 'Loading...'}
+              </p>
+            </div>
+            <div className='flex items-center gap-3'>
+              <Button
+                variant='outline'
+                size='sm'
+                onClick={() => setSimpleMode(!simpleMode)}
+                className='flex items-center gap-2 h-12 px-4'
+                aria-label={
+                  simpleMode
+                    ? 'Switch to full view mode'
+                    : 'Switch to simple mode'
+                }
+              >
+                {simpleMode ? <Eye /> : <EyeOff />}
+                {simpleMode ? 'Full View' : 'Simple Mode'}
+              </Button>
+              <RealTimeNotifications />
+              <OfflineStatus />
+              <ProfileSwitcher />
             </div>
           </div>
-        )}
-      </header>
+
+          {simpleMode && (
+            <div
+              className='bg-primary/10 border-2 border-primary/30 rounded-lg p-4 mb-4'
+              role='banner'
+            >
+              <div className='flex items-center gap-3 text-primary font-semibold'>
+                <Target />
+                <span>Today's Focus: Check-in → Train → Progress</span>
+              </div>
+            </div>
+          )}
+        </header>
+      </HeroBackground>
 
       {showCelebration && (
         <div
@@ -860,32 +866,30 @@ export default function Dashboard() {
           </section>
 
           <section aria-labelledby='training-title'>
-            <Card className='border-2 border-primary/30 bg-gradient-to-br from-primary/10 to-primary/5 shadow-lg'>
-              <CardContent className='pt-8 pb-8'>
-                <div className='text-center space-y-6'>
-                  <div className='text-6xl mb-4' role='img' aria-label='Rocket'>
-                    🚀
-                  </div>
-                  <h2
-                    id='training-title'
-                    className='text-2xl font-bold text-primary leading-tight'
-                  >
-                    Ready to train?
-                  </h2>
-                  <p className='text-muted-foreground text-lg leading-relaxed'>
-                    Next up: Lower-Body Strength
-                  </p>
-                  <Button
-                    size='lg'
-                    className='w-full h-16 text-lg font-semibold transition-all duration-200 hover:scale-102 shadow-lg'
-                    aria-label="Start today's lower-body strength training session"
-                    onClick={() => handleStartSession('lower-body-strength')}
-                  >
-                    <Play /> Start Today's Session
-                  </Button>
+            <SessionCardBackground sessionType='strength' className='h-64'>
+              <div className='text-center space-y-6'>
+                <div className='text-6xl mb-4' role='img' aria-label='Rocket'>
+                  🚀
                 </div>
-              </CardContent>
-            </Card>
+                <h2
+                  id='training-title'
+                  className='text-2xl font-bold leading-tight'
+                >
+                  Ready to train?
+                </h2>
+                <p className='text-lg leading-relaxed'>
+                  Next up: Lower-Body Strength
+                </p>
+                <Button
+                  size='lg'
+                  className='w-full h-16 text-lg font-semibold transition-all duration-200 hover:scale-102 shadow-lg'
+                  aria-label="Start today's lower-body strength training session"
+                  onClick={() => handleStartSession('lower-body-strength')}
+                >
+                  <Play /> Start Today's Session
+                </Button>
+              </div>
+            </SessionCardBackground>
           </section>
 
           {!simpleMode && (

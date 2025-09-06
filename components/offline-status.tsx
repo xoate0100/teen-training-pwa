@@ -5,7 +5,7 @@ import { useValidation } from '@/lib/hooks/use-validation';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Wifi, WifiOff, Sync, AlertTriangle, CheckCircle } from 'lucide-react';
+import { Wifi, WifiOff, RefreshCw, AlertTriangle, CheckCircle } from 'lucide-react';
 import { toast } from 'sonner';
 
 export function OfflineStatus() {
@@ -47,7 +47,7 @@ export function OfflineStatus() {
       return <WifiOff className='w-4 h-4 text-red-500' />;
     }
     if (needsSync()) {
-      return <Sync className='w-4 h-4 text-yellow-500' />;
+      return <RefreshCw className='w-4 h-4 text-yellow-500' />;
     }
     return <Wifi className='w-4 h-4 text-green-500' />;
   };
@@ -178,7 +178,7 @@ export function OfflineStatus() {
 
             {needsSync() && !status.isOffline && (
               <div className='flex items-start gap-2 p-3 bg-blue-50 border border-blue-200 rounded-lg'>
-                <Sync className='w-4 h-4 text-blue-600 mt-0.5' />
+                <RefreshCw className='w-4 h-4 text-blue-600 mt-0.5' />
                 <div className='text-sm'>
                   <p className='font-medium text-blue-800'>Sync Pending</p>
                   <p className='text-blue-700'>
@@ -209,7 +209,7 @@ export function OfflineStatus() {
                 className='flex-1'
                 disabled={status.isOffline}
               >
-                <Sync className='w-4 h-4 mr-2' />
+                <RefreshCw className='w-4 h-4 mr-2' />
                 {needsSync() ? 'Sync Now' : 'Check Sync'}
               </Button>
               <Button

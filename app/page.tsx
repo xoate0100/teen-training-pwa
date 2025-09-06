@@ -13,6 +13,8 @@ import { UserOnboarding } from '@/components/user-onboarding';
 import { RealTimeNotifications } from '@/components/real-time-notifications';
 import { RealTimeAchievements } from '@/components/real-time-achievements';
 import { OfflineStatus } from '@/components/offline-status';
+import { WeekCalculationDisplay } from '@/components/week-calculation-display';
+import { SmartSchedulingDisplay } from '@/components/smart-scheduling-display';
 import { useUser } from '@/lib/contexts/user-context';
 import { useDatabase } from '@/lib/hooks/use-database';
 
@@ -308,7 +310,7 @@ export default function Dashboard() {
 
       <Tabs defaultValue='dashboard' className='w-full'>
         <TabsList
-          className='grid w-full grid-cols-4 mb-6 h-12'
+          className='grid w-full grid-cols-5 mb-6 h-12'
           role='tablist'
           aria-label='Main navigation'
         >
@@ -320,6 +322,9 @@ export default function Dashboard() {
           </TabsTrigger>
           <TabsTrigger value='progress' className='text-base font-medium'>
             Progress
+          </TabsTrigger>
+          <TabsTrigger value='smart' className='text-base font-medium'>
+            Smart
           </TabsTrigger>
           <TabsTrigger value='profile' className='text-base font-medium'>
             Profile
@@ -1092,6 +1097,13 @@ export default function Dashboard() {
               </div>
             </CardContent>
           </Card>
+        </TabsContent>
+
+        <TabsContent value='smart' className='space-y-6'>
+          <div className='grid gap-6 md:grid-cols-2'>
+            <WeekCalculationDisplay />
+            <SmartSchedulingDisplay />
+          </div>
         </TabsContent>
       </Tabs>
     </div>

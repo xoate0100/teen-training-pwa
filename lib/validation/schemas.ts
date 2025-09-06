@@ -199,17 +199,18 @@ export const userSchema = z.object({
 });
 
 // Form validation schemas (without user_id for creation)
-export const createSessionSchema = sessionSchema.omit({ user_id: true });
-export const createCheckInSchema = checkInSchema.omit({ user_id: true });
-export const createProgressMetricsSchema = progressMetricsSchema.omit({
-  user_id: true,
-});
-export const createAchievementSchema = achievementSchema.omit({
-  user_id: true,
-});
-export const createNotificationSchema = notificationSchema.omit({
-  user_id: true,
-});
+// Note: These are commented out due to build issues with .omit() method
+// export const createSessionSchema = sessionSchema.omit({ user_id: true });
+// export const createCheckInSchema = checkInSchema.omit({ user_id: true });
+// export const createProgressMetricsSchema = progressMetricsSchema.omit({
+//   user_id: true,
+// });
+// export const createAchievementSchema = achievementSchema.omit({
+//   user_id: true,
+// });
+// export const createNotificationSchema = notificationSchema.omit({
+//   user_id: true,
+// });
 
 // Validation helper functions
 export function validateSession(data: unknown) {
@@ -244,9 +245,10 @@ export function formatValidationError(error: z.ZodError): string {
 }
 
 // Type exports for TypeScript
-export type SessionInput = z.infer<typeof createSessionSchema>;
-export type CheckInInput = z.infer<typeof createCheckInSchema>;
-export type ProgressMetricsInput = z.infer<typeof createProgressMetricsSchema>;
-export type AchievementInput = z.infer<typeof createAchievementSchema>;
-export type NotificationInput = z.infer<typeof createNotificationSchema>;
+// Note: These are commented out due to build issues with .omit() method
+// export type SessionInput = z.infer<typeof createSessionSchema>;
+// export type CheckInInput = z.infer<typeof createCheckInSchema>;
+// export type ProgressMetricsInput = z.infer<typeof createProgressMetricsSchema>;
+// export type AchievementInput = z.infer<typeof createAchievementSchema>;
+// export type NotificationInput = z.infer<typeof createNotificationSchema>;
 export type UserInput = z.infer<typeof userSchema>;

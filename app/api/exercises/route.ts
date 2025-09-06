@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createSupabaseServerClient } from '@/lib/supabase/client'
+import { exerciseDBService } from '@/lib/api/exercisedb'
+import { youtubeService } from '@/lib/api/youtube'
 import { Exercise, ApiResponse, PaginatedResponse } from '@/lib/types/database'
 
 // GET /api/exercises - Get exercises with filtering and pagination

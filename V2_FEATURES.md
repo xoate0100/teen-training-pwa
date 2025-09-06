@@ -22,16 +22,16 @@ _Dependencies: None | Timeline: 2-3 weeks_
 
 ### 1.1 User Profile Management System
 
-- [ ] **1.1.1** Create admin profile management interface
-  - [ ] User creation form for beta testers
-  - [ ] Profile switcher component in header
-  - [ ] User avatar and basic info display
-  - [ ] Current user indicator with visual feedback
-- [ ] **1.1.2** Implement user context and state management
-  - [ ] UserContext provider with React Context API
-  - [ ] User switching functionality
-  - [ ] Persistent user selection across sessions
-  - [ ] User data caching and optimization
+- [x] **1.1.1** Create admin profile management interface
+  - [x] User creation form for beta testers
+  - [x] Profile switcher component in header
+  - [x] User avatar and basic info display
+  - [x] Current user indicator with visual feedback
+- [x] **1.1.2** Implement user context and state management
+  - [x] UserContext provider with React Context API
+  - [x] User switching functionality
+  - [x] Persistent user selection across sessions
+  - [x] User data caching and optimization
 - [ ] **1.1.3** Create user onboarding flow
   - [ ] Initial profile setup wizard
   - [ ] Sport and experience level selection

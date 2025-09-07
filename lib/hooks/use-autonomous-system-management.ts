@@ -9,7 +9,11 @@ import {
   ABTestResult, 
   LearningPattern, 
   SystemHealthMetrics, 
-  AutomationRule 
+  AutomationRule,
+  UserBehaviorPattern,
+  PreferenceEvolution,
+  GoalAdaptation,
+  PerformanceOptimizationLoop
 } from '@/lib/services/autonomous-system-management';
 
 export interface UseAutonomousSystemManagementReturn {
@@ -39,6 +43,16 @@ export interface UseAutonomousSystemManagementReturn {
   createAutomationRule: (rule: Omit<AutomationRule, 'id' | 'lastTriggered' | 'successRate'>) => Promise<string>;
   evaluateAutomationRules: () => Promise<void>;
   
+  // Adaptive Learning System
+  behaviorPatterns: UserBehaviorPattern[];
+  preferenceEvolutions: PreferenceEvolution[];
+  goalAdaptations: GoalAdaptation[];
+  optimizationLoops: PerformanceOptimizationLoop[];
+  getBehaviorPatterns: (userId: string) => UserBehaviorPattern[];
+  getPreferenceEvolutions: (userId: string) => PreferenceEvolution[];
+  getGoalAdaptations: (userId: string) => GoalAdaptation[];
+  getOptimizationLoops: (userId: string) => PerformanceOptimizationLoop[];
+  
   // System Management
   destroy: () => void;
   
@@ -55,6 +69,10 @@ export function useAutonomousSystemManagement(): UseAutonomousSystemManagementRe
   const [learningPatterns, setLearningPatterns] = useState<LearningPattern[]>([]);
   const [systemHealth, setSystemHealth] = useState<SystemHealthMetrics | null>(null);
   const [automationRules, setAutomationRules] = useState<AutomationRule[]>([]);
+  const [behaviorPatterns, setBehaviorPatterns] = useState<UserBehaviorPattern[]>([]);
+  const [preferenceEvolutions, setPreferenceEvolutions] = useState<PreferenceEvolution[]>([]);
+  const [goalAdaptations, setGoalAdaptations] = useState<GoalAdaptation[]>([]);
+  const [optimizationLoops, setOptimizationLoops] = useState<PerformanceOptimizationLoop[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -68,6 +86,10 @@ export function useAutonomousSystemManagement(): UseAutonomousSystemManagementRe
       setLearningPatterns(autonomousSystemManagement.getLearningPatterns('current-user'));
       setSystemHealth(autonomousSystemManagement.getSystemHealth());
       setAutomationRules(autonomousSystemManagement.getAutomationRules());
+      setBehaviorPatterns(autonomousSystemManagement.getBehaviorPatterns('current-user'));
+      setPreferenceEvolutions(autonomousSystemManagement.getPreferenceEvolutions('current-user'));
+      setGoalAdaptations(autonomousSystemManagement.getGoalAdaptations('current-user'));
+      setOptimizationLoops(autonomousSystemManagement.getOptimizationLoops('current-user'));
     };
 
     updateData();
@@ -152,6 +174,26 @@ export function useAutonomousSystemManagement(): UseAutonomousSystemManagementRe
     return autonomousSystemManagement.getLearningPatterns(userId);
   }, []);
 
+  // Get behavior patterns
+  const getBehaviorPatterns = useCallback((userId: string) => {
+    return autonomousSystemManagement.getBehaviorPatterns(userId);
+  }, []);
+
+  // Get preference evolutions
+  const getPreferenceEvolutions = useCallback((userId: string) => {
+    return autonomousSystemManagement.getPreferenceEvolutions(userId);
+  }, []);
+
+  // Get goal adaptations
+  const getGoalAdaptations = useCallback((userId: string) => {
+    return autonomousSystemManagement.getGoalAdaptations(userId);
+  }, []);
+
+  // Get optimization loops
+  const getOptimizationLoops = useCallback((userId: string) => {
+    return autonomousSystemManagement.getOptimizationLoops(userId);
+  }, []);
+
   // Create automation rule
   const createAutomationRule = useCallback(async (rule: Omit<AutomationRule, 'id' | 'lastTriggered' | 'successRate'>) => {
     try {
@@ -202,6 +244,14 @@ export function useAutonomousSystemManagement(): UseAutonomousSystemManagementRe
     automationRules,
     createAutomationRule,
     evaluateAutomationRules,
+    behaviorPatterns,
+    preferenceEvolutions,
+    goalAdaptations,
+    optimizationLoops,
+    getBehaviorPatterns,
+    getPreferenceEvolutions,
+    getGoalAdaptations,
+    getOptimizationLoops,
     destroy,
     isLoading,
     error,

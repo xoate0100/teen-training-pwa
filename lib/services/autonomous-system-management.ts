@@ -63,6 +63,101 @@ export interface LearningPattern {
   impact: 'high' | 'medium' | 'low';
 }
 
+export interface UserBehaviorPattern {
+  userId: string;
+  patternId: string;
+  patternName: string;
+  description: string;
+  frequency: number; // How often this pattern occurs (0-1)
+  consistency: number; // How consistent this pattern is (0-1)
+  strength: number; // How strong this pattern is (0-1)
+  lastObserved: Date;
+  firstObserved: Date;
+  evolution: {
+    trend: 'increasing' | 'stable' | 'decreasing';
+    rate: number; // Rate of change per week
+    confidence: number; // Confidence in trend (0-1)
+  };
+  triggers: {
+    timeOfDay?: string[];
+    dayOfWeek?: string[];
+    sessionType?: string[];
+    mood?: string[];
+    weather?: string[];
+  };
+  actions: {
+    type: string;
+    parameters: any;
+    effectiveness: number; // How effective this action is (0-1)
+  }[];
+}
+
+export interface PreferenceEvolution {
+  userId: string;
+  preferenceType: 'exercise' | 'timing' | 'intensity' | 'duration' | 'environment';
+  currentValue: any;
+  previousValue: any;
+  evolutionRate: number; // Rate of change per month
+  confidence: number;
+  lastUpdated: Date;
+  history: {
+    value: any;
+    timestamp: Date;
+    context: any;
+  }[];
+  predictions: {
+    nextValue: any;
+    confidence: number;
+    timeframe: number; // Days until predicted change
+  };
+}
+
+export interface GoalAdaptation {
+  userId: string;
+  goalId: string;
+  originalGoal: any;
+  currentGoal: any;
+  adaptationReason: string;
+  adaptationDate: Date;
+  successRate: number; // How successful adaptations have been (0-1)
+  adaptations: {
+    type: 'increase' | 'decrease' | 'modify' | 'replace';
+    value: any;
+    reason: string;
+    date: Date;
+    effectiveness: number;
+  }[];
+  nextAdaptation: {
+    predictedType: string;
+    predictedValue: any;
+    confidence: number;
+    timeframe: number; // Days until next adaptation
+  };
+}
+
+export interface PerformanceOptimizationLoop {
+  loopId: string;
+  userId: string;
+  optimizationType: 'training_load' | 'recovery' | 'nutrition' | 'sleep' | 'motivation';
+  currentState: any;
+  targetState: any;
+  optimizationStrategy: string;
+  iterations: {
+    iteration: number;
+    state: any;
+    performance: number;
+    timestamp: Date;
+    changes: any;
+  }[];
+  convergenceRate: number; // How quickly the loop converges (0-1)
+  stability: number; // How stable the optimization is (0-1)
+  nextIteration: {
+    predictedChanges: any;
+    confidence: number;
+    timeframe: number; // Hours until next iteration
+  };
+}
+
 export interface SystemHealthMetrics {
   timestamp: Date;
   overallHealth: number; // 0-100
@@ -118,6 +213,13 @@ export class AutonomousSystemManagementService {
   private performanceHistory: any[] = [];
   private learningInterval: number | null = null;
   private healthCheckInterval: number | null = null;
+  
+  // Adaptive Learning System Properties
+  private behaviorPatterns: Map<string, UserBehaviorPattern[]> = new Map();
+  private preferenceEvolutions: Map<string, PreferenceEvolution[]> = new Map();
+  private goalAdaptations: Map<string, GoalAdaptation[]> = new Map();
+  private optimizationLoops: Map<string, PerformanceOptimizationLoop[]> = new Map();
+  private adaptiveLearningInterval: number | null = null;
 
   constructor() {
     this.initializeService();
@@ -126,6 +228,7 @@ export class AutonomousSystemManagementService {
   private initializeService() {
     this.startContinuousLearning();
     this.startHealthMonitoring();
+    this.startAdaptiveLearning();
     this.loadStoredData();
   }
 
@@ -1263,6 +1366,902 @@ export class AutonomousSystemManagementService {
     // Implement support contact logic
   }
 
+  // Adaptive Learning System
+  private startAdaptiveLearning(): void {
+    this.adaptiveLearningInterval = setInterval(() => {
+      this.performAdaptiveLearning();
+    }, 600000); // Every 10 minutes
+  }
+
+  private async performAdaptiveLearning(): Promise<void> {
+    try {
+      // Learn user behavior patterns
+      await this.learnUserBehaviorPatterns();
+      
+      // Track preference evolution
+      await this.trackPreferenceEvolution();
+      
+      // Adapt goals based on performance
+      await this.adaptGoals();
+      
+      // Run performance optimization loops
+      await this.runPerformanceOptimizationLoops();
+      
+    } catch (error) {
+      console.error('Error in adaptive learning:', error);
+    }
+  }
+
+  // User Behavior Pattern Learning
+  private async learnUserBehaviorPatterns(): Promise<void> {
+    try {
+      const sessions = await this.databaseService.getSessions('current-user');
+      const checkIns = await this.databaseService.getCheckIns('current-user');
+      
+      if (sessions.length < 5) return;
+      
+      // Analyze training patterns
+      const trainingPatterns = this.analyzeTrainingPatterns(sessions);
+      this.updateBehaviorPatterns('current-user', 'training', trainingPatterns);
+      
+      // Analyze recovery patterns
+      const recoveryPatterns = this.analyzeRecoveryPatterns(sessions, checkIns);
+      this.updateBehaviorPatterns('current-user', 'recovery', recoveryPatterns);
+      
+      // Analyze motivation patterns
+      const motivationPatterns = this.analyzeMotivationPatterns(sessions, checkIns);
+      this.updateBehaviorPatterns('current-user', 'motivation', motivationPatterns);
+      
+      // Analyze performance patterns
+      const performancePatterns = this.analyzePerformancePatterns(sessions);
+      this.updateBehaviorPatterns('current-user', 'performance', performancePatterns);
+      
+    } catch (error) {
+      console.error('Error learning user behavior patterns:', error);
+    }
+  }
+
+  private analyzeTrainingPatterns(sessions: SessionData[]): UserBehaviorPattern[] {
+    const patterns: UserBehaviorPattern[] = [];
+    
+    // Analyze session timing patterns
+    const timePatterns = this.analyzeTimePatterns(sessions);
+    if (timePatterns) {
+      patterns.push(timePatterns);
+    }
+    
+    // Analyze exercise selection patterns
+    const exercisePatterns = this.analyzeExercisePatterns(sessions);
+    if (exercisePatterns) {
+      patterns.push(exercisePatterns);
+    }
+    
+    // Analyze intensity patterns
+    const intensityPatterns = this.analyzeIntensityPatterns(sessions);
+    if (intensityPatterns) {
+      patterns.push(intensityPatterns);
+    }
+    
+    return patterns;
+  }
+
+  private analyzeTimePatterns(sessions: SessionData[]): UserBehaviorPattern | null {
+    const timeSlots = sessions.map(s => {
+      const hour = new Date(s.date).getHours();
+      if (hour < 6) return 'early_morning';
+      if (hour < 12) return 'morning';
+      if (hour < 17) return 'afternoon';
+      if (hour < 21) return 'evening';
+      return 'night';
+    });
+    
+    const timeCounts = timeSlots.reduce((acc, time) => {
+      acc[time] = (acc[time] || 0) + 1;
+      return acc;
+    }, {} as Record<string, number>);
+    
+    const mostCommonTime = Object.entries(timeCounts).reduce((a, b) => 
+      timeCounts[a[0]] > timeCounts[b[0]] ? a : b
+    );
+    
+    if (mostCommonTime[1] < sessions.length * 0.3) return null; // Not significant enough
+    
+    return {
+      userId: 'current-user',
+      patternId: `time_pattern_${Date.now()}`,
+      patternName: 'Preferred Training Time',
+      description: `User prefers training in the ${mostCommonTime[0]}`,
+      frequency: mostCommonTime[1] / sessions.length,
+      consistency: this.calculateConsistency(timeSlots),
+      strength: mostCommonTime[1] / sessions.length,
+      lastObserved: new Date(),
+      firstObserved: new Date(sessions[0].date),
+      evolution: {
+        trend: 'stable',
+        rate: 0,
+        confidence: 0.8,
+      },
+      triggers: {
+        timeOfDay: [mostCommonTime[0]],
+      },
+      actions: [
+        {
+          type: 'schedule_optimization',
+          parameters: { preferredTime: mostCommonTime[0] },
+          effectiveness: 0.9,
+        },
+      ],
+    };
+  }
+
+  private analyzeExercisePatterns(sessions: SessionData[]): UserBehaviorPattern | null {
+    const exerciseFrequency = new Map<string, number>();
+    sessions.forEach(session => {
+      session.exercises.forEach(exercise => {
+        exerciseFrequency.set(exercise.name, (exerciseFrequency.get(exercise.name) || 0) + 1);
+      });
+    });
+    
+    const sortedExercises = Array.from(exerciseFrequency.entries())
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 5);
+    
+    if (sortedExercises.length === 0) return null;
+    
+    const totalExercises = Array.from(exerciseFrequency.values()).reduce((sum, count) => sum + count, 0);
+    const topExercise = sortedExercises[0];
+    
+    return {
+      userId: 'current-user',
+      patternId: `exercise_pattern_${Date.now()}`,
+      patternName: 'Exercise Preferences',
+      description: `User frequently performs ${topExercise[0]}`,
+      frequency: topExercise[1] / totalExercises,
+      consistency: this.calculateConsistency(Array.from(exerciseFrequency.keys())),
+      strength: topExercise[1] / totalExercises,
+      lastObserved: new Date(),
+      firstObserved: new Date(sessions[0].date),
+      evolution: {
+        trend: 'stable',
+        rate: 0,
+        confidence: 0.7,
+      },
+      triggers: {
+        sessionType: ['strength', 'volleyball', 'plyometric'],
+      },
+      actions: [
+        {
+          type: 'exercise_recommendation',
+          parameters: { preferredExercises: sortedExercises.map(e => e[0]) },
+          effectiveness: 0.8,
+        },
+      ],
+    };
+  }
+
+  private analyzeIntensityPatterns(sessions: SessionData[]): UserBehaviorPattern | null {
+    const intensities = sessions.map(session => {
+      const allRPEs = session.exercises.flatMap(ex => ex.sets.map(set => set.rpe || 5));
+      return allRPEs.reduce((sum, rpe) => sum + rpe, 0) / allRPEs.length;
+    });
+    
+    const avgIntensity = intensities.reduce((sum, intensity) => sum + intensity, 0) / intensities.length;
+    const intensityVariance = intensities.reduce((sum, intensity) => 
+      sum + Math.pow(intensity - avgIntensity, 2), 0
+    ) / intensities.length;
+    
+    const intensityLevel = avgIntensity < 6 ? 'low' : avgIntensity < 8 ? 'medium' : 'high';
+    
+    return {
+      userId: 'current-user',
+      patternId: `intensity_pattern_${Date.now()}`,
+      patternName: 'Training Intensity Preference',
+      description: `User prefers ${intensityLevel} intensity training`,
+      frequency: 1 - (intensityVariance / 10), // Lower variance = higher frequency
+      consistency: 1 - (intensityVariance / 10),
+      strength: avgIntensity / 10,
+      lastObserved: new Date(),
+      firstObserved: new Date(sessions[0].date),
+      evolution: {
+        trend: this.calculateTrend(intensities),
+        rate: this.calculateTrendRate(intensities),
+        confidence: 0.6,
+      },
+      triggers: {
+        sessionType: ['strength', 'volleyball', 'plyometric'],
+      },
+      actions: [
+        {
+          type: 'intensity_adjustment',
+          parameters: { targetIntensity: avgIntensity },
+          effectiveness: 0.7,
+        },
+      ],
+    };
+  }
+
+  private analyzeRecoveryPatterns(sessions: SessionData[], checkIns: CheckInData[]): UserBehaviorPattern[] {
+    const patterns: UserBehaviorPattern[] = [];
+    
+    // Analyze recovery time patterns
+    const recoveryTimes = this.calculateRecoveryTimes(sessions);
+    if (recoveryTimes.length > 0) {
+      patterns.push({
+        userId: 'current-user',
+        patternId: `recovery_pattern_${Date.now()}`,
+        patternName: 'Recovery Time Pattern',
+        description: `Average recovery time: ${recoveryTimes.reduce((sum, time) => sum + time, 0) / recoveryTimes.length} hours`,
+        frequency: 1,
+        consistency: this.calculateConsistency(recoveryTimes.map(t => t.toString())),
+        strength: 0.8,
+        lastObserved: new Date(),
+        firstObserved: new Date(sessions[0].date),
+        evolution: {
+          trend: 'stable',
+          rate: 0,
+          confidence: 0.7,
+        },
+        triggers: {},
+        actions: [
+          {
+            type: 'recovery_optimization',
+            parameters: { averageRecoveryTime: recoveryTimes.reduce((sum, time) => sum + time, 0) / recoveryTimes.length },
+            effectiveness: 0.8,
+          },
+        ],
+      });
+    }
+    
+    return patterns;
+  }
+
+  private analyzeMotivationPatterns(sessions: SessionData[], checkIns: CheckInData[]): UserBehaviorPattern[] {
+    const patterns: UserBehaviorPattern[] = [];
+    
+    // Analyze motivation trends from check-ins
+    const motivationScores = checkIns.map(c => c.motivation || 5);
+    if (motivationScores.length > 0) {
+      const avgMotivation = motivationScores.reduce((sum, score) => sum + score, 0) / motivationScores.length;
+      const motivationTrend = this.calculateTrend(motivationScores);
+      
+      patterns.push({
+        userId: 'current-user',
+        patternId: `motivation_pattern_${Date.now()}`,
+        patternName: 'Motivation Pattern',
+        description: `Average motivation: ${avgMotivation.toFixed(1)}/10`,
+        frequency: 1,
+        consistency: this.calculateConsistency(motivationScores.map(s => s.toString())),
+        strength: avgMotivation / 10,
+        lastObserved: new Date(),
+        firstObserved: new Date(checkIns[0].date),
+        evolution: {
+          trend: motivationTrend,
+          rate: this.calculateTrendRate(motivationScores),
+          confidence: 0.6,
+        },
+        triggers: {
+          mood: ['motivated', 'focused', 'energetic'],
+        },
+        actions: [
+          {
+            type: 'motivation_boost',
+            parameters: { targetMotivation: Math.min(10, avgMotivation + 1) },
+            effectiveness: 0.6,
+          },
+        ],
+      });
+    }
+    
+    return patterns;
+  }
+
+  private analyzePerformancePatterns(sessions: SessionData[]): UserBehaviorPattern[] {
+    const patterns: UserBehaviorPattern[] = [];
+    
+    // Analyze performance progression
+    const performanceTrend = this.calculatePerformanceTrend();
+    const improvementRate = this.calculateImprovementRate(sessions);
+    
+    patterns.push({
+      userId: 'current-user',
+      patternId: `performance_pattern_${Date.now()}`,
+      patternName: 'Performance Progression',
+      description: `Performance trend: ${performanceTrend}, improvement rate: ${(improvementRate * 100).toFixed(1)}%`,
+      frequency: 1,
+      consistency: 0.8,
+      strength: Math.abs(improvementRate),
+      lastObserved: new Date(),
+      firstObserved: new Date(sessions[0].date),
+      evolution: {
+        trend: performanceTrend === 'improving' ? 'increasing' : performanceTrend === 'declining' ? 'decreasing' : 'stable',
+        rate: improvementRate,
+        confidence: 0.7,
+      },
+      triggers: {
+        sessionType: ['strength', 'volleyball', 'plyometric'],
+      },
+      actions: [
+        {
+          type: 'progression_adjustment',
+          parameters: { targetImprovementRate: 0.1 },
+          effectiveness: 0.8,
+        },
+      ],
+    });
+    
+    return patterns;
+  }
+
+  private updateBehaviorPatterns(userId: string, category: string, patterns: UserBehaviorPattern[]): void {
+    const userPatterns = this.behaviorPatterns.get(userId) || [];
+    
+    patterns.forEach(pattern => {
+      const existingPattern = userPatterns.find(p => p.patternName === pattern.patternName);
+      
+      if (existingPattern) {
+        // Update existing pattern
+        existingPattern.frequency = (existingPattern.frequency + pattern.frequency) / 2;
+        existingPattern.consistency = (existingPattern.consistency + pattern.consistency) / 2;
+        existingPattern.strength = (existingPattern.strength + pattern.strength) / 2;
+        existingPattern.lastObserved = new Date();
+        existingPattern.evolution.rate = (existingPattern.evolution.rate + pattern.evolution.rate) / 2;
+      } else {
+        // Add new pattern
+        userPatterns.push(pattern);
+      }
+    });
+    
+    this.behaviorPatterns.set(userId, userPatterns);
+  }
+
+  // Preference Evolution Tracking
+  private async trackPreferenceEvolution(): Promise<void> {
+    try {
+      const sessions = await this.databaseService.getSessions('current-user');
+      const checkIns = await this.databaseService.getCheckIns('current-user');
+      
+      if (sessions.length < 10) return;
+      
+      // Track exercise preferences
+      await this.trackExercisePreferenceEvolution(sessions);
+      
+      // Track timing preferences
+      await this.trackTimingPreferenceEvolution(sessions);
+      
+      // Track intensity preferences
+      await this.trackIntensityPreferenceEvolution(sessions);
+      
+      // Track duration preferences
+      await this.trackDurationPreferenceEvolution(sessions);
+      
+    } catch (error) {
+      console.error('Error tracking preference evolution:', error);
+    }
+  }
+
+  private async trackExercisePreferenceEvolution(sessions: SessionData[]): Promise<void> {
+    const exerciseCounts = new Map<string, { count: number; sessions: SessionData[] }>();
+    
+    sessions.forEach(session => {
+      session.exercises.forEach(exercise => {
+        if (!exerciseCounts.has(exercise.name)) {
+          exerciseCounts.set(exercise.name, { count: 0, sessions: [] });
+        }
+        exerciseCounts.get(exercise.name)!.count++;
+        exerciseCounts.get(exercise.name)!.sessions.push(session);
+      });
+    });
+    
+    const sortedExercises = Array.from(exerciseCounts.entries())
+      .sort((a, b) => b[1].count - a[1].count);
+    
+    if (sortedExercises.length < 2) return;
+    
+    const topExercise = sortedExercises[0];
+    const secondExercise = sortedExercises[1];
+    
+    // Calculate evolution over time
+    const recentSessions = sessions.slice(-Math.floor(sessions.length / 2));
+    const olderSessions = sessions.slice(0, Math.floor(sessions.length / 2));
+    
+    const recentCount = recentSessions.filter(s => 
+      s.exercises.some(e => e.name === topExercise[0])
+    ).length;
+    const olderCount = olderSessions.filter(s => 
+      s.exercises.some(e => e.name === topExercise[0])
+    ).length;
+    
+    const evolutionRate = (recentCount - olderCount) / Math.max(olderCount, 1);
+    
+    const preferenceEvolution: PreferenceEvolution = {
+      userId: 'current-user',
+      preferenceType: 'exercise',
+      currentValue: topExercise[0],
+      previousValue: secondExercise[0],
+      evolutionRate,
+      confidence: Math.min(1, Math.abs(evolutionRate) * 2),
+      lastUpdated: new Date(),
+      history: topExercise[1].sessions.map(s => ({
+        value: topExercise[0],
+        timestamp: s.date,
+        context: { sessionType: s.type },
+      })),
+      predictions: {
+        nextValue: evolutionRate > 0 ? topExercise[0] : secondExercise[0],
+        confidence: Math.abs(evolutionRate),
+        timeframe: 30, // 30 days
+      },
+    };
+    
+    this.updatePreferenceEvolution('current-user', preferenceEvolution);
+  }
+
+  private async trackTimingPreferenceEvolution(sessions: SessionData[]): Promise<void> {
+    const timeSlots = sessions.map(s => {
+      const hour = new Date(s.date).getHours();
+      if (hour < 6) return 'early_morning';
+      if (hour < 12) return 'morning';
+      if (hour < 17) return 'afternoon';
+      if (hour < 21) return 'evening';
+      return 'night';
+    });
+    
+    const timeCounts = timeSlots.reduce((acc, time) => {
+      acc[time] = (acc[time] || 0) + 1;
+      return acc;
+    }, {} as Record<string, number>);
+    
+    const sortedTimes = Object.entries(timeCounts).sort((a, b) => b[1] - a[1]);
+    if (sortedTimes.length < 2) return;
+    
+    const currentTime = sortedTimes[0][0];
+    const previousTime = sortedTimes[1][0];
+    
+    const preferenceEvolution: PreferenceEvolution = {
+      userId: 'current-user',
+      preferenceType: 'timing',
+      currentValue: currentTime,
+      previousValue: previousTime,
+      evolutionRate: 0.1, // Simulated
+      confidence: 0.8,
+      lastUpdated: new Date(),
+      history: sessions.map(s => ({
+        value: timeSlots[sessions.indexOf(s)],
+        timestamp: s.date,
+        context: { sessionType: s.type },
+      })),
+      predictions: {
+        nextValue: currentTime,
+        confidence: 0.7,
+        timeframe: 14, // 14 days
+      },
+    };
+    
+    this.updatePreferenceEvolution('current-user', preferenceEvolution);
+  }
+
+  private async trackIntensityPreferenceEvolution(sessions: SessionData[]): Promise<void> {
+    const intensities = sessions.map(session => {
+      const allRPEs = session.exercises.flatMap(ex => ex.sets.map(set => set.rpe || 5));
+      return allRPEs.reduce((sum, rpe) => sum + rpe, 0) / allRPEs.length;
+    });
+    
+    const recentIntensity = intensities.slice(-Math.floor(intensities.length / 2))
+      .reduce((sum, intensity) => sum + intensity, 0) / Math.floor(intensities.length / 2);
+    const olderIntensity = intensities.slice(0, Math.floor(intensities.length / 2))
+      .reduce((sum, intensity) => sum + intensity, 0) / Math.floor(intensities.length / 2);
+    
+    const evolutionRate = (recentIntensity - olderIntensity) / Math.max(olderIntensity, 1);
+    
+    const preferenceEvolution: PreferenceEvolution = {
+      userId: 'current-user',
+      preferenceType: 'intensity',
+      currentValue: recentIntensity,
+      previousValue: olderIntensity,
+      evolutionRate,
+      confidence: Math.min(1, Math.abs(evolutionRate) * 2),
+      lastUpdated: new Date(),
+      history: intensities.map((intensity, index) => ({
+        value: intensity,
+        timestamp: sessions[index].date,
+        context: { sessionType: sessions[index].type },
+      })),
+      predictions: {
+        nextValue: recentIntensity + evolutionRate * 0.1,
+        confidence: Math.abs(evolutionRate),
+        timeframe: 21, // 21 days
+      },
+    };
+    
+    this.updatePreferenceEvolution('current-user', preferenceEvolution);
+  }
+
+  private async trackDurationPreferenceEvolution(sessions: SessionData[]): Promise<void> {
+    const durations = sessions.map(s => s.duration || 60);
+    
+    const recentDuration = durations.slice(-Math.floor(durations.length / 2))
+      .reduce((sum, duration) => sum + duration, 0) / Math.floor(durations.length / 2);
+    const olderDuration = durations.slice(0, Math.floor(durations.length / 2))
+      .reduce((sum, duration) => sum + duration, 0) / Math.floor(durations.length / 2);
+    
+    const evolutionRate = (recentDuration - olderDuration) / Math.max(olderDuration, 1);
+    
+    const preferenceEvolution: PreferenceEvolution = {
+      userId: 'current-user',
+      preferenceType: 'duration',
+      currentValue: recentDuration,
+      previousValue: olderDuration,
+      evolutionRate,
+      confidence: Math.min(1, Math.abs(evolutionRate) * 2),
+      lastUpdated: new Date(),
+      history: durations.map((duration, index) => ({
+        value: duration,
+        timestamp: sessions[index].date,
+        context: { sessionType: sessions[index].type },
+      })),
+      predictions: {
+        nextValue: recentDuration + evolutionRate * 5,
+        confidence: Math.abs(evolutionRate),
+        timeframe: 28, // 28 days
+      },
+    };
+    
+    this.updatePreferenceEvolution('current-user', preferenceEvolution);
+  }
+
+  private updatePreferenceEvolution(userId: string, evolution: PreferenceEvolution): void {
+    const userEvolutions = this.preferenceEvolutions.get(userId) || [];
+    
+    const existingEvolution = userEvolutions.find(e => e.preferenceType === evolution.preferenceType);
+    
+    if (existingEvolution) {
+      // Update existing evolution
+      existingEvolution.currentValue = evolution.currentValue;
+      existingEvolution.previousValue = evolution.previousValue;
+      existingEvolution.evolutionRate = evolution.evolutionRate;
+      existingEvolution.confidence = evolution.confidence;
+      existingEvolution.lastUpdated = new Date();
+      existingEvolution.history = evolution.history;
+      existingEvolution.predictions = evolution.predictions;
+    } else {
+      // Add new evolution
+      userEvolutions.push(evolution);
+    }
+    
+    this.preferenceEvolutions.set(userId, userEvolutions);
+  }
+
+  // Goal Adaptation Algorithms
+  private async adaptGoals(): Promise<void> {
+    try {
+      const sessions = await this.databaseService.getSessions('current-user');
+      const checkIns = await this.databaseService.getCheckIns('current-user');
+      
+      if (sessions.length < 10) return;
+      
+      // Get current goals (simulated)
+      const currentGoals = this.getCurrentGoals();
+      
+      for (const goal of currentGoals) {
+        const adaptation = await this.analyzeGoalAdaptation(goal, sessions, checkIns);
+        if (adaptation) {
+          this.updateGoalAdaptation('current-user', adaptation);
+        }
+      }
+      
+    } catch (error) {
+      console.error('Error adapting goals:', error);
+    }
+  }
+
+  private getCurrentGoals(): any[] {
+    // Simulated current goals
+    return [
+      {
+        id: 'strength_goal',
+        type: 'strength',
+        target: 'Increase bench press by 20lbs',
+        current: 'Increased by 15lbs',
+        deadline: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 days
+      },
+      {
+        id: 'volleyball_goal',
+        type: 'volleyball',
+        target: 'Improve vertical jump by 4 inches',
+        current: 'Improved by 2 inches',
+        deadline: new Date(Date.now() + 60 * 24 * 60 * 60 * 1000), // 60 days
+      },
+    ];
+  }
+
+  private async analyzeGoalAdaptation(goal: any, sessions: SessionData[], checkIns: CheckInData[]): Promise<GoalAdaptation | null> {
+    // Analyze progress towards goal
+    const progress = this.calculateGoalProgress(goal, sessions);
+    const timeRemaining = (goal.deadline.getTime() - Date.now()) / (24 * 60 * 60 * 1000);
+    const requiredProgressRate = (100 - progress) / timeRemaining;
+    
+    // Check if goal needs adaptation
+    if (requiredProgressRate > 2) { // More than 2% per day needed
+      const adaptation = {
+        userId: 'current-user',
+        goalId: goal.id,
+        originalGoal: goal,
+        currentGoal: {
+          ...goal,
+          target: this.adjustGoalTarget(goal, 0.8), // Reduce by 20%
+          deadline: new Date(goal.deadline.getTime() + 7 * 24 * 60 * 60 * 1000), // Extend by 1 week
+        },
+        adaptationReason: 'Goal is too ambitious for current timeline',
+        adaptationDate: new Date(),
+        successRate: 0.7,
+        adaptations: [
+          {
+            type: 'modify' as const,
+            value: { target: this.adjustGoalTarget(goal, 0.8), deadline: new Date(goal.deadline.getTime() + 7 * 24 * 60 * 60 * 1000) },
+            reason: 'Timeline adjustment needed',
+            date: new Date(),
+            effectiveness: 0.8,
+          },
+        ],
+        nextAdaptation: {
+          predictedType: 'increase',
+          predictedValue: this.adjustGoalTarget(goal, 1.1),
+          confidence: 0.6,
+          timeframe: 14, // 14 days
+        },
+      };
+      
+      return adaptation;
+    }
+    
+    return null;
+  }
+
+  private calculateGoalProgress(goal: any, sessions: SessionData[]): number {
+    // Simulate progress calculation based on sessions
+    const recentSessions = sessions.slice(-10);
+    const progress = Math.min(100, (recentSessions.length / 10) * 100);
+    return progress;
+  }
+
+  private adjustGoalTarget(goal: any, factor: number): string {
+    // Simulate goal target adjustment
+    return goal.target.replace(/\d+/, (match: string) => Math.round(parseInt(match) * factor).toString());
+  }
+
+  private updateGoalAdaptation(userId: string, adaptation: GoalAdaptation): void {
+    const userAdaptations = this.goalAdaptations.get(userId) || [];
+    
+    const existingAdaptation = userAdaptations.find(a => a.goalId === adaptation.goalId);
+    
+    if (existingAdaptation) {
+      // Update existing adaptation
+      existingAdaptation.currentGoal = adaptation.currentGoal;
+      existingAdaptation.adaptationReason = adaptation.adaptationReason;
+      existingAdaptation.adaptationDate = new Date();
+      existingAdaptation.adaptations.push(...adaptation.adaptations);
+      existingAdaptation.nextAdaptation = adaptation.nextAdaptation;
+    } else {
+      // Add new adaptation
+      userAdaptations.push(adaptation);
+    }
+    
+    this.goalAdaptations.set(userId, userAdaptations);
+  }
+
+  // Performance Optimization Loops
+  private async runPerformanceOptimizationLoops(): Promise<void> {
+    try {
+      const sessions = await this.databaseService.getSessions('current-user');
+      const checkIns = await this.databaseService.getCheckIns('current-user');
+      
+      if (sessions.length < 5) return;
+      
+      // Run training load optimization
+      await this.runTrainingLoadOptimizationLoop(sessions, checkIns);
+      
+      // Run recovery optimization
+      await this.runRecoveryOptimizationLoop(sessions, checkIns);
+      
+      // Run motivation optimization
+      await this.runMotivationOptimizationLoop(sessions, checkIns);
+      
+    } catch (error) {
+      console.error('Error running performance optimization loops:', error);
+    }
+  }
+
+  private async runTrainingLoadOptimizationLoop(sessions: SessionData[], checkIns: CheckInData[]): Promise<void> {
+    const loopId = 'training_load_optimization';
+    const userId = 'current-user';
+    
+    // Get or create optimization loop
+    let loop = this.optimizationLoops.get(userId)?.find(l => l.loopId === loopId);
+    
+    if (!loop) {
+      loop = {
+        loopId,
+        userId,
+        optimizationType: 'training_load',
+        currentState: { weeklyLoad: 0, intensity: 0 },
+        targetState: { weeklyLoad: 100, intensity: 7 },
+        optimizationStrategy: 'gradual_progression',
+        iterations: [],
+        convergenceRate: 0,
+        stability: 0,
+        nextIteration: {
+          predictedChanges: {},
+          confidence: 0,
+          timeframe: 24,
+        },
+      };
+    }
+    
+    // Calculate current state
+    const currentLoad = this.calculateWeeklyLoad(sessions.slice(-7));
+    const currentIntensity = this.calculateAverageIntensity(sessions.slice(-7));
+    
+    // Calculate performance
+    const performance = this.calculatePerformanceScore(sessions.slice(-7), checkIns.slice(-7));
+    
+    // Add iteration
+    const iteration = {
+      iteration: loop.iterations.length + 1,
+      state: { weeklyLoad: currentLoad, intensity: currentIntensity },
+      performance,
+      timestamp: new Date(),
+      changes: this.calculateTrainingLoadChanges(loop, currentLoad, currentIntensity, performance),
+    };
+    
+    loop.iterations.push(iteration);
+    
+    // Update loop state
+    loop.currentState = { weeklyLoad: currentLoad, intensity: currentIntensity };
+    loop.convergenceRate = this.calculateConvergenceRate(loop.iterations);
+    loop.stability = this.calculateStability(loop.iterations);
+    loop.nextIteration = this.predictNextIteration(loop);
+    
+    // Update optimization loops
+    const userLoops = this.optimizationLoops.get(userId) || [];
+    const existingLoopIndex = userLoops.findIndex(l => l.loopId === loopId);
+    
+    if (existingLoopIndex >= 0) {
+      userLoops[existingLoopIndex] = loop;
+    } else {
+      userLoops.push(loop);
+    }
+    
+    this.optimizationLoops.set(userId, userLoops);
+  }
+
+  private async runRecoveryOptimizationLoop(sessions: SessionData[], checkIns: CheckInData[]): Promise<void> {
+    const loopId = 'recovery_optimization';
+    const userId = 'current-user';
+    
+    // Similar implementation for recovery optimization
+    // ... (implementation details would be similar to training load)
+  }
+
+  private async runMotivationOptimizationLoop(sessions: SessionData[], checkIns: CheckInData[]): Promise<void> {
+    const loopId = 'motivation_optimization';
+    const userId = 'current-user';
+    
+    // Similar implementation for motivation optimization
+    // ... (implementation details would be similar to training load)
+  }
+
+  // Helper methods for adaptive learning
+  private calculateTrend(values: number[]): 'increasing' | 'stable' | 'decreasing' {
+    if (values.length < 3) return 'stable';
+    
+    const firstHalf = values.slice(0, Math.floor(values.length / 2));
+    const secondHalf = values.slice(Math.floor(values.length / 2));
+    
+    const firstAvg = firstHalf.reduce((sum, val) => sum + val, 0) / firstHalf.length;
+    const secondAvg = secondHalf.reduce((sum, val) => sum + val, 0) / secondHalf.length;
+    
+    const change = (secondAvg - firstAvg) / firstAvg;
+    
+    if (change > 0.1) return 'increasing';
+    if (change < -0.1) return 'decreasing';
+    return 'stable';
+  }
+
+  private calculateTrendRate(values: number[]): number {
+    if (values.length < 2) return 0;
+    
+    const first = values[0];
+    const last = values[values.length - 1];
+    const timeSpan = values.length; // Assuming weekly data
+    
+    return (last - first) / first / timeSpan;
+  }
+
+  private calculateRecoveryTimes(sessions: SessionData[]): number[] {
+    const recoveryTimes: number[] = [];
+    
+    for (let i = 1; i < sessions.length; i++) {
+      const timeDiff = sessions[i].date.getTime() - sessions[i - 1].date.getTime();
+      const hours = timeDiff / (1000 * 60 * 60);
+      recoveryTimes.push(hours);
+    }
+    
+    return recoveryTimes;
+  }
+
+  private calculateTrainingLoadChanges(loop: PerformanceOptimizationLoop, currentLoad: number, currentIntensity: number, performance: number): any {
+    // Calculate what changes should be made based on current state and performance
+    const targetLoad = loop.targetState.weeklyLoad;
+    const targetIntensity = loop.targetState.intensity;
+    
+    const loadChange = (targetLoad - currentLoad) / 10; // Gradual change
+    const intensityChange = (targetIntensity - currentIntensity) / 10;
+    
+    return {
+      loadAdjustment: loadChange,
+      intensityAdjustment: intensityChange,
+      reason: performance > 0.8 ? 'increase_load' : performance < 0.6 ? 'decrease_load' : 'maintain_load',
+    };
+  }
+
+  private calculateConvergenceRate(iterations: PerformanceOptimizationLoop['iterations']): number {
+    if (iterations.length < 3) return 0;
+    
+    const recent = iterations.slice(-3);
+    const performanceVariance = recent.reduce((sum, iter) => 
+      sum + Math.pow(iter.performance - 0.8, 2), 0
+    ) / recent.length;
+    
+    return Math.max(0, 1 - performanceVariance);
+  }
+
+  private calculateStability(iterations: PerformanceOptimizationLoop['iterations']): number {
+    if (iterations.length < 3) return 0;
+    
+    const recent = iterations.slice(-3);
+    const performanceValues = recent.map(iter => iter.performance);
+    const variance = this.calculateVariance(performanceValues);
+    
+    return Math.max(0, 1 - variance);
+  }
+
+  private calculateVariance(values: number[]): number {
+    const mean = values.reduce((sum, val) => sum + val, 0) / values.length;
+    return values.reduce((sum, val) => sum + Math.pow(val - mean, 2), 0) / values.length;
+  }
+
+  private predictNextIteration(loop: PerformanceOptimizationLoop): PerformanceOptimizationLoop['nextIteration'] {
+    const recent = loop.iterations.slice(-3);
+    if (recent.length < 2) {
+      return {
+        predictedChanges: {},
+        confidence: 0,
+        timeframe: 24,
+      };
+    }
+    
+    const lastPerformance = recent[recent.length - 1].performance;
+    const performanceTrend = this.calculateTrend(recent.map(iter => iter.performance));
+    
+    return {
+      predictedChanges: {
+        loadAdjustment: performanceTrend === 'increasing' ? 0.1 : performanceTrend === 'decreasing' ? -0.1 : 0,
+        intensityAdjustment: performanceTrend === 'increasing' ? 0.05 : performanceTrend === 'decreasing' ? -0.05 : 0,
+      },
+      confidence: Math.min(0.9, lastPerformance),
+      timeframe: 24,
+    };
+  }
+
+  private calculatePerformanceScore(sessions: SessionData[], checkIns: CheckInData[]): number {
+    // Calculate overall performance score based on sessions and check-ins
+    const sessionScore = sessions.length > 0 ? 0.8 : 0.2;
+    const checkInScore = checkIns.length > 0 ? 
+      checkIns.reduce((sum, c) => sum + (c.motivation || 5), 0) / checkIns.length / 10 : 0.5;
+    
+    return (sessionScore + checkInScore) / 2;
+  }
+
   // Data persistence
   private loadStoredData(): void {
     try {
@@ -1333,6 +2332,23 @@ export class AutonomousSystemManagementService {
     return Array.from(this.automationRules.values());
   }
 
+  // Adaptive Learning System Getters
+  getBehaviorPatterns(userId: string): UserBehaviorPattern[] {
+    return this.behaviorPatterns.get(userId) || [];
+  }
+
+  getPreferenceEvolutions(userId: string): PreferenceEvolution[] {
+    return this.preferenceEvolutions.get(userId) || [];
+  }
+
+  getGoalAdaptations(userId: string): GoalAdaptation[] {
+    return this.goalAdaptations.get(userId) || [];
+  }
+
+  getOptimizationLoops(userId: string): PerformanceOptimizationLoop[] {
+    return this.optimizationLoops.get(userId) || [];
+  }
+
   // Cleanup
   destroy(): void {
     if (this.learningInterval) {
@@ -1340,6 +2356,9 @@ export class AutonomousSystemManagementService {
     }
     if (this.healthCheckInterval) {
       clearInterval(this.healthCheckInterval);
+    }
+    if (this.adaptiveLearningInterval) {
+      clearInterval(this.adaptiveLearningInterval);
     }
     this.saveData();
   }

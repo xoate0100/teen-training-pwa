@@ -4,63 +4,17 @@ import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
-import { Clock, Target } from 'lucide-react';
+import { Clock, Target, Brain, AlertCircle } from 'lucide-react';
 import { ExerciseInterface } from '@/components/exercise-interface';
 import { Button } from '@/components/ui/button';
-
-const mockExercises = [
-  {
-    id: '1',
-    name: 'Goblet Squats',
-    sets: 3,
-    reps: '10-12',
-    load: '25 lbs',
-    instructions: [
-      'Hold dumbbell at chest level',
-      'Squat down keeping chest up',
-      'Drive through heels to stand',
-      'Control the descent (3 seconds down)',
-    ],
-  },
-  {
-    id: '2',
-    name: 'Push-ups',
-    sets: 3,
-    reps: '8-10',
-    instructions: [
-      'Start in plank position',
-      'Lower chest to floor',
-      'Push back to start position',
-      'Keep core tight throughout',
-    ],
-  },
-  {
-    id: '3',
-    name: 'Single-Leg Glute Bridges',
-    sets: 3,
-    reps: '8 each leg',
-    instructions: [
-      'Lie on back, one foot on ground',
-      'Lift other leg straight up',
-      'Drive through heel to lift hips',
-      'Squeeze glutes at the top',
-    ],
-  },
-  {
-    id: '4',
-    name: 'Plank Hold',
-    sets: 3,
-    reps: '30-45 sec',
-    instructions: [
-      'Start in forearm plank',
-      'Keep body in straight line',
-      'Breathe normally',
-      'Focus on core engagement',
-    ],
-  },
-];
+import {
+  sessionProgramIntegration,
+  SessionProgram,
+} from '@/lib/services/session-program-integration';
+import { useUser } from '@/lib/contexts/user-context';
 
 export default function SessionPage() {
+  const { currentUser } = useUser();
   const [sessionStartTime, setSessionStartTime] = useState<Date | null>(null);
   const [sessionDuration, setSessionDuration] = useState(0);
   const [currentExercise, setCurrentExercise] = useState(0);
@@ -70,13 +24,60 @@ export default function SessionPage() {
   const [showAutoAdvance, setShowAutoAdvance] = useState(false);
   const [autoAdvanceCountdown, setAutoAdvanceCountdown] = useState(3);
 
+  // Program integration state
+  const [sessionProgram, setSessionProgram] = useState<SessionProgram | null>(
+    null
+  );
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [recommendations, setRecommendations] = useState<string[]>([]);
+
+  // Load session program on component mount
   useEffect(() => {
-    if (!sessionStartTime) {
-      setSessionStartTime(new Date());
-    }
-  }, [sessionStartTime]);
+    const loadSessionProgram = async () => {
+      if (!currentUser?.id) return;
+
+      try {
+        setIsLoading(true);
+        setError(null);
+
+        // Get session type from URL params or default to strength
+        const urlParams = new URLSearchParams(window.location.search);
+        const sessionType = urlParams.get('type') || 'strength';
+
+        // Generate session program
+        const program = await sessionProgramIntegration.generateSessionProgram(
+          currentUser.id,
+          sessionType
+        );
+
+        // Get session context for recommendations
+        const context = await sessionProgramIntegration.fetchProgramData(
+          currentUser.id
+        );
+        const sessionRecommendations =
+          sessionProgramIntegration.getSessionRecommendations(context);
+
+        setSessionProgram(program);
+        setRecommendations(sessionRecommendations);
+
+        // Set session start time
+        setSessionStartTime(new Date());
+      } catch (err) {
+        console.error('Error loading session program:', err);
+        setError(
+          err instanceof Error ? err.message : 'Failed to load session program'
+        );
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadSessionProgram();
+  }, [currentUser?.id]);
 
   useEffect(() => {
+    // eslint-disable-next-line no-undef
     const interval = setInterval(() => {
       if (sessionStartTime) {
         const now = new Date();
@@ -87,6 +88,7 @@ export default function SessionPage() {
       }
     }, 1000);
 
+    // eslint-disable-next-line no-undef
     return () => clearInterval(interval);
   }, [sessionStartTime]);
 
@@ -96,20 +98,24 @@ export default function SessionPage() {
     return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
 
-  const sessionProgress = (completedExercises / mockExercises.length) * 100;
+  const exercises = sessionProgram?.exercises || [];
+  const sessionProgress =
+    exercises.length > 0 ? (completedExercises / exercises.length) * 100 : 0;
 
   const handleExerciseComplete = (data: any) => {
     const newExerciseData = [...exerciseData, data];
     setExerciseData(newExerciseData);
     setCompletedExercises(prev => prev + 1);
 
-    if (currentExercise < mockExercises.length - 1) {
+    if (currentExercise < exercises.length - 1) {
       setShowAutoAdvance(true);
       setAutoAdvanceCountdown(3);
 
+      // eslint-disable-next-line no-undef
       const countdownInterval = setInterval(() => {
         setAutoAdvanceCountdown(prev => {
           if (prev <= 1) {
+            // eslint-disable-next-line no-undef
             clearInterval(countdownInterval);
             setShowAutoAdvance(false);
             setCurrentExercise(prevEx => prevEx + 1);
@@ -124,7 +130,7 @@ export default function SessionPage() {
   };
 
   const handleNextExercise = () => {
-    if (currentExercise < mockExercises.length - 1) {
+    if (currentExercise < exercises.length - 1) {
       setCurrentExercise(prev => prev + 1);
     }
   };
@@ -140,6 +146,48 @@ export default function SessionPage() {
     setAutoAdvanceCountdown(3);
   };
 
+  // Loading state
+  if (isLoading) {
+    return (
+      <div className='min-h-screen bg-background p-4 flex items-center justify-center'>
+        <Card className='w-full max-w-md text-center border-2 border-primary/20 shadow-xl'>
+          <CardContent className='p-8'>
+            <div className='animate-spin w-12 h-12 border-4 border-primary border-t-transparent rounded-full mx-auto mb-4'></div>
+            <h2 className='text-2xl font-bold mb-2 text-primary'>
+              Loading Your Session
+            </h2>
+            <p className='text-muted-foreground'>
+              Analyzing your progress and generating personalized exercises...
+            </p>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  // Error state
+  if (error) {
+    return (
+      <div className='min-h-screen bg-background p-4 flex items-center justify-center'>
+        <Card className='w-full max-w-md text-center border-2 border-red-200 shadow-xl'>
+          <CardContent className='p-8'>
+            <div className='text-6xl mb-4'>⚠️</div>
+            <h2 className='text-2xl font-bold mb-2 text-red-600'>
+              Session Error
+            </h2>
+            <p className='text-muted-foreground mb-6'>{error}</p>
+            <Button
+              onClick={() => window.location.reload()}
+              className='w-full h-12 text-lg font-semibold'
+            >
+              Try Again
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
   if (sessionComplete) {
     return (
       <div className='min-h-screen bg-background p-4 flex items-center justify-center'>
@@ -150,7 +198,7 @@ export default function SessionPage() {
               Amazing Work!
             </h2>
             <p className='text-lg text-muted-foreground mb-6'>
-              You crushed all {mockExercises.length} exercises like a champion!
+              You crushed all {exercises.length} exercises like a champion!
             </p>
             <div className='space-y-3 text-base bg-muted/50 p-4 rounded-lg mb-6'>
               <div className='flex justify-between'>
@@ -212,9 +260,13 @@ export default function SessionPage() {
         <div className='flex items-center justify-between'>
           <div>
             <h1 className='text-2xl font-bold text-foreground mb-2'>
-              Lower-Body Strength
+              {sessionProgram?.name || 'Training Session'}
             </h1>
-            <p className='text-muted-foreground'>Monday Morning • Week 6</p>
+            <p className='text-muted-foreground'>
+              {sessionProgram?.phase.charAt(0).toUpperCase() +
+                sessionProgram?.phase.slice(1)}{' '}
+              Phase • Week {sessionProgram?.week}
+            </p>
           </div>
           <Badge variant='secondary' className='text-lg px-3 py-1'>
             <Clock className='h-4 w-4 mr-1' />
@@ -222,13 +274,86 @@ export default function SessionPage() {
           </Badge>
         </div>
 
+        {/* Program Intelligence Display */}
+        {sessionProgram && (
+          <Card className='border-blue-200 bg-blue-50/50'>
+            <CardContent className='p-4'>
+              <div className='flex items-start gap-3'>
+                <Brain className='h-5 w-5 text-blue-600 mt-0.5' />
+                <div className='flex-1'>
+                  <h3 className='font-semibold text-blue-800 mb-2'>
+                    AI-Powered Session
+                  </h3>
+                  <div className='grid grid-cols-2 gap-4 text-sm'>
+                    <div>
+                      <span className='text-blue-700 font-medium'>
+                        Intensity:
+                      </span>
+                      <span className='ml-2 text-blue-600 capitalize'>
+                        {sessionProgram.intensity}
+                      </span>
+                    </div>
+                    <div>
+                      <span className='text-blue-700 font-medium'>Volume:</span>
+                      <span className='ml-2 text-blue-600 capitalize'>
+                        {sessionProgram.volume}
+                      </span>
+                    </div>
+                    <div>
+                      <span className='text-blue-700 font-medium'>Focus:</span>
+                      <span className='ml-2 text-blue-600'>
+                        {sessionProgram.focus.join(', ')}
+                      </span>
+                    </div>
+                    <div>
+                      <span className='text-blue-700 font-medium'>
+                        Duration:
+                      </span>
+                      <span className='ml-2 text-blue-600'>
+                        ~{sessionProgram.estimatedDuration} min
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Recommendations */}
+        {recommendations.length > 0 && (
+          <Card className='border-yellow-200 bg-yellow-50/50'>
+            <CardContent className='p-4'>
+              <div className='flex items-start gap-3'>
+                <AlertCircle className='h-5 w-5 text-yellow-600 mt-0.5' />
+                <div className='flex-1'>
+                  <h3 className='font-semibold text-yellow-800 mb-2'>
+                    Personalized Recommendations
+                  </h3>
+                  <ul className='space-y-1'>
+                    {recommendations.map((rec, index) => (
+                      <li
+                        key={index}
+                        className='text-sm text-yellow-700 flex items-start gap-2'
+                      >
+                        <span className='text-yellow-600 mt-1'>•</span>
+                        <span>{rec}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
         <Card>
           <CardContent className='p-4'>
             <div className='space-y-3'>
               <div className='flex items-center justify-between'>
                 <span className='text-sm font-medium'>Session Progress</span>
                 <span className='text-sm text-muted-foreground'>
-                  {completedExercises} / {mockExercises.length} exercises
+                  {completedExercises} / {exercises.length} exercises
                 </span>
               </div>
               <Progress value={sessionProgress} className='h-2' />
@@ -242,7 +367,13 @@ export default function SessionPage() {
                       })
                     : ''}
                 </span>
-                <span>Est. 25-30 min total</span>
+                <span>
+                  Est. {sessionProgram?.estimatedDuration || 25}-
+                  {sessionProgram?.estimatedDuration
+                    ? sessionProgram.estimatedDuration + 5
+                    : 30}{' '}
+                  min total
+                </span>
               </div>
             </div>
           </CardContent>
@@ -257,7 +388,7 @@ export default function SessionPage() {
           </CardHeader>
           <CardContent className='pt-0'>
             <div className='space-y-2'>
-              {mockExercises
+              {exercises
                 .slice(currentExercise, currentExercise + 2)
                 .map((exercise, index) => (
                   <div
@@ -279,6 +410,7 @@ export default function SessionPage() {
                     </div>
                     <div className='text-sm text-muted-foreground'>
                       {exercise.sets} × {exercise.reps}
+                      {exercise.load && ` • ${exercise.load}`}
                     </div>
                   </div>
                 ))}
@@ -287,14 +419,16 @@ export default function SessionPage() {
         </Card>
       </div>
 
-      <ExerciseInterface
-        exercise={mockExercises[currentExercise]}
-        exerciseIndex={currentExercise}
-        totalExercises={mockExercises.length}
-        onComplete={handleExerciseComplete}
-        onNext={handleNextExercise}
-        onPrevious={handlePreviousExercise}
-      />
+      {exercises.length > 0 && (
+        <ExerciseInterface
+          exercise={exercises[currentExercise]}
+          exerciseIndex={currentExercise}
+          totalExercises={exercises.length}
+          onComplete={handleExerciseComplete}
+          onNext={handleNextExercise}
+          onPrevious={handlePreviousExercise}
+        />
+      )}
     </div>
   );
 }

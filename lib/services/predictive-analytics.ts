@@ -675,8 +675,323 @@ export class PredictiveAnalyticsService {
   }
 
   private async calculateOptimizationRecommendations(sessions: SessionData[], checkIns: CheckInData[]): Promise<OptimizationRecommendation[]> {
-    // Implementation for optimization recommendations
-    return [];
+    const recommendations: OptimizationRecommendation[] = [];
+
+    // Training Load Optimization
+    const trainingLoadRec = this.optimizeTrainingLoad(sessions, checkIns);
+    if (trainingLoadRec) {
+      recommendations.push(trainingLoadRec);
+    }
+
+    // Schedule Efficiency Improvements
+    const scheduleRec = this.optimizeSchedule(sessions, checkIns);
+    if (scheduleRec) {
+      recommendations.push(scheduleRec);
+    }
+
+    // Exercise Selection Optimization
+    const exerciseRec = this.optimizeExerciseSelection(sessions, checkIns);
+    if (exerciseRec) {
+      recommendations.push(exerciseRec);
+    }
+
+    // Recovery Strategy Enhancement
+    const recoveryRec = this.optimizeRecoveryStrategy(sessions, checkIns);
+    if (recoveryRec) {
+      recommendations.push(recoveryRec);
+    }
+
+    return recommendations;
+  }
+
+  private optimizeTrainingLoad(sessions: SessionData[], checkIns: CheckInData[]): OptimizationRecommendation | null {
+    const recentSessions = sessions.slice(-14); // Last 2 weeks
+    if (recentSessions.length < 7) return null;
+
+    const currentLoad = this.calculateWeeklyLoad(recentSessions);
+    const loadProgression = this.calculateLoadProgression(recentSessions);
+    const avgRecovery = this.calculateAverageRecovery(checkIns.slice(-7));
+
+    let recommendedLoad = currentLoad;
+    let improvement = 0;
+    let description = '';
+    let steps: string[] = [];
+
+    if (loadProgression > 0.2 && avgRecovery < 6) {
+      // Reduce load due to rapid progression and poor recovery
+      recommendedLoad = currentLoad * 0.85;
+      improvement = 15;
+      description = 'Reduce training load to prevent overtraining and improve recovery';
+      steps = [
+        'Reduce weekly training volume by 15%',
+        'Focus on technique over intensity',
+        'Implement deload week every 4-6 weeks',
+        'Monitor recovery scores daily'
+      ];
+    } else if (loadProgression < -0.1 && avgRecovery > 7) {
+      // Increase load due to declining progression and good recovery
+      recommendedLoad = currentLoad * 1.1;
+      improvement = 10;
+      description = 'Gradually increase training load to optimize progress';
+      steps = [
+        'Increase weekly training volume by 10%',
+        'Add one additional set per exercise',
+        'Progressive overload on main lifts',
+        'Monitor performance and recovery'
+      ];
+    } else if (Math.abs(loadProgression) < 0.05) {
+      // Maintain current load with slight variation
+      recommendedLoad = currentLoad * 1.05;
+      improvement = 5;
+      description = 'Add slight variation to training load for continued adaptation';
+      steps = [
+        'Add 5% to weekly training volume',
+        'Vary exercise selection slightly',
+        'Maintain current progression rate',
+        'Continue monitoring recovery'
+      ];
+    } else {
+      return null; // No optimization needed
+    }
+
+    return {
+      userId: 'current-user',
+      type: 'training_load',
+      currentState: { weeklyLoad: currentLoad, progression: loadProgression },
+      recommendedState: { weeklyLoad: recommendedLoad, targetProgression: 0.1 },
+      expectedImprovement: improvement,
+      implementationDifficulty: improvement > 10 ? 'medium' : 'easy',
+      timeToImplement: 7,
+      description,
+      steps,
+    };
+  }
+
+  private optimizeSchedule(sessions: SessionData[], checkIns: CheckInData[]): OptimizationRecommendation | null {
+    const recentSessions = sessions.slice(-30); // Last 30 days
+    if (recentSessions.length < 10) return null;
+
+    const currentFrequency = this.calculateTrainingFrequency(recentSessions);
+    const consistency = this.calculateSessionConsistency(recentSessions);
+    const avgRecovery = this.calculateAverageRecovery(checkIns.slice(-7));
+
+    let recommendedFrequency = currentFrequency;
+    let improvement = 0;
+    let description = '';
+    let steps: string[] = [];
+
+    if (currentFrequency > 6 && avgRecovery < 6) {
+      // Reduce frequency due to overtraining
+      recommendedFrequency = 4;
+      improvement = 20;
+      description = 'Reduce training frequency to improve recovery and prevent burnout';
+      steps = [
+        'Reduce to 4 training sessions per week',
+        'Add 2-3 rest days between sessions',
+        'Focus on quality over quantity',
+        'Implement active recovery on rest days'
+      ];
+    } else if (currentFrequency < 3 && avgRecovery > 7) {
+      // Increase frequency due to undertraining
+      recommendedFrequency = 4;
+      improvement = 15;
+      description = 'Increase training frequency to optimize progress';
+      steps = [
+        'Increase to 4 training sessions per week',
+        'Maintain 48-72 hours between similar sessions',
+        'Gradually build up training volume',
+        'Monitor recovery and adjust as needed'
+      ];
+    } else if (consistency < 0.6) {
+      // Improve consistency
+      improvement = 10;
+      description = 'Improve training consistency for better results';
+      steps = [
+        'Set specific training days and times',
+        'Create workout reminders and notifications',
+        'Start with shorter, more manageable sessions',
+        'Track attendance and celebrate consistency'
+      ];
+    } else {
+      return null; // No optimization needed
+    }
+
+    return {
+      userId: 'current-user',
+      type: 'schedule',
+      currentState: { frequency: currentFrequency, consistency },
+      recommendedState: { frequency: recommendedFrequency, targetConsistency: 0.8 },
+      expectedImprovement: improvement,
+      implementationDifficulty: 'easy',
+      timeToImplement: 3,
+      description,
+      steps,
+    };
+  }
+
+  private optimizeExerciseSelection(sessions: SessionData[], checkIns: CheckInData[]): OptimizationRecommendation | null {
+    const recentSessions = sessions.slice(-14);
+    if (recentSessions.length < 7) return null;
+
+    const exerciseVariety = this.calculateExerciseVariety(recentSessions);
+    const performanceTrend = this.calculatePerformanceTrend(recentSessions);
+    const plateauRisk = this.assessPlateauRisk(recentSessions);
+
+    let improvement = 0;
+    let description = '';
+    let steps: string[] = [];
+
+    if (exerciseVariety < 0.3) {
+      // Low variety - add more exercises
+      improvement = 15;
+      description = 'Increase exercise variety to prevent plateaus and improve overall fitness';
+      steps = [
+        'Add 2-3 new exercises to your routine',
+        'Rotate exercises every 4-6 weeks',
+        'Include different movement patterns',
+        'Focus on compound movements'
+      ];
+    } else if (plateauRisk > 0.7) {
+      // High plateau risk - modify exercises
+      improvement = 20;
+      description = 'Modify exercise selection to break through plateaus';
+      steps = [
+        'Change exercise variations (e.g., barbell to dumbbell)',
+        'Modify rep ranges and tempos',
+        'Add supersets or drop sets',
+        'Focus on weak points and imbalances'
+      ];
+    } else if (performanceTrend < -0.05) {
+      // Declining performance - simplify selection
+      improvement = 10;
+      description = 'Simplify exercise selection to focus on fundamentals';
+      steps = [
+        'Reduce to 4-6 core exercises',
+        'Focus on compound movements',
+        'Master basic movement patterns',
+        'Gradually add complexity back'
+      ];
+    } else {
+      return null; // No optimization needed
+    }
+
+    return {
+      userId: 'current-user',
+      type: 'exercise_selection',
+      currentState: { variety: exerciseVariety, plateauRisk, performanceTrend },
+      recommendedState: { targetVariety: 0.5, targetPlateauRisk: 0.3, targetPerformanceTrend: 0.05 },
+      expectedImprovement: improvement,
+      implementationDifficulty: 'medium',
+      timeToImplement: 14,
+      description,
+      steps,
+    };
+  }
+
+  private optimizeRecoveryStrategy(sessions: SessionData[], checkIns: CheckInData[]): OptimizationRecommendation | null {
+    const recentCheckIns = checkIns.slice(-14);
+    if (recentCheckIns.length < 7) return null;
+
+    const avgRecovery = this.calculateAverageRecovery(recentCheckIns);
+    const avgSleep = this.calculateAverageSleep(recentCheckIns);
+    const avgStress = this.calculateAverageStress(recentCheckIns);
+    const avgNutrition = this.calculateAverageNutrition(recentCheckIns);
+
+    let improvement = 0;
+    let description = '';
+    let steps: string[] = [];
+
+    if (avgRecovery < 6) {
+      improvement = 25;
+      description = 'Improve recovery strategies to enhance performance and prevent burnout';
+      
+      if (avgSleep < 6) {
+        steps.push('Prioritize 7-9 hours of quality sleep per night');
+        steps.push('Create consistent sleep schedule');
+        steps.push('Optimize sleep environment (dark, cool, quiet)');
+      }
+      
+      if (avgStress > 7) {
+        steps.push('Implement stress management techniques (meditation, breathing)');
+        steps.push('Take regular breaks during the day');
+        steps.push('Practice relaxation techniques before bed');
+      }
+      
+      if (avgNutrition < 6) {
+        steps.push('Focus on balanced nutrition with adequate protein');
+        steps.push('Stay hydrated throughout the day');
+        steps.push('Consider post-workout nutrition timing');
+      }
+      
+      steps.push('Implement active recovery (light walking, stretching)');
+      steps.push('Consider massage or foam rolling');
+    } else if (avgRecovery > 8) {
+      improvement = 10;
+      description = 'Maintain excellent recovery practices and consider increasing training load';
+      steps = [
+        'Continue current recovery practices',
+        'Consider increasing training intensity',
+        'Monitor for signs of undertraining',
+        'Maintain current sleep and nutrition habits'
+      ];
+    } else {
+      return null; // No optimization needed
+    }
+
+    return {
+      userId: 'current-user',
+      type: 'recovery',
+      currentState: { recovery: avgRecovery, sleep: avgSleep, stress: avgStress, nutrition: avgNutrition },
+      recommendedState: { targetRecovery: 8, targetSleep: 8, targetStress: 4, targetNutrition: 8 },
+      expectedImprovement: improvement,
+      implementationDifficulty: 'medium',
+      timeToImplement: 21,
+      description,
+      steps,
+    };
+  }
+
+  // Helper methods for optimization calculations
+  private calculateAverageRecovery(checkIns: CheckInData[]): number {
+    if (checkIns.length === 0) return 5;
+    return checkIns.reduce((sum, checkIn) => sum + (checkIn.recovery || 5), 0) / checkIns.length;
+  }
+
+  private calculateAverageSleep(checkIns: CheckInData[]): number {
+    if (checkIns.length === 0) return 5;
+    return checkIns.reduce((sum, checkIn) => sum + (checkIn.sleep || 5), 0) / checkIns.length;
+  }
+
+  private calculateAverageStress(checkIns: CheckInData[]): number {
+    if (checkIns.length === 0) return 5;
+    return checkIns.reduce((sum, checkIn) => sum + (checkIn.stress || 5), 0) / checkIns.length;
+  }
+
+  private calculateAverageNutrition(checkIns: CheckInData[]): number {
+    if (checkIns.length === 0) return 5;
+    return checkIns.reduce((sum, checkIn) => sum + (checkIn.nutrition || 5), 0) / checkIns.length;
+  }
+
+  private calculateExerciseVariety(sessions: SessionData[]): number {
+    const exerciseSet = new Set();
+    sessions.forEach(session => {
+      session.exercises.forEach(exercise => {
+        exerciseSet.add(exercise.name);
+      });
+    });
+    
+    // Normalize by number of sessions
+    return exerciseSet.size / (sessions.length * 3); // Assuming 3 exercises per session average
+  }
+
+  private assessPlateauRisk(sessions: SessionData[]): number {
+    if (sessions.length < 7) return 0;
+    
+    const performanceTrend = this.calculatePerformanceTrend(sessions);
+    const exerciseVariety = this.calculateExerciseVariety(sessions);
+    
+    // Higher plateau risk if performance is declining and variety is low
+    return Math.max(0, (1 - performanceTrend) * (1 - exerciseVariety));
   }
 
   // Risk Assessment Methods

@@ -353,6 +353,12 @@ export class AutonomousSystemManagementService {
       // Analyze system performance
       await this.analyzeSystemPerformance();
       
+      // Detect problems proactively
+      await this.detectProblems();
+      
+      // Perform self-healing
+      await this.performSelfHealing();
+      
     } catch (error) {
       console.error('Error in continuous learning:', error);
     }
@@ -521,6 +527,310 @@ export class AutonomousSystemManagementService {
     }, 60000); // Every minute
   }
 
+  // Proactive Problem Detection
+  async detectProblems(): Promise<void> {
+    try {
+      // Check for performance degradation
+      await this.detectPerformanceDegradation();
+      
+      // Check for data inconsistencies
+      await this.detectDataInconsistencies();
+      
+      // Check for user behavior anomalies
+      await this.detectUserBehaviorAnomalies();
+      
+      // Check for system resource issues
+      await this.detectResourceIssues();
+      
+    } catch (error) {
+      console.error('Error in proactive problem detection:', error);
+    }
+  }
+
+  private async detectPerformanceDegradation(): Promise<void> {
+    if (this.performanceHistory.length < 5) return;
+    
+    const recent = this.performanceHistory.slice(-5);
+    const avgAccuracy = recent.reduce((sum, p) => sum + p.accuracy, 0) / recent.length;
+    const avgResponseTime = recent.reduce((sum, p) => sum + p.responseTime, 0) / recent.length;
+    
+    // Check for accuracy degradation
+    if (avgAccuracy < 0.7) {
+      await this.triggerAlert({
+        type: 'Performance Degradation',
+        severity: 'high',
+        message: `Model accuracy has dropped to ${(avgAccuracy * 100).toFixed(1)}%`,
+        actions: [
+          { type: 'reduce_intensity', parameters: { factor: 0.8 } },
+          { type: 'schedule_recovery', parameters: { duration: 24 } }
+        ]
+      });
+    }
+    
+    // Check for response time issues
+    if (avgResponseTime > 200) {
+      await this.triggerAlert({
+        type: 'Response Time Issue',
+        severity: 'medium',
+        message: `Average response time is ${avgResponseTime.toFixed(0)}ms`,
+        actions: [
+          { type: 'optimize_cache', parameters: { clearOld: true } }
+        ]
+      });
+    }
+  }
+
+  private async detectDataInconsistencies(): Promise<void> {
+    try {
+      const sessions = await this.databaseService.getSessions('current-user');
+      const checkIns = await this.databaseService.getCheckIns('current-user');
+      
+      // Check for missing data
+      const recentSessions = sessions.filter(s => 
+        new Date(s.date) > new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)
+      );
+      const recentCheckIns = checkIns.filter(c => 
+        new Date(c.date) > new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)
+      );
+      
+      if (recentSessions.length === 0) {
+        await this.triggerAlert({
+          type: 'Data Inconsistency',
+          severity: 'medium',
+          message: 'No recent session data found',
+          actions: [
+            { type: 'send_notification', parameters: { 
+              type: 'Data Sync', 
+              message: 'Please sync your training data' 
+            }}
+          ]
+        });
+      }
+      
+      // Check for inconsistent data patterns
+      const inconsistentSessions = sessions.filter(s => 
+        s.exercises.some(ex => ex.sets.some(set => set.weight < 0 || set.reps < 0))
+      );
+      
+      if (inconsistentSessions.length > 0) {
+        await this.triggerAlert({
+          type: 'Data Quality Issue',
+          severity: 'low',
+          message: `${inconsistentSessions.length} sessions have invalid data`,
+          actions: [
+            { type: 'data_cleanup', parameters: { sessions: inconsistentSessions.map(s => s.id) } }
+          ]
+        });
+      }
+      
+    } catch (error) {
+      console.error('Error detecting data inconsistencies:', error);
+    }
+  }
+
+  private async detectUserBehaviorAnomalies(): Promise<void> {
+    try {
+      const sessions = await this.databaseService.getSessions('current-user');
+      const checkIns = await this.databaseService.getCheckIns('current-user');
+      
+      if (sessions.length < 10) return;
+      
+      // Check for sudden changes in training patterns
+      const recentSessions = sessions.slice(-5);
+      const olderSessions = sessions.slice(-10, -5);
+      
+      const recentAvgIntensity = this.calculateAverageIntensity(recentSessions);
+      const olderAvgIntensity = this.calculateAverageIntensity(olderSessions);
+      
+      const intensityChange = Math.abs(recentAvgIntensity - olderAvgIntensity) / olderAvgIntensity;
+      
+      if (intensityChange > 0.5) {
+        await this.triggerAlert({
+          type: 'Behavior Anomaly',
+          severity: 'medium',
+          message: `Significant change in training intensity detected (${(intensityChange * 100).toFixed(1)}%)`,
+          actions: [
+            { type: 'send_notification', parameters: { 
+              type: 'Training Adjustment', 
+              message: 'Consider adjusting your training intensity' 
+            }}
+          ]
+        });
+      }
+      
+      // Check for missed sessions
+      const expectedSessions = Math.floor((Date.now() - new Date(sessions[0].date).getTime()) / (7 * 24 * 60 * 60 * 1000)) * 3;
+      const actualSessions = sessions.length;
+      
+      if (actualSessions < expectedSessions * 0.7) {
+        await this.triggerAlert({
+          type: 'Consistency Issue',
+          severity: 'low',
+          message: 'Training consistency has decreased',
+          actions: [
+            { type: 'send_notification', parameters: { 
+              type: 'Motivation', 
+              message: 'You\'re doing great! Keep up the consistent training' 
+            }}
+          ]
+        });
+      }
+      
+    } catch (error) {
+      console.error('Error detecting user behavior anomalies:', error);
+    }
+  }
+
+  private async detectResourceIssues(): Promise<void> {
+    // Check memory usage
+    if (typeof performance !== 'undefined' && performance.memory) {
+      const memoryUsage = performance.memory.usedJSHeapSize / performance.memory.jsHeapSizeLimit;
+      
+      if (memoryUsage > 0.8) {
+        await this.triggerAlert({
+          type: 'Resource Issue',
+          severity: 'medium',
+          message: `High memory usage detected (${(memoryUsage * 100).toFixed(1)}%)`,
+          actions: [
+            { type: 'clear_cache', parameters: { aggressive: true } }
+          ]
+        });
+      }
+    }
+    
+    // Check for storage issues
+    try {
+      const storageUsed = JSON.stringify(localStorage).length;
+      const storageLimit = 5 * 1024 * 1024; // 5MB
+      
+      if (storageUsed > storageLimit * 0.8) {
+        await this.triggerAlert({
+          type: 'Storage Issue',
+          severity: 'low',
+          message: 'Local storage is getting full',
+          actions: [
+            { type: 'cleanup_old_data', parameters: { days: 30 } }
+          ]
+        });
+      }
+    } catch (error) {
+      console.error('Error checking storage:', error);
+    }
+  }
+
+  // Self-Healing System Capabilities
+  async performSelfHealing(): Promise<void> {
+    try {
+      // Auto-fix common issues
+      await this.autoFixDataInconsistencies();
+      await this.autoOptimizePerformance();
+      await this.autoCleanupResources();
+      
+    } catch (error) {
+      console.error('Error in self-healing:', error);
+    }
+  }
+
+  private async autoFixDataInconsistencies(): Promise<void> {
+    try {
+      const sessions = await this.databaseService.getSessions('current-user');
+      let fixedCount = 0;
+      
+      for (const session of sessions) {
+        let needsUpdate = false;
+        
+        // Fix negative weights
+        session.exercises.forEach(exercise => {
+          exercise.sets.forEach(set => {
+            if (set.weight < 0) {
+              set.weight = 0;
+              needsUpdate = true;
+            }
+            if (set.reps < 0) {
+              set.reps = 0;
+              needsUpdate = true;
+            }
+            if (set.rpe && (set.rpe < 1 || set.rpe > 10)) {
+              set.rpe = Math.max(1, Math.min(10, set.rpe));
+              needsUpdate = true;
+            }
+          });
+        });
+        
+        if (needsUpdate) {
+          await this.databaseService.updateSession(session.id, session);
+          fixedCount++;
+        }
+      }
+      
+      if (fixedCount > 0) {
+        console.log(`Auto-fixed ${fixedCount} data inconsistencies`);
+      }
+      
+    } catch (error) {
+      console.error('Error auto-fixing data inconsistencies:', error);
+    }
+  }
+
+  private async autoOptimizePerformance(): Promise<void> {
+    try {
+      // Clear old performance history
+      if (this.performanceHistory.length > 50) {
+        this.performanceHistory = this.performanceHistory.slice(-25);
+      }
+      
+      // Clear old model metrics
+      const now = Date.now();
+      for (const [modelId, metrics] of this.modelMetrics) {
+        const age = now - metrics.lastUpdated.getTime();
+        if (age > 24 * 60 * 60 * 1000) { // 24 hours
+          this.modelMetrics.delete(modelId);
+        }
+      }
+      
+      // Clear old parameter history
+      if (this.parameterHistory.length > 100) {
+        this.parameterHistory = this.parameterHistory.slice(-50);
+      }
+      
+      console.log('Performance optimization completed');
+      
+    } catch (error) {
+      console.error('Error auto-optimizing performance:', error);
+    }
+  }
+
+  private async autoCleanupResources(): Promise<void> {
+    try {
+      // Clean up old notifications
+      const notifications = JSON.parse(localStorage.getItem('notifications') || '[]');
+      const recentNotifications = notifications.filter((n: any) => 
+        new Date(n.timestamp) > new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)
+      );
+      localStorage.setItem('notifications', JSON.stringify(recentNotifications));
+      
+      // Clean up old alerts
+      const alerts = JSON.parse(localStorage.getItem('alerts') || '[]');
+      const recentAlerts = alerts.filter((a: any) => 
+        new Date(a.timestamp) > new Date(Date.now() - 3 * 24 * 60 * 60 * 1000)
+      );
+      localStorage.setItem('alerts', JSON.stringify(recentAlerts));
+      
+      // Clean up old learning patterns
+      for (const [userId, patterns] of this.learningPatterns) {
+        const recentPatterns = patterns.filter(p => 
+          new Date(p.lastObserved) > new Date(Date.now() - 30 * 24 * 60 * 60 * 1000)
+        );
+        this.learningPatterns.set(userId, recentPatterns);
+      }
+      
+      console.log('Resource cleanup completed');
+      
+    } catch (error) {
+      console.error('Error auto-cleaning resources:', error);
+    }
+  }
+
   private async performHealthCheck(): Promise<void> {
     const health: SystemHealthMetrics = {
       timestamp: new Date(),
@@ -655,23 +965,302 @@ export class AutonomousSystemManagementService {
   }
 
   private async adjustSession(parameters: any): Promise<void> {
-    // Implement session adjustment logic
-    console.log('Adjusting session with parameters:', parameters);
+    try {
+      const { sessionId, adjustments } = parameters;
+      
+      // Get current session data
+      const sessions = await this.databaseService.getSessions('current-user');
+      const session = sessions.find(s => s.id === sessionId);
+      
+      if (!session) {
+        throw new Error('Session not found');
+      }
+
+      // Apply intelligent adjustments
+      if (adjustments.intensity) {
+        await this.adjustSessionIntensity(session, adjustments.intensity);
+      }
+      
+      if (adjustments.duration) {
+        await this.adjustSessionDuration(session, adjustments.duration);
+      }
+      
+      if (adjustments.exercises) {
+        await this.adjustSessionExercises(session, adjustments.exercises);
+      }
+      
+      // Update session in database
+      await this.databaseService.updateSession(sessionId, session);
+      
+      console.log('Session adjusted successfully:', sessionId);
+    } catch (error) {
+      console.error('Error adjusting session:', error);
+      throw error;
+    }
+  }
+
+  private async adjustSessionIntensity(session: SessionData, intensityAdjustment: number): Promise<void> {
+    // Adjust RPE and weights based on intensity adjustment
+    session.exercises.forEach(exercise => {
+      exercise.sets.forEach(set => {
+        if (set.rpe) {
+          set.rpe = Math.max(1, Math.min(10, set.rpe + intensityAdjustment));
+        }
+        if (set.weight) {
+          set.weight = Math.max(0, set.weight * (1 + intensityAdjustment * 0.1));
+        }
+      });
+    });
+  }
+
+  private async adjustSessionDuration(session: SessionData, durationAdjustment: number): Promise<void> {
+    // Adjust session duration
+    session.duration = Math.max(15, Math.min(120, (session.duration || 60) + durationAdjustment));
+  }
+
+  private async adjustSessionExercises(session: SessionData, exerciseAdjustments: any[]): Promise<void> {
+    // Add, remove, or modify exercises based on adjustments
+    exerciseAdjustments.forEach(adjustment => {
+      if (adjustment.action === 'add') {
+        session.exercises.push(adjustment.exercise);
+      } else if (adjustment.action === 'remove') {
+        session.exercises = session.exercises.filter(ex => ex.id !== adjustment.exerciseId);
+      } else if (adjustment.action === 'modify') {
+        const exercise = session.exercises.find(ex => ex.id === adjustment.exerciseId);
+        if (exercise) {
+          Object.assign(exercise, adjustment.modifications);
+        }
+      }
+    });
   }
 
   private async sendNotification(parameters: any): Promise<void> {
-    // Implement notification sending logic
-    console.log('Sending notification with parameters:', parameters);
+    try {
+      const { type, message, priority, userId, channels } = parameters;
+      
+      // Create notification object
+      const notification = {
+        id: `notif_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+        type,
+        message,
+        priority: priority || 'medium',
+        userId: userId || 'current-user',
+        channels: channels || ['in_app'],
+        timestamp: new Date(),
+        read: false,
+      };
+      
+      // Store notification
+      const notifications = JSON.parse(localStorage.getItem('notifications') || '[]');
+      notifications.push(notification);
+      localStorage.setItem('notifications', JSON.stringify(notifications));
+      
+      // Send to different channels
+      if (channels?.includes('in_app')) {
+        this.showInAppNotification(notification);
+      }
+      
+      if (channels?.includes('email')) {
+        await this.sendEmailNotification(notification);
+      }
+      
+      if (channels?.includes('push')) {
+        await this.sendPushNotification(notification);
+      }
+      
+      console.log('Notification sent successfully:', notification.id);
+    } catch (error) {
+      console.error('Error sending notification:', error);
+      throw error;
+    }
+  }
+
+  private showInAppNotification(notification: any): void {
+    // Create in-app notification element
+    const notificationElement = document.createElement('div');
+    notificationElement.className = 'fixed top-4 right-4 bg-white border rounded-lg shadow-lg p-4 z-50 max-w-sm';
+    notificationElement.innerHTML = `
+      <div class="flex items-start gap-3">
+        <div class="flex-shrink-0">
+          <div class="w-2 h-2 bg-blue-500 rounded-full"></div>
+        </div>
+        <div class="flex-1">
+          <h4 class="font-medium text-sm">${notification.type}</h4>
+          <p class="text-sm text-gray-600 mt-1">${notification.message}</p>
+        </div>
+        <button onclick="this.parentElement.parentElement.remove()" class="text-gray-400 hover:text-gray-600">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+          </svg>
+        </button>
+      </div>
+    `;
+    
+    document.body.appendChild(notificationElement);
+    
+    // Auto-remove after 5 seconds
+    setTimeout(() => {
+      if (notificationElement.parentElement) {
+        notificationElement.remove();
+      }
+    }, 5000);
+  }
+
+  private async sendEmailNotification(notification: any): Promise<void> {
+    // Simulate email sending
+    console.log('Sending email notification:', notification);
+    // In a real implementation, this would integrate with an email service
+  }
+
+  private async sendPushNotification(notification: any): Promise<void> {
+    // Simulate push notification
+    console.log('Sending push notification:', notification);
+    // In a real implementation, this would integrate with a push notification service
   }
 
   private async modifyRecommendation(parameters: any): Promise<void> {
-    // Implement recommendation modification logic
-    console.log('Modifying recommendation with parameters:', parameters);
+    try {
+      const { recommendationId, modifications, userId } = parameters;
+      
+      // Get current recommendations
+      const recommendations = JSON.parse(localStorage.getItem('recommendations') || '[]');
+      const recommendation = recommendations.find((r: any) => r.id === recommendationId);
+      
+      if (!recommendation) {
+        throw new Error('Recommendation not found');
+      }
+      
+      // Apply modifications
+      Object.assign(recommendation, modifications);
+      recommendation.lastModified = new Date();
+      recommendation.modifiedBy = 'autonomous_system';
+      
+      // Update recommendations
+      localStorage.setItem('recommendations', JSON.stringify(recommendations));
+      
+      console.log('Recommendation modified successfully:', recommendationId);
+    } catch (error) {
+      console.error('Error modifying recommendation:', error);
+      throw error;
+    }
   }
 
   private async triggerAlert(parameters: any): Promise<void> {
-    // Implement alert triggering logic
-    console.log('Triggering alert with parameters:', parameters);
+    try {
+      const { type, severity, message, userId, actions } = parameters;
+      
+      // Create alert object
+      const alert = {
+        id: `alert_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+        type,
+        severity: severity || 'medium',
+        message,
+        userId: userId || 'current-user',
+        timestamp: new Date(),
+        acknowledged: false,
+        actions: actions || [],
+      };
+      
+      // Store alert
+      const alerts = JSON.parse(localStorage.getItem('alerts') || '[]');
+      alerts.push(alert);
+      localStorage.setItem('alerts', JSON.stringify(alerts));
+      
+      // Show alert in UI
+      this.showAlert(alert);
+      
+      // Execute any immediate actions
+      if (actions) {
+        for (const action of actions) {
+          await this.executeAction(action);
+        }
+      }
+      
+      console.log('Alert triggered successfully:', alert.id);
+    } catch (error) {
+      console.error('Error triggering alert:', error);
+      throw error;
+    }
+  }
+
+  private showAlert(alert: any): void {
+    // Create alert element
+    const alertElement = document.createElement('div');
+    alertElement.className = `fixed top-4 left-1/2 transform -translate-x-1/2 bg-white border-l-4 ${
+      alert.severity === 'high' ? 'border-red-500' : 
+      alert.severity === 'medium' ? 'border-yellow-500' : 'border-blue-500'
+    } rounded-lg shadow-lg p-4 z-50 max-w-md`;
+    alertElement.innerHTML = `
+      <div class="flex items-start gap-3">
+        <div class="flex-shrink-0">
+          <div class="w-2 h-2 ${
+            alert.severity === 'high' ? 'bg-red-500' : 
+            alert.severity === 'medium' ? 'bg-yellow-500' : 'bg-blue-500'
+          } rounded-full"></div>
+        </div>
+        <div class="flex-1">
+          <h4 class="font-medium text-sm">${alert.type}</h4>
+          <p class="text-sm text-gray-600 mt-1">${alert.message}</p>
+          <div class="flex gap-2 mt-3">
+            <button onclick="this.closest('.alert-container').remove()" class="text-xs bg-gray-100 hover:bg-gray-200 px-3 py-1 rounded">
+              Dismiss
+            </button>
+            <button onclick="this.closest('.alert-container').remove()" class="text-xs bg-blue-100 hover:bg-blue-200 px-3 py-1 rounded">
+              Acknowledge
+            </button>
+          </div>
+        </div>
+      </div>
+    `;
+    
+    alertElement.classList.add('alert-container');
+    document.body.appendChild(alertElement);
+    
+    // Auto-remove after 10 seconds
+    setTimeout(() => {
+      if (alertElement.parentElement) {
+        alertElement.remove();
+      }
+    }, 10000);
+  }
+
+  private async executeAction(action: any): Promise<void> {
+    switch (action.type) {
+      case 'pause_training':
+        await this.pauseTraining(action.parameters);
+        break;
+      case 'reduce_intensity':
+        await this.reduceIntensity(action.parameters);
+        break;
+      case 'schedule_recovery':
+        await this.scheduleRecovery(action.parameters);
+        break;
+      case 'contact_support':
+        await this.contactSupport(action.parameters);
+        break;
+      default:
+        console.log('Unknown action type:', action.type);
+    }
+  }
+
+  private async pauseTraining(parameters: any): Promise<void> {
+    console.log('Pausing training:', parameters);
+    // Implement training pause logic
+  }
+
+  private async reduceIntensity(parameters: any): Promise<void> {
+    console.log('Reducing intensity:', parameters);
+    // Implement intensity reduction logic
+  }
+
+  private async scheduleRecovery(parameters: any): Promise<void> {
+    console.log('Scheduling recovery:', parameters);
+    // Implement recovery scheduling logic
+  }
+
+  private async contactSupport(parameters: any): Promise<void> {
+    console.log('Contacting support:', parameters);
+    // Implement support contact logic
   }
 
   // Data persistence

@@ -631,19 +631,323 @@ export class PredictiveAnalyticsService {
   }
 
   private async calculateRiskAssessment(sessions: SessionData[], checkIns: CheckInData[]): Promise<RiskAssessment> {
-    // Implementation for risk assessment
+    const riskFactors: RiskAssessment['riskFactors'] = [];
+    let overallRisk = 0;
+
+    // Injury Risk Assessment
+    const injuryRisk = this.assessInjuryRisk(sessions, checkIns);
+    if (injuryRisk.score > 0) {
+      riskFactors.push(injuryRisk);
+      overallRisk += injuryRisk.score * 0.3;
+    }
+
+    // Overtraining Detection
+    const overtrainingRisk = this.assessOvertrainingRisk(sessions, checkIns);
+    if (overtrainingRisk.score > 0) {
+      riskFactors.push(overtrainingRisk);
+      overallRisk += overtrainingRisk.score * 0.25;
+    }
+
+    // Burnout Prevention
+    const burnoutRisk = this.assessBurnoutRisk(sessions, checkIns);
+    if (burnoutRisk.score > 0) {
+      riskFactors.push(burnoutRisk);
+      overallRisk += burnoutRisk.score * 0.2;
+    }
+
+    // Recovery Optimization
+    const recoveryRisk = this.assessRecoveryRisk(sessions, checkIns);
+    if (recoveryRisk.score > 0) {
+      riskFactors.push(recoveryRisk);
+      overallRisk += recoveryRisk.score * 0.25;
+    }
+
+    // Generate recommendations based on risk factors
+    const recommendations = this.generateRiskRecommendations(riskFactors, overallRisk);
+
     return {
       userId: 'current-user',
       assessmentDate: new Date(),
-      overallRisk: 25,
-      riskFactors: [],
-      recommendations: [],
+      overallRisk: Math.min(100, Math.round(overallRisk)),
+      riskFactors,
+      recommendations,
     };
   }
 
   private async calculateOptimizationRecommendations(sessions: SessionData[], checkIns: CheckInData[]): Promise<OptimizationRecommendation[]> {
     // Implementation for optimization recommendations
     return [];
+  }
+
+  // Risk Assessment Methods
+  private assessInjuryRisk(sessions: SessionData[], checkIns: CheckInData[]): RiskAssessment['riskFactors'][0] {
+    let score = 0;
+    const contributingFactors: string[] = [];
+    const mitigationStrategies: string[] = [];
+
+    // Analyze training load progression
+    const recentSessions = sessions.slice(-14); // Last 2 weeks
+    if (recentSessions.length >= 7) {
+      const loadProgression = this.calculateLoadProgression(recentSessions);
+      if (loadProgression > 0.2) { // >20% increase per week
+        score += 30;
+        contributingFactors.push('Rapid training load increase');
+        mitigationStrategies.push('Reduce training load by 10-15%');
+      }
+    }
+
+    // Analyze RPE trends
+    const avgRPE = this.calculateAverageRPE(recentSessions);
+    if (avgRPE > 8.5) {
+      score += 25;
+      contributingFactors.push('Consistently high perceived exertion');
+      mitigationStrategies.push('Reduce intensity and focus on technique');
+    }
+
+    // Analyze recovery patterns
+    const recentCheckIns = checkIns.slice(-7);
+    const avgRecovery = recentCheckIns.reduce((sum, checkIn) => sum + (checkIn.recovery || 5), 0) / recentCheckIns.length;
+    if (avgRecovery < 6) {
+      score += 20;
+      contributingFactors.push('Poor recovery scores');
+      mitigationStrategies.push('Improve sleep quality and stress management');
+    }
+
+    const level = score < 20 ? 'low' : score < 40 ? 'medium' : score < 60 ? 'high' : 'critical';
+
+    return {
+      type: 'injury',
+      level,
+      score: Math.min(100, score),
+      description: `Injury risk assessment based on training patterns and recovery metrics`,
+      contributingFactors,
+      mitigationStrategies,
+    };
+  }
+
+  private assessOvertrainingRisk(sessions: SessionData[], checkIns: CheckInData[]): RiskAssessment['riskFactors'][0] {
+    let score = 0;
+    const contributingFactors: string[] = [];
+    const mitigationStrategies: string[] = [];
+
+    // Analyze training frequency
+    const trainingFrequency = this.calculateTrainingFrequency(sessions);
+    if (trainingFrequency > 6) { // More than 6 sessions per week
+      score += 20;
+      contributingFactors.push('High training frequency');
+      mitigationStrategies.push('Reduce training frequency to 4-5 sessions per week');
+    }
+
+    // Analyze performance trends
+    const performanceTrend = this.calculatePerformanceTrend(sessions);
+    if (performanceTrend < -0.05) { // Declining performance
+      score += 30;
+      contributingFactors.push('Declining performance indicators');
+      mitigationStrategies.push('Take 3-5 days complete rest');
+    }
+
+    const level = score < 20 ? 'low' : score < 40 ? 'medium' : score < 60 ? 'high' : 'critical';
+
+    return {
+      type: 'overtraining',
+      level,
+      score: Math.min(100, score),
+      description: `Overtraining risk assessment based on training load and recovery patterns`,
+      contributingFactors,
+      mitigationStrategies,
+    };
+  }
+
+  private assessBurnoutRisk(sessions: SessionData[], checkIns: CheckInData[]): RiskAssessment['riskFactors'][0] {
+    let score = 0;
+    const contributingFactors: string[] = [];
+    const mitigationStrategies: string[] = [];
+
+    // Analyze motivation trends
+    const motivationTrend = this.calculateMotivationTrend(checkIns);
+    if (motivationTrend < -0.1) { // Declining motivation
+      score += 25;
+      contributingFactors.push('Declining motivation levels');
+      mitigationStrategies.push('Take a break and reassess goals');
+    }
+
+    // Analyze session consistency
+    const sessionConsistency = this.calculateSessionConsistency(sessions);
+    if (sessionConsistency < 0.6) {
+      score += 20;
+      contributingFactors.push('Inconsistent training attendance');
+      mitigationStrategies.push('Simplify training routine and set smaller goals');
+    }
+
+    const level = score < 20 ? 'low' : score < 40 ? 'medium' : score < 60 ? 'high' : 'critical';
+
+    return {
+      type: 'burnout',
+      level,
+      score: Math.min(100, score),
+      description: `Burnout risk assessment based on motivation, consistency, and psychological factors`,
+      contributingFactors,
+      mitigationStrategies,
+    };
+  }
+
+  private assessRecoveryRisk(sessions: SessionData[], checkIns: CheckInData[]): RiskAssessment['riskFactors'][0] {
+    let score = 0;
+    const contributingFactors: string[] = [];
+    const mitigationStrategies: string[] = [];
+
+    // Analyze recovery scores
+    const recentCheckIns = checkIns.slice(-7);
+    const avgRecovery = recentCheckIns.reduce((sum, checkIn) => sum + (checkIn.recovery || 5), 0) / recentCheckIns.length;
+    if (avgRecovery < 6) {
+      score += 30;
+      contributingFactors.push('Consistently low recovery scores');
+      mitigationStrategies.push('Implement active recovery and improve sleep hygiene');
+    }
+
+    // Analyze sleep patterns
+    const avgSleep = recentCheckIns.reduce((sum, checkIn) => sum + (checkIn.sleep || 5), 0) / recentCheckIns.length;
+    if (avgSleep < 6) {
+      score += 25;
+      contributingFactors.push('Insufficient sleep duration');
+      mitigationStrategies.push('Prioritize 7-9 hours of quality sleep per night');
+    }
+
+    const level = score < 20 ? 'low' : score < 40 ? 'medium' : score < 60 ? 'high' : 'critical';
+
+    return {
+      type: 'recovery',
+      level,
+      score: Math.min(100, score),
+      description: `Recovery risk assessment based on sleep, stress, nutrition, and training balance`,
+      contributingFactors,
+      mitigationStrategies,
+    };
+  }
+
+  // Helper methods for risk assessment calculations
+  private calculateLoadProgression(sessions: SessionData[]): number {
+    if (sessions.length < 7) return 0;
+    
+    const firstWeek = sessions.slice(0, 7);
+    const secondWeek = sessions.slice(7);
+    
+    const firstWeekLoad = this.calculateWeeklyLoad(firstWeek);
+    const secondWeekLoad = this.calculateWeeklyLoad(secondWeek);
+    
+    return (secondWeekLoad - firstWeekLoad) / firstWeekLoad;
+  }
+
+  private calculateWeeklyLoad(sessions: SessionData[]): number {
+    return sessions.reduce((total, session) => {
+      const sessionLoad = session.exercises.reduce((exerciseTotal, exercise) => {
+        return exerciseTotal + exercise.sets.reduce((setTotal, set) => {
+          return setTotal + (set.weight * set.reps * (set.rpe || 5));
+        }, 0);
+      }, 0);
+      return total + sessionLoad;
+    }, 0);
+  }
+
+  private calculateAverageRPE(sessions: SessionData[]): number {
+    if (sessions.length === 0) return 0;
+    
+    const allRPEs = sessions.flatMap(session => 
+      session.exercises.flatMap(exercise => 
+        exercise.sets.map(set => set.rpe || 5)
+      )
+    );
+    
+    return allRPEs.reduce((sum, rpe) => sum + rpe, 0) / allRPEs.length;
+  }
+
+  private calculateTrainingFrequency(sessions: SessionData[]): number {
+    const recentSessions = sessions.slice(-30); // Last 30 days
+    return recentSessions.length / 4.3; // Sessions per week
+  }
+
+  private calculatePerformanceTrend(sessions: SessionData[]): number {
+    if (sessions.length < 7) return 0;
+    
+    const firstHalf = sessions.slice(0, Math.floor(sessions.length / 2));
+    const secondHalf = sessions.slice(Math.floor(sessions.length / 2));
+    
+    const firstAvg = this.calculateAverageIntensity(firstHalf);
+    const secondAvg = this.calculateAverageIntensity(secondHalf);
+    
+    return (secondAvg - firstAvg) / firstAvg;
+  }
+
+  private calculateAverageIntensity(sessions: SessionData[]): number {
+    if (sessions.length === 0) return 0;
+    
+    const allIntensities = sessions.flatMap(session => 
+      session.exercises.flatMap(exercise => 
+        exercise.sets.map(set => set.rpe || 5)
+      )
+    );
+    
+    return allIntensities.reduce((sum, intensity) => sum + intensity, 0) / allIntensities.length;
+  }
+
+  private calculateMotivationTrend(checkIns: CheckInData[]): number {
+    if (checkIns.length < 7) return 0;
+    
+    const firstHalf = checkIns.slice(0, Math.floor(checkIns.length / 2));
+    const secondHalf = checkIns.slice(Math.floor(checkIns.length / 2));
+    
+    const firstAvg = firstHalf.reduce((sum, checkIn) => sum + (checkIn.motivation || 5), 0) / firstHalf.length;
+    const secondAvg = secondHalf.reduce((sum, checkIn) => sum + (checkIn.motivation || 5), 0) / secondHalf.length;
+    
+    return (secondAvg - firstAvg) / firstAvg;
+  }
+
+  private calculateSessionConsistency(sessions: SessionData[]): number {
+    if (sessions.length < 7) return 0.5;
+    
+    const intervals = [];
+    for (let i = 1; i < sessions.length; i++) {
+      const interval = sessions[i].date.getTime() - sessions[i-1].date.getTime();
+      intervals.push(interval);
+    }
+    
+    const avgInterval = intervals.reduce((sum, interval) => sum + interval, 0) / intervals.length;
+    const variance = intervals.reduce((sum, interval) => sum + Math.pow(interval - avgInterval, 2), 0) / intervals.length;
+    const coefficient = Math.sqrt(variance) / avgInterval;
+    
+    return Math.max(0, 1 - coefficient);
+  }
+
+  private generateRiskRecommendations(riskFactors: RiskAssessment['riskFactors'], overallRisk: number): RiskAssessment['recommendations'] {
+    const recommendations: RiskAssessment['recommendations'] = [];
+    
+    if (overallRisk >= 80) {
+      recommendations.push({
+        priority: 'immediate',
+        action: 'Take immediate action to reduce training load and focus on recovery',
+        expectedImpact: 'Prevent potential injury or burnout',
+      });
+    } else if (overallRisk >= 60) {
+      recommendations.push({
+        priority: 'short_term',
+        action: 'Reduce training intensity and implement recovery strategies',
+        expectedImpact: 'Lower risk levels within 1-2 weeks',
+      });
+    } else if (overallRisk >= 40) {
+      recommendations.push({
+        priority: 'long_term',
+        action: 'Monitor risk factors and make gradual adjustments',
+        expectedImpact: 'Maintain healthy training balance',
+      });
+    } else {
+      recommendations.push({
+        priority: 'long_term',
+        action: 'Continue current approach with regular monitoring',
+        expectedImpact: 'Maintain optimal training conditions',
+      });
+    }
+    
+    return recommendations;
   }
 
   // Clear caches

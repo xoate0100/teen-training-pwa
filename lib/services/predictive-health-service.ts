@@ -1,6 +1,5 @@
 'use client';
 
-/* eslint-disable no-unused-vars */
 import { SessionData, CheckInData } from '@/lib/services/database-service';
 import {
   WellnessInsights,

@@ -1,10 +1,9 @@
 'use client';
 
-// eslint-disable-next-line no-unused-vars
 import { SessionData, CheckInData } from '@/lib/services/database-service';
-// eslint-disable-next-line no-unused-vars
+
 import { BehaviorInsights } from './behavior-analysis-service';
-// eslint-disable-next-line no-unused-vars
+
 import { PerformanceForecast } from './performance-prediction-service';
 import { OpenAIService, ConversationContext } from './openai-service';
 
@@ -152,7 +151,10 @@ export class AdaptiveContentService {
 
         instructions.push(instruction);
       } catch (error) {
-        console.error(`Error generating instruction for ${exercise.name}:`, error);
+        console.error(
+          `Error generating instruction for ${exercise.name}:`,
+          error
+        );
         // Add fallback instruction
         instructions.push(this.generateFallbackInstruction(exercise));
       }
@@ -185,9 +187,7 @@ export class AdaptiveContentService {
     tips.push(...this.generateNutritionTips(context));
 
     // Sort by relevance and priority
-    return tips
-      .sort((a, b) => b.relevance - a.relevance)
-      .slice(0, 10); // Limit to top 10 tips
+    return tips.sort((a, b) => b.relevance - a.relevance).slice(0, 10); // Limit to top 10 tips
   }
 
   // Generate progress celebration messages
@@ -201,11 +201,12 @@ export class AdaptiveContentService {
     context: ConversationContext
   ): Promise<ProgressCelebrationMessage> {
     try {
-      const celebrationMessage = await OpenAIService.generateProgressCelebration(
-        achievement.description,
-        context,
-        achievement
-      );
+      const celebrationMessage =
+        await OpenAIService.generateProgressCelebration(
+          achievement.description,
+          context,
+          achievement
+        );
 
       return {
         type: achievement.type,
@@ -270,7 +271,7 @@ export class AdaptiveContentService {
   // Helper methods
   private static extractFocusAreas(sessionData: any): string[] {
     const focusAreas: string[] = [];
-    
+
     if (sessionData.type === 'strength') {
       focusAreas.push('strength building', 'muscle development');
     } else if (sessionData.type === 'volleyball') {
@@ -278,53 +279,62 @@ export class AdaptiveContentService {
     } else if (sessionData.type === 'conditioning') {
       focusAreas.push('cardiovascular fitness', 'endurance');
     }
-    
+
     return focusAreas;
   }
 
-  private static generateWorkoutTitle(sessionData: any, context: ConversationContext): string {
+  private static generateWorkoutTitle(
+    sessionData: any,
+    context: ConversationContext
+  ): string {
     const intensity = sessionData.intensity;
     const type = sessionData.type;
     const duration = sessionData.duration;
-    
+
     const intensityAdjectives = {
       low: 'Gentle',
       moderate: 'Balanced',
       high: 'Intense',
     };
-    
+
     const typeNames = {
       strength: 'Strength Training',
       volleyball: 'Volleyball Skills',
       conditioning: 'Conditioning',
     };
-    
+
     return `${intensityAdjectives[intensity]} ${typeNames[type]} (${duration} min)`;
   }
 
-  private static generateInstructions(sessionData: any, context: ConversationContext): string[] {
+  private static generateInstructions(
+    sessionData: any,
+    context: ConversationContext
+  ): string[] {
     const instructions: string[] = [];
-    
+
     instructions.push(`Complete ${sessionData.exercises.length} exercises`);
     instructions.push(`Rest 60-90 seconds between sets`);
     instructions.push(`Focus on proper form throughout`);
-    
+
     if (sessionData.intensity === 'high') {
       instructions.push('Push yourself but maintain good form');
     } else if (sessionData.intensity === 'low') {
       instructions.push('Focus on movement quality over intensity');
     }
-    
+
     return instructions;
   }
 
-  private static generateWorkoutTips(sessionData: any, context: ConversationContext): string[] {
+  private static generateWorkoutTips(
+    sessionData: any,
+    context: ConversationContext
+  ): string[] {
     const tips: string[] = [];
-    
+
     tips.push('Warm up properly before starting');
     tips.push('Stay hydrated throughout the workout');
     tips.push('Listen to your body and adjust as needed');
-    
+
     if (sessionData.type === 'strength') {
       tips.push('Focus on controlled movements');
       tips.push('Breathe properly during each rep');
@@ -332,41 +342,52 @@ export class AdaptiveContentService {
       tips.push('Practice sport-specific movements');
       tips.push('Focus on coordination and timing');
     }
-    
+
     return tips;
   }
 
-  private static generateMotivation(sessionData: any, context: ConversationContext): string {
+  private static generateMotivation(
+    sessionData: any,
+    context: ConversationContext
+  ): string {
     const motivationalMessages = [
       "You've got this! Every rep counts towards your goals.",
       "Push through the challenge - you're stronger than you think.",
       "Focus on progress, not perfection. You're doing great!",
-      "This workout will make you stronger and more confident.",
+      'This workout will make you stronger and more confident.',
     ];
-    
-    return motivationalMessages[Math.floor(Math.random() * motivationalMessages.length)];
+
+    return motivationalMessages[
+      Math.floor(Math.random() * motivationalMessages.length)
+    ];
   }
 
-  private static generateSafetyNotes(sessionData: any, context: ConversationContext): string[] {
+  private static generateSafetyNotes(
+    sessionData: any,
+    context: ConversationContext
+  ): string[] {
     const safetyNotes: string[] = [];
-    
+
     safetyNotes.push('Stop if you feel any pain or discomfort');
     safetyNotes.push('Use proper form to prevent injury');
     safetyNotes.push('Start with lighter weights if needed');
-    
+
     if (sessionData.intensity === 'high') {
       safetyNotes.push('Be extra careful with form at high intensity');
     }
-    
+
     return safetyNotes;
   }
 
-  private static assessDifficulty(sessionData: any, context: ConversationContext): 'beginner' | 'intermediate' | 'advanced' {
+  private static assessDifficulty(
+    sessionData: any,
+    context: ConversationContext
+  ): 'beginner' | 'intermediate' | 'advanced' {
     if (!context.behaviorInsights) return 'beginner';
-    
+
     const userLevel = this.assessUserLevel(context);
     const intensity = sessionData.intensity;
-    
+
     if (userLevel === 'beginner' || intensity === 'low') return 'beginner';
     if (userLevel === 'advanced' && intensity === 'high') return 'advanced';
     return 'intermediate';
@@ -374,18 +395,22 @@ export class AdaptiveContentService {
 
   private static assessUserLevel(context: ConversationContext): string {
     if (!context.behaviorInsights) return 'beginner';
-    
-    const consistency = context.behaviorInsights.patterns.consistency.weeklyFrequency;
+
+    const consistency =
+      context.behaviorInsights.patterns.consistency.weeklyFrequency;
     const experience = context.behaviorInsights.habits.workoutHabit.strength;
-    
+
     if (consistency >= 4 && experience >= 0.8) return 'advanced';
     if (consistency >= 3 && experience >= 0.6) return 'intermediate';
     return 'beginner';
   }
 
-  private static generateVariations(exercise: any, context: ConversationContext): string[] {
+  private static generateVariations(
+    exercise: any,
+    context: ConversationContext
+  ): string[] {
     const variations: string[] = [];
-    
+
     if (exercise.name.toLowerCase().includes('squat')) {
       variations.push('Goblet Squat', 'Jump Squat', 'Single-leg Squat');
     } else if (exercise.name.toLowerCase().includes('push')) {
@@ -393,37 +418,58 @@ export class AdaptiveContentService {
     } else if (exercise.name.toLowerCase().includes('plank')) {
       variations.push('Side Plank', 'Plank Up-downs', 'Plank Jacks');
     }
-    
+
     return variations;
   }
 
-  private static generateProgressions(exercise: any, context: ConversationContext): string[] {
+  private static generateProgressions(
+    exercise: any,
+    context: ConversationContext
+  ): string[] {
     const progressions: string[] = [];
-    
+
     if (exercise.difficulty === 'beginner') {
-      progressions.push('Increase reps', 'Add weight', 'Try advanced variation');
+      progressions.push(
+        'Increase reps',
+        'Add weight',
+        'Try advanced variation'
+      );
     } else if (exercise.difficulty === 'intermediate') {
-      progressions.push('Increase weight', 'Add complexity', 'Reduce rest time');
+      progressions.push(
+        'Increase weight',
+        'Add complexity',
+        'Reduce rest time'
+      );
     }
-    
+
     return progressions;
   }
 
-  private static generateRegressions(exercise: any, context: ConversationContext): string[] {
+  private static generateRegressions(
+    exercise: any,
+    context: ConversationContext
+  ): string[] {
     const regressions: string[] = [];
-    
+
     if (exercise.difficulty === 'advanced') {
-      regressions.push('Reduce weight', 'Simplify movement', 'Increase rest time');
+      regressions.push(
+        'Reduce weight',
+        'Simplify movement',
+        'Increase rest time'
+      );
     } else if (exercise.difficulty === 'intermediate') {
       regressions.push('Use lighter weight', 'Focus on form', 'Take more rest');
     }
-    
+
     return regressions;
   }
 
-  private static generateCues(exercise: any, context: ConversationContext): string[] {
+  private static generateCues(
+    exercise: any,
+    context: ConversationContext
+  ): string[] {
     const cues: string[] = [];
-    
+
     if (exercise.name.toLowerCase().includes('squat')) {
       cues.push('Chest up', 'Knees out', 'Weight on heels');
     } else if (exercise.name.toLowerCase().includes('push')) {
@@ -431,39 +477,55 @@ export class AdaptiveContentService {
     } else if (exercise.name.toLowerCase().includes('plank')) {
       cues.push('Straight line', 'Engage core', 'Breathe normally');
     }
-    
+
     return cues;
   }
 
-  private static generateCommonMistakes(exercise: any, context: ConversationContext): string[] {
+  private static generateCommonMistakes(
+    exercise: any,
+    context: ConversationContext
+  ): string[] {
     const mistakes: string[] = [];
-    
+
     if (exercise.name.toLowerCase().includes('squat')) {
-      mistakes.push('Knees caving in', 'Heels lifting', 'Leaning too far forward');
+      mistakes.push(
+        'Knees caving in',
+        'Heels lifting',
+        'Leaning too far forward'
+      );
     } else if (exercise.name.toLowerCase().includes('push')) {
-      mistakes.push('Sagging hips', 'Incomplete range of motion', 'Flaring elbows');
+      mistakes.push(
+        'Sagging hips',
+        'Incomplete range of motion',
+        'Flaring elbows'
+      );
     }
-    
+
     return mistakes;
   }
 
-  private static generateExerciseSafetyTips(exercise: any, context: ConversationContext): string[] {
+  private static generateExerciseSafetyTips(
+    exercise: any,
+    context: ConversationContext
+  ): string[] {
     const safetyTips: string[] = [];
-    
+
     safetyTips.push('Stop if you feel pain');
     safetyTips.push('Maintain proper form');
     safetyTips.push('Start with lighter weight');
-    
+
     if (exercise.name.toLowerCase().includes('squat')) {
       safetyTips.push('Keep knees tracking over toes');
     } else if (exercise.name.toLowerCase().includes('push')) {
       safetyTips.push('Keep core engaged throughout');
     }
-    
+
     return safetyTips;
   }
 
-  private static generateFallbackInstruction(exercise: any): DynamicInstruction {
+  private static generateFallbackInstruction(
+    exercise: any
+  ): DynamicInstruction {
     return {
       exerciseId: exercise.id,
       exerciseName: exercise.name,
@@ -477,13 +539,17 @@ export class AdaptiveContentService {
     };
   }
 
-  private static generateFormTips(context: ConversationContext, currentPhase: string): ContextualTip[] {
+  private static generateFormTips(
+    context: ConversationContext,
+    currentPhase: string
+  ): ContextualTip[] {
     return [
       {
         id: 'form_tip_1',
         category: 'form',
         title: 'Focus on Form',
-        content: 'Quality over quantity - proper form prevents injury and maximizes results',
+        content:
+          'Quality over quantity - proper form prevents injury and maximizes results',
         relevance: 0.9,
         timing: 'during-workout',
         priority: 'high',
@@ -492,7 +558,8 @@ export class AdaptiveContentService {
         id: 'form_tip_2',
         category: 'form',
         title: 'Controlled Movements',
-        content: 'Slow and controlled movements are more effective than fast, sloppy ones',
+        content:
+          'Slow and controlled movements are more effective than fast, sloppy ones',
         relevance: 0.8,
         timing: 'during-workout',
         priority: 'medium',
@@ -500,12 +567,15 @@ export class AdaptiveContentService {
     ];
   }
 
-  private static generateMotivationTips(context: ConversationContext, sessionType: string): ContextualTip[] {
+  private static generateMotivationTips(
+    context: ConversationContext,
+    sessionType: string
+  ): ContextualTip[] {
     return [
       {
         id: 'motivation_tip_1',
         category: 'motivation',
-        title: 'You\'ve Got This!',
+        title: "You've Got This!",
         content: 'Every workout brings you closer to your goals',
         relevance: 0.7,
         timing: 'pre-workout',
@@ -523,7 +593,10 @@ export class AdaptiveContentService {
     ];
   }
 
-  private static generateSafetyTips(context: ConversationContext, currentPhase: string): ContextualTip[] {
+  private static generateSafetyTips(
+    context: ConversationContext,
+    currentPhase: string
+  ): ContextualTip[] {
     return [
       {
         id: 'safety_tip_1',
@@ -546,13 +619,16 @@ export class AdaptiveContentService {
     ];
   }
 
-  private static generateRecoveryTips(context: ConversationContext): ContextualTip[] {
+  private static generateRecoveryTips(
+    context: ConversationContext
+  ): ContextualTip[] {
     return [
       {
         id: 'recovery_tip_1',
         category: 'recovery',
         title: 'Rest and Recovery',
-        content: 'Adequate rest is essential for muscle growth and injury prevention',
+        content:
+          'Adequate rest is essential for muscle growth and injury prevention',
         relevance: 0.7,
         timing: 'post-workout',
         priority: 'medium',
@@ -569,7 +645,9 @@ export class AdaptiveContentService {
     ];
   }
 
-  private static generateNutritionTips(context: ConversationContext): ContextualTip[] {
+  private static generateNutritionTips(
+    context: ConversationContext
+  ): ContextualTip[] {
     return [
       {
         id: 'nutrition_tip_1',
@@ -614,11 +692,13 @@ export class AdaptiveContentService {
     ];
   }
 
-  private static generatePersonalizedContent(context: ConversationContext): AdaptiveContent['personalizedContent'] {
+  private static generatePersonalizedContent(
+    context: ConversationContext
+  ): AdaptiveContent['personalizedContent'] {
     return {
       motivationalQuotes: [
         'Every expert was once a beginner',
-        'The only bad workout is the one that didn\'t happen',
+        "The only bad workout is the one that didn't happen",
         'Progress, not perfection',
         'You are stronger than you think',
       ],
@@ -626,7 +706,7 @@ export class AdaptiveContentService {
         'Keep your core engaged',
         'Breathe properly during each rep',
         'Focus on the mind-muscle connection',
-        'Control the weight, don\'t let it control you',
+        "Control the weight, don't let it control you",
       ],
       goalReminders: [
         'Remember why you started',
@@ -650,24 +730,31 @@ export class AdaptiveContentService {
       improvement: 'Great Improvement!',
       consistency: 'Consistency Champion!',
     };
-    
+
     return titles[achievement.type] || 'Congratulations!';
   }
 
-  private static generateCelebrationVisual(achievement: any): ProgressCelebrationMessage['visual'] {
+  private static generateCelebrationVisual(
+    achievement: any
+  ): ProgressCelebrationMessage['visual'] {
     const visuals = {
       milestone: { emoji: '🏆', color: 'gold' },
       achievement: { emoji: '🎯', color: 'blue' },
       improvement: { emoji: '📈', color: 'green' },
       consistency: { emoji: '🔥', color: 'orange' },
     };
-    
+
     return visuals[achievement.type] || { emoji: '🎉', color: 'purple' };
   }
 
-  private static shouldBeShareable(achievement: any, context: ConversationContext): boolean {
+  private static shouldBeShareable(
+    achievement: any,
+    context: ConversationContext
+  ): boolean {
     // Simple logic - in a real app, this would be more sophisticated
-    return achievement.type === 'milestone' || achievement.type === 'achievement';
+    return (
+      achievement.type === 'milestone' || achievement.type === 'achievement'
+    );
   }
 
   private static suggestNextGoal(context: ConversationContext): string {
@@ -675,7 +762,9 @@ export class AdaptiveContentService {
     return 'Complete 5 workouts this week';
   }
 
-  private static generateFallbackCelebration(achievement: any): ProgressCelebrationMessage {
+  private static generateFallbackCelebration(
+    achievement: any
+  ): ProgressCelebrationMessage {
     return {
       type: achievement.type,
       title: 'Congratulations!',

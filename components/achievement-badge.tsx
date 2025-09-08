@@ -115,7 +115,7 @@ interface AchievementCardProps {
   achievement: Achievement;
   showDescription?: boolean;
   showProgress?: boolean;
-  /* eslint-disable-next-line no-unused-vars */
+
   onAchievementClick?: (achievement: Achievement) => void;
   className?: string;
 }
@@ -208,7 +208,7 @@ export function AchievementCard({
 interface AchievementGridProps {
   achievements: Achievement[];
   showProgress?: boolean;
-  /* eslint-disable-next-line no-unused-vars */
+
   onAchievementClick?: (achievement: Achievement) => void;
   className?: string;
 }

@@ -13,7 +13,7 @@ import { cn } from '@/lib/utils';
 
 interface SessionTypeShowcaseProps {
   className?: string;
-  /* eslint-disable-next-line no-unused-vars */
+
   onSessionSelect?: (sessionType: SessionTheme['type']) => void;
 }
 

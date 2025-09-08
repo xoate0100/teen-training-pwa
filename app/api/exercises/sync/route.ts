@@ -11,7 +11,7 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const { source = 'both', batch_size = 100 } = body;
 
-    let results = {
+    const results = {
       exercisedb: { synced: 0, errors: 0 },
       youtube: { synced: 0, errors: 0 },
       total: 0,

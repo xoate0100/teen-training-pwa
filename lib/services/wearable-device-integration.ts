@@ -156,11 +156,23 @@ export class WearableDeviceIntegrationService {
   // Save data to localStorage
   private saveData() {
     try {
-      localStorage.setItem('wearable_heart_rate', JSON.stringify(this.heartRateData));
+      localStorage.setItem(
+        'wearable_heart_rate',
+        JSON.stringify(this.heartRateData)
+      );
       localStorage.setItem('wearable_sleep', JSON.stringify(this.sleepData));
-      localStorage.setItem('wearable_activity', JSON.stringify(this.activityData));
-      localStorage.setItem('wearable_recovery', JSON.stringify(this.recoveryMetrics));
-      localStorage.setItem('wearable_devices', JSON.stringify([...this.devices.values()]));
+      localStorage.setItem(
+        'wearable_activity',
+        JSON.stringify(this.activityData)
+      );
+      localStorage.setItem(
+        'wearable_recovery',
+        JSON.stringify(this.recoveryMetrics)
+      );
+      localStorage.setItem(
+        'wearable_devices',
+        JSON.stringify([...this.devices.values()])
+      );
     } catch (error) {
       console.error('Error saving wearable data:', error);
     }
@@ -169,9 +181,12 @@ export class WearableDeviceIntegrationService {
   // Start auto-sync
   private startAutoSync() {
     if (this.config.autoSync && this.syncInterval === null) {
-      this.syncInterval = setInterval(() => {
-        this.syncAllDevices();
-      }, this.config.syncInterval * 60 * 1000);
+      this.syncInterval = setInterval(
+        () => {
+          this.syncAllDevices();
+        },
+        this.config.syncInterval * 60 * 1000
+      );
     }
   }
 
@@ -223,9 +238,11 @@ export class WearableDeviceIntegrationService {
   }
 
   // Connect device
-  async connectDevice(device: Omit<WearableDevice, 'id' | 'connected' | 'lastSync'>): Promise<string> {
+  async connectDevice(
+    device: Omit<WearableDevice, 'id' | 'connected' | 'lastSync'>
+  ): Promise<string> {
     const deviceId = `device_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-    
+
     const newDevice: WearableDevice = {
       ...device,
       id: deviceId,
@@ -264,7 +281,7 @@ export class WearableDeviceIntegrationService {
   // Sync all devices
   async syncAllDevices(): Promise<void> {
     const connectedDevices = this.getConnectedDevices();
-    
+
     for (const device of connectedDevices) {
       try {
         await this.syncDevice(device.id);
@@ -287,11 +304,11 @@ export class WearableDeviceIntegrationService {
     try {
       // Simulate device sync - in real implementation, this would connect to device APIs
       await this.simulateDeviceSync(device);
-      
+
       device.lastSync = new Date();
       this.devices.set(deviceId, device);
       this.saveData();
-      
+
       this.emit('syncComplete', { deviceId });
     } catch (error) {
       this.emit('syncError', { deviceId, error });
@@ -308,19 +325,31 @@ export class WearableDeviceIntegrationService {
     const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
 
     // Generate sample data based on device capabilities
-    if (device.capabilities.includes('heart_rate') && this.config.enableHeartRate) {
+    if (
+      device.capabilities.includes('heart_rate') &&
+      this.config.enableHeartRate
+    ) {
       this.generateHeartRateData(device, today);
     }
 
-    if (device.capabilities.includes('sleep') && this.config.enableSleepTracking) {
+    if (
+      device.capabilities.includes('sleep') &&
+      this.config.enableSleepTracking
+    ) {
       this.generateSleepData(device, today);
     }
 
-    if (device.capabilities.includes('activity') && this.config.enableActivityTracking) {
+    if (
+      device.capabilities.includes('activity') &&
+      this.config.enableActivityTracking
+    ) {
       this.generateActivityData(device, today);
     }
 
-    if (device.capabilities.includes('recovery') && this.config.enableRecoveryMetrics) {
+    if (
+      device.capabilities.includes('recovery') &&
+      this.config.enableRecoveryMetrics
+    ) {
       this.generateRecoveryMetrics(device, today);
     }
   }
@@ -416,7 +445,11 @@ export class WearableDeviceIntegrationService {
     const fatigueLevel = 10 + Math.random() * 50; // 10-60
 
     const recommendations = this.generateRecoveryRecommendations(
-      hrv, restingHeartRate, sleepQuality, stressLevel, readinessScore
+      hrv,
+      restingHeartRate,
+      sleepQuality,
+      stressLevel,
+      readinessScore
     );
 
     const recoveryMetrics: RecoveryMetrics = {
@@ -437,7 +470,9 @@ export class WearableDeviceIntegrationService {
   }
 
   // Get heart rate zone
-  private getHeartRateZone(bpm: number): 'rest' | 'fat_burn' | 'cardio' | 'peak' {
+  private getHeartRateZone(
+    bpm: number
+  ): 'rest' | 'fat_burn' | 'cardio' | 'peak' {
     if (bpm < 100) return 'rest';
     if (bpm < 130) return 'fat_burn';
     if (bpm < 160) return 'cardio';
@@ -445,7 +480,9 @@ export class WearableDeviceIntegrationService {
   }
 
   // Get activity intensity
-  private getActivityIntensity(activeMinutes: number): 'low' | 'moderate' | 'high' {
+  private getActivityIntensity(
+    activeMinutes: number
+  ): 'low' | 'moderate' | 'high' {
     if (activeMinutes < 30) return 'low';
     if (activeMinutes < 60) return 'moderate';
     return 'high';
@@ -454,8 +491,16 @@ export class WearableDeviceIntegrationService {
   // Get random activity type
   private getRandomActivityType(): string {
     const activities = [
-      'walking', 'running', 'cycling', 'swimming', 'strength_training',
-      'yoga', 'dancing', 'sports', 'hiking', 'other'
+      'walking',
+      'running',
+      'cycling',
+      'swimming',
+      'strength_training',
+      'yoga',
+      'dancing',
+      'sports',
+      'hiking',
+      'other',
     ];
     return activities[Math.floor(Math.random() * activities.length)];
   }
@@ -474,7 +519,9 @@ export class WearableDeviceIntegrationService {
       recommendations.push('Consider taking a rest day - HRV is low');
     }
     if (restingHeartRate > 70) {
-      recommendations.push('Focus on recovery - resting heart rate is elevated');
+      recommendations.push(
+        'Focus on recovery - resting heart rate is elevated'
+      );
     }
     if (sleepQuality < 80) {
       recommendations.push('Improve sleep hygiene for better recovery');
@@ -493,22 +540,30 @@ export class WearableDeviceIntegrationService {
   }
 
   // Clean old data
-  private cleanOldData(type: 'heartRate' | 'sleep' | 'activity' | 'recovery'): void {
+  private cleanOldData(
+    type: 'heartRate' | 'sleep' | 'activity' | 'recovery'
+  ): void {
     const cutoffDate = new Date();
     cutoffDate.setDate(cutoffDate.getDate() - this.config.dataRetentionDays);
 
     switch (type) {
       case 'heartRate':
-        this.heartRateData = this.heartRateData.filter(data => data.timestamp >= cutoffDate);
+        this.heartRateData = this.heartRateData.filter(
+          data => data.timestamp >= cutoffDate
+        );
         break;
       case 'sleep':
         this.sleepData = this.sleepData.filter(data => data.date >= cutoffDate);
         break;
       case 'activity':
-        this.activityData = this.activityData.filter(data => data.date >= cutoffDate);
+        this.activityData = this.activityData.filter(
+          data => data.date >= cutoffDate
+        );
         break;
       case 'recovery':
-        this.recoveryMetrics = this.recoveryMetrics.filter(data => data.date >= cutoffDate);
+        this.recoveryMetrics = this.recoveryMetrics.filter(
+          data => data.date >= cutoffDate
+        );
         break;
     }
   }
@@ -516,70 +571,70 @@ export class WearableDeviceIntegrationService {
   // Get heart rate data
   getHeartRateData(startDate?: Date, endDate?: Date): HeartRateData[] {
     let data = [...this.heartRateData];
-    
+
     if (startDate) {
       data = data.filter(item => item.timestamp >= startDate);
     }
     if (endDate) {
       data = data.filter(item => item.timestamp <= endDate);
     }
-    
+
     return data.sort((a, b) => a.timestamp.getTime() - b.timestamp.getTime());
   }
 
   // Get sleep data
   getSleepData(startDate?: Date, endDate?: Date): SleepData[] {
     let data = [...this.sleepData];
-    
+
     if (startDate) {
       data = data.filter(item => item.date >= startDate);
     }
     if (endDate) {
       data = data.filter(item => item.date <= endDate);
     }
-    
+
     return data.sort((a, b) => a.date.getTime() - b.date.getTime());
   }
 
   // Get activity data
   getActivityData(startDate?: Date, endDate?: Date): ActivityData[] {
     let data = [...this.activityData];
-    
+
     if (startDate) {
       data = data.filter(item => item.date >= startDate);
     }
     if (endDate) {
       data = data.filter(item => item.date <= endDate);
     }
-    
+
     return data.sort((a, b) => a.date.getTime() - b.date.getTime());
   }
 
   // Get recovery metrics
   getRecoveryMetrics(startDate?: Date, endDate?: Date): RecoveryMetrics[] {
     let data = [...this.recoveryMetrics];
-    
+
     if (startDate) {
       data = data.filter(item => item.date >= startDate);
     }
     if (endDate) {
       data = data.filter(item => item.date <= endDate);
     }
-    
+
     return data.sort((a, b) => a.date.getTime() - b.date.getTime());
   }
 
   // Get latest recovery metrics
   getLatestRecoveryMetrics(): RecoveryMetrics | null {
     if (this.recoveryMetrics.length === 0) return null;
-    
+
     return this.recoveryMetrics[this.recoveryMetrics.length - 1];
   }
 
   // Update configuration
   updateConfig(config: Partial<DeviceIntegrationConfig>): void {
     this.config = { ...this.config, ...config };
-    
+
     if (config.autoSync !== undefined) {
       if (config.autoSync) {
         this.startAutoSync();

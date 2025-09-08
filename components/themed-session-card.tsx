@@ -182,9 +182,9 @@ interface ThemedSessionGridProps {
     isLocked?: boolean;
     progress?: number;
   }>;
-  /* eslint-disable-next-line no-unused-vars */
+
   onSessionStart?: (sessionId: string) => void;
-  /* eslint-disable-next-line no-unused-vars */
+
   onSessionDetails?: (sessionId: string) => void;
   className?: string;
 }

@@ -59,7 +59,12 @@ export interface AutomaticSchedule {
 
 export interface ConflictResolution {
   conflictId: string;
-  resolution: 'reschedule' | 'adjust_time' | 'reduce_intensity' | 'postpone' | 'skip';
+  resolution:
+    | 'reschedule'
+    | 'adjust_time'
+    | 'reduce_intensity'
+    | 'postpone'
+    | 'skip';
   newDate?: string;
   newTime?: string;
   newIntensity?: 'low' | 'moderate' | 'high';
@@ -85,7 +90,7 @@ export class SessionSchedulingService {
   ): SessionSchedule | null {
     const current = new Date(currentDate);
     const sessionsThisWeek = this.getSessionsForWeek(sessions, currentDate);
-    
+
     // Check if we've reached weekly limit
     if (sessionsThisWeek.length >= userPreferences.maxSessionsPerWeek) {
       return null;
@@ -96,42 +101,52 @@ export class SessionSchedulingService {
       const nextDate = new Date(current);
       nextDate.setDate(current.getDate() + i);
       const dayOfWeek = nextDate.getDay();
-      
+
       if (userPreferences.availableDays.includes(dayOfWeek)) {
         const optimalTiming = this.calculateOptimalTiming(
           nextDate.toISOString().split('T')[0],
           checkIns,
           sessions
         );
-        
+
         const conflicts = this.detectConflicts(
           nextDate.toISOString().split('T')[0],
           optimalTiming.bestTime,
           checkIns,
           sessions
         );
-        
+
         const sessionType = this.recommendSessionType(
           nextDate.toISOString().split('T')[0],
           sessions,
           checkIns
         );
-        
+
         return {
           id: `session_${Date.now()}`,
           date: nextDate.toISOString().split('T')[0],
           time: optimalTiming.bestTime,
           type: sessionType,
           duration: this.calculateOptimalDuration(sessionType, checkIns),
-          intensity: this.calculateOptimalIntensity(sessionType, checkIns, sessions),
-          priority: this.calculatePriority(sessionsThisWeek.length, userPreferences.maxSessionsPerWeek),
-          reason: this.generateSessionReason(sessionType, optimalTiming.factors),
+          intensity: this.calculateOptimalIntensity(
+            sessionType,
+            checkIns,
+            sessions
+          ),
+          priority: this.calculatePriority(
+            sessionsThisWeek.length,
+            userPreferences.maxSessionsPerWeek
+          ),
+          reason: this.generateSessionReason(
+            sessionType,
+            optimalTiming.factors
+          ),
           conflicts,
           optimal: conflicts.length === 0,
         };
       }
     }
-    
+
     return null;
   }
 
@@ -148,8 +163,10 @@ export class SessionSchedulingService {
     // Check recent energy patterns
     const recentCheckIns = checkIns.slice(0, 7);
     if (recentCheckIns.length > 0) {
-      const avgEnergy = recentCheckIns.reduce((sum, c) => sum + c.energy, 0) / recentCheckIns.length;
-      
+      const avgEnergy =
+        recentCheckIns.reduce((sum, c) => sum + c.energy, 0) /
+        recentCheckIns.length;
+
       if (avgEnergy >= 7) {
         bestTime = '18:00';
         confidence += 20;
@@ -168,8 +185,9 @@ export class SessionSchedulingService {
     // Check sleep patterns
     const recentSleep = recentCheckIns.map(c => c.sleep);
     if (recentSleep.length > 0) {
-      const avgSleep = recentSleep.reduce((sum, s) => sum + s, 0) / recentSleep.length;
-      
+      const avgSleep =
+        recentSleep.reduce((sum, s) => sum + s, 0) / recentSleep.length;
+
       if (avgSleep >= 8) {
         confidence += 15;
         factors.push('Good sleep quality');
@@ -186,8 +204,9 @@ export class SessionSchedulingService {
         const sessionDate = new Date(s.date);
         return sessionDate.getHours();
       });
-      
-      const avgSessionTime = sessionTimes.reduce((sum, t) => sum + t, 0) / sessionTimes.length;
+
+      const avgSessionTime =
+        sessionTimes.reduce((sum, t) => sum + t, 0) / sessionTimes.length;
       bestTime = `${Math.round(avgSessionTime).toString().padStart(2, '0')}:00`;
       confidence += 10;
       factors.push('Consistent with recent schedule');
@@ -196,11 +215,13 @@ export class SessionSchedulingService {
     // Check day of week patterns
     const targetDate = new Date(date);
     const dayOfWeek = targetDate.getDay();
-    
-    if (dayOfWeek === 1) { // Monday
+
+    if (dayOfWeek === 1) {
+      // Monday
       bestTime = '18:00';
       factors.push('Monday motivation');
-    } else if (dayOfWeek === 5) { // Friday
+    } else if (dayOfWeek === 5) {
+      // Friday
       bestTime = '17:00';
       factors.push('Friday energy');
     }
@@ -222,9 +243,9 @@ export class SessionSchedulingService {
   ): ScheduleConflict[] {
     const conflicts: ScheduleConflict[] = [];
     const targetDate = new Date(date);
-    // eslint-disable-next-line no-unused-vars
+
     const targetTime = new Date(`${date}T${time}`);
-    
+
     // Check for energy conflicts
     const recentCheckIn = checkIns.find(c => c.date === date);
     if (recentCheckIn) {
@@ -251,9 +272,10 @@ export class SessionSchedulingService {
       const lastSession = recentSessions[0];
       const lastSessionDate = new Date(lastSession.date);
       const daysSinceLastSession = Math.floor(
-        (targetDate.getTime() - lastSessionDate.getTime()) / (1000 * 60 * 60 * 24)
+        (targetDate.getTime() - lastSessionDate.getTime()) /
+          (1000 * 60 * 60 * 24)
       );
-      
+
       if (daysSinceLastSession < 1) {
         conflicts.push({
           type: 'recovery',
@@ -292,7 +314,7 @@ export class SessionSchedulingService {
   ): 'strength' | 'volleyball' | 'conditioning' | 'rest' {
     const recentCheckIn = checkIns.find(c => c.date === date);
     const recentSessions = sessions.slice(0, 7);
-    
+
     // Check if rest is needed
     if (recentCheckIn) {
       if (recentCheckIn.energy <= 3 || recentCheckIn.soreness >= 8) {
@@ -301,9 +323,15 @@ export class SessionSchedulingService {
     }
 
     // Check recent session distribution
-    const strengthSessions = recentSessions.filter(s => s.type === 'strength').length;
-    const volleyballSessions = recentSessions.filter(s => s.type === 'volleyball').length;
-    const conditioningSessions = recentSessions.filter(s => s.type === 'conditioning').length;
+    const strengthSessions = recentSessions.filter(
+      s => s.type === 'strength'
+    ).length;
+    const volleyballSessions = recentSessions.filter(
+      s => s.type === 'volleyball'
+    ).length;
+    const conditioningSessions = recentSessions.filter(
+      s => s.type === 'conditioning'
+    ).length;
 
     // Balance session types
     if (strengthSessions === 0) return 'strength';
@@ -359,7 +387,7 @@ export class SessionSchedulingService {
 
     // Base intensity on session type
     let baseIntensity: 'low' | 'moderate' | 'high' = 'moderate';
-    
+
     if (sessionType === 'conditioning') baseIntensity = 'high';
     else if (sessionType === 'strength') baseIntensity = 'moderate';
     else if (sessionType === 'volleyball') baseIntensity = 'moderate';
@@ -392,17 +420,14 @@ export class SessionSchedulingService {
     maxSessionsPerWeek: number
   ): 'high' | 'medium' | 'low' {
     const remainingSessions = maxSessionsPerWeek - currentWeekSessions;
-    
+
     if (remainingSessions <= 1) return 'high';
     if (remainingSessions <= 2) return 'medium';
     return 'low';
   }
 
   // Generate session reason
-  static generateSessionReason(
-    sessionType: string,
-    factors: string[]
-  ): string {
+  static generateSessionReason(sessionType: string, factors: string[]): string {
     const reasons = {
       strength: 'Build strength and muscle',
       volleyball: 'Improve skills and athleticism',
@@ -410,8 +435,9 @@ export class SessionSchedulingService {
       rest: 'Recovery and regeneration',
     };
 
-    let reason = reasons[sessionType as keyof typeof reasons] || 'Maintain fitness';
-    
+    let reason =
+      reasons[sessionType as keyof typeof reasons] || 'Maintain fitness';
+
     if (factors.length > 0) {
       reason += ` (${factors.join(', ')})`;
     }
@@ -423,7 +449,7 @@ export class SessionSchedulingService {
   static generateTimeAlternatives(bestTime: string): string[] {
     const time = parseInt(bestTime.split(':')[0]);
     const alternatives: string[] = [];
-    
+
     for (let i = -2; i <= 2; i++) {
       if (i === 0) continue; // Skip the best time itself
       const alternativeTime = time + i;
@@ -431,7 +457,7 @@ export class SessionSchedulingService {
         alternatives.push(`${alternativeTime.toString().padStart(2, '0')}:00`);
       }
     }
-    
+
     return alternatives;
   }
 
@@ -445,7 +471,7 @@ export class SessionSchedulingService {
     weekStart.setDate(targetDate.getDate() - targetDate.getDay());
     const weekEnd = new Date(weekStart);
     weekEnd.setDate(weekStart.getDate() + 6);
-    
+
     return sessions.filter(session => {
       const sessionDate = new Date(session.date);
       return sessionDate >= weekStart && sessionDate <= weekEnd;
@@ -470,7 +496,7 @@ export class SessionSchedulingService {
     }
 
     // Check multiple factors for rest recommendation
-    const shouldRest = 
+    const shouldRest =
       recentCheckIn.energy <= 3 ||
       recentCheckIn.soreness >= 8 ||
       recentCheckIn.sleep < 5 ||
@@ -554,7 +580,9 @@ export class SessionSchedulingService {
 
       if (recoveryRecommendation.shouldRest) {
         recoveryDays.push(dateStr);
-        adjustments.push(`Recovery day scheduled for ${dateStr}: ${recoveryRecommendation.reason}`);
+        adjustments.push(
+          `Recovery day scheduled for ${dateStr}: ${recoveryRecommendation.reason}`
+        );
         continue;
       }
 
@@ -575,9 +603,22 @@ export class SessionSchedulingService {
       }
 
       // Generate session for this day
-      const sessionType = this.recommendSessionType(dateStr, sessions, checkIns);
-      const optimalTiming = this.calculateOptimalTiming(dateStr, checkIns, sessions);
-      const conflicts = this.detectConflicts(dateStr, optimalTiming.bestTime, checkIns, sessions);
+      const sessionType = this.recommendSessionType(
+        dateStr,
+        sessions,
+        checkIns
+      );
+      const optimalTiming = this.calculateOptimalTiming(
+        dateStr,
+        checkIns,
+        sessions
+      );
+      const conflicts = this.detectConflicts(
+        dateStr,
+        optimalTiming.bestTime,
+        checkIns,
+        sessions
+      );
 
       const session: SessionSchedule = {
         id: `session_${dateStr}_${Date.now()}`,
@@ -585,8 +626,15 @@ export class SessionSchedulingService {
         time: optimalTiming.bestTime,
         type: sessionType,
         duration: this.calculateOptimalDuration(sessionType, checkIns),
-        intensity: this.calculateOptimalIntensity(sessionType, checkIns, sessions),
-        priority: this.calculatePriority(scheduledSessions.length, userPreferences.maxSessionsPerWeek),
+        intensity: this.calculateOptimalIntensity(
+          sessionType,
+          checkIns,
+          sessions
+        ),
+        priority: this.calculatePriority(
+          scheduledSessions.length,
+          userPreferences.maxSessionsPerWeek
+        ),
         reason: this.generateSessionReason(sessionType, optimalTiming.factors),
         conflicts,
         optimal: conflicts.length === 0,
@@ -596,7 +644,9 @@ export class SessionSchedulingService {
       allConflicts.push(...conflicts);
 
       if (conflicts.length > 0) {
-        adjustments.push(`Conflicts detected for ${dateStr}: ${conflicts.map(c => c.description).join(', ')}`);
+        adjustments.push(
+          `Conflicts detected for ${dateStr}: ${conflicts.map(c => c.description).join(', ')}`
+        );
       }
     }
 
@@ -655,7 +705,11 @@ export class SessionSchedulingService {
       case 'energy':
         if (conflict.severity === 'high') {
           resolution = 'postpone';
-          newDate = this.findNextAvailableDate(session.date, sessions, checkIns);
+          newDate = this.findNextAvailableDate(
+            session.date,
+            sessions,
+            checkIns
+          );
           reason = 'Low energy levels require postponement';
           impact = 'high';
         } else {
@@ -669,7 +723,11 @@ export class SessionSchedulingService {
       case 'recovery':
         if (conflict.severity === 'high') {
           resolution = 'postpone';
-          newDate = this.findNextAvailableDate(session.date, sessions, checkIns);
+          newDate = this.findNextAvailableDate(
+            session.date,
+            sessions,
+            checkIns
+          );
           reason = 'Insufficient recovery time';
           impact = 'high';
         } else {
@@ -719,23 +777,28 @@ export class SessionSchedulingService {
     checkIns: CheckInData[]
   ): string {
     const original = new Date(originalDate);
-    
+
     for (let i = 1; i <= 7; i++) {
       const nextDate = new Date(original);
       nextDate.setDate(original.getDate() + i);
       const dateStr = nextDate.toISOString().split('T')[0];
-      
+
       // Check if date is available
       const existingSession = sessions.find(s => s.date === dateStr);
       if (existingSession) continue;
-      
+
       // Check for conflicts
-      const conflicts = this.detectConflicts(dateStr, '18:00', checkIns, sessions);
+      const conflicts = this.detectConflicts(
+        dateStr,
+        '18:00',
+        checkIns,
+        sessions
+      );
       if (conflicts.length === 0) {
         return dateStr;
       }
     }
-    
+
     return originalDate; // Fallback to original date
   }
 
@@ -767,9 +830,13 @@ export class SessionSchedulingService {
     }
 
     // Find next available date
-    const recoveryDate = this.findNextAvailableDate(originalDate, sessions, checkIns);
+    const recoveryDate = this.findNextAvailableDate(
+      originalDate,
+      sessions,
+      checkIns
+    );
     const recoveryTime = this.findOptimalTime(recoveryDate, checkIns, sessions);
-    
+
     // Adjust intensity based on time since missed session
     let adjustedIntensity: 'low' | 'moderate' | 'high' = 'moderate';
     if (daysSinceMissed >= 3) {
@@ -779,7 +846,12 @@ export class SessionSchedulingService {
     }
 
     // Check for conflicts
-    const conflicts = this.detectConflicts(recoveryDate, recoveryTime, checkIns, sessions);
+    const conflicts = this.detectConflicts(
+      recoveryDate,
+      recoveryTime,
+      checkIns,
+      sessions
+    );
 
     return {
       missedSessionId,
@@ -801,18 +873,26 @@ export class SessionSchedulingService {
   ): {
     bestTimes: { time: string; confidence: number; factors: string[] }[];
     weeklyPattern: { day: string; avgTime: string; success: number }[];
-    energyPatterns: { time: string; avgEnergy: number; recommendation: string }[];
-    recoveryPatterns: { day: string; avgRecovery: number; recommendation: string }[];
+    energyPatterns: {
+      time: string;
+      avgEnergy: number;
+      recommendation: string;
+    }[];
+    recoveryPatterns: {
+      day: string;
+      avgRecovery: number;
+      recommendation: string;
+    }[];
   } {
     // Analyze best times based on historical data
     const bestTimes = this.analyzeBestTimes(sessions, checkIns);
-    
+
     // Analyze weekly patterns
     const weeklyPattern = this.analyzeWeeklyPatterns(sessions);
-    
+
     // Analyze energy patterns
     const energyPatterns = this.analyzeEnergyPatterns(checkIns);
-    
+
     // Analyze recovery patterns
     const recoveryPatterns = this.analyzeRecoveryPatterns(sessions, checkIns);
 
@@ -829,18 +909,21 @@ export class SessionSchedulingService {
     sessions: SessionData[],
     checkIns: CheckInData[]
   ): { time: string; confidence: number; factors: string[] }[] {
-    const timePerformance: Record<string, { count: number; avgRPE: number; completion: number }> = {};
+    const timePerformance: Record<
+      string,
+      { count: number; avgRPE: number; completion: number }
+    > = {};
 
     // Group sessions by hour
     for (const session of sessions) {
       const sessionDate = new Date(session.date);
       const hour = sessionDate.getHours();
       const timeKey = `${hour.toString().padStart(2, '0')}:00`;
-      
+
       if (!timePerformance[timeKey]) {
         timePerformance[timeKey] = { count: 0, avgRPE: 0, completion: 0 };
       }
-      
+
       timePerformance[timeKey].count++;
       timePerformance[timeKey].avgRPE += session.totalRPE;
       timePerformance[timeKey].completion += session.completed ? 1 : 0;
@@ -850,20 +933,20 @@ export class SessionSchedulingService {
     const results = Object.entries(timePerformance).map(([time, data]) => {
       const avgRPE = data.avgRPE / data.count;
       const completionRate = data.completion / data.count;
-      
+
       let confidence = 50;
       const factors: string[] = [];
-      
+
       if (completionRate >= 0.9) {
         confidence += 30;
         factors.push('High completion rate');
       }
-      
+
       if (avgRPE >= 6 && avgRPE <= 8) {
         confidence += 20;
         factors.push('Optimal intensity range');
       }
-      
+
       if (data.count >= 5) {
         confidence += 10;
         factors.push('Sufficient data points');
@@ -880,19 +963,32 @@ export class SessionSchedulingService {
   }
 
   // Analyze weekly patterns
-  private static analyzeWeeklyPatterns(sessions: SessionData[]): { day: string; avgTime: string; success: number }[] {
-    const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-    const dayPatterns: Record<number, { times: number[]; completed: number; total: number }> = {};
+  private static analyzeWeeklyPatterns(
+    sessions: SessionData[]
+  ): { day: string; avgTime: string; success: number }[] {
+    const dayNames = [
+      'Sunday',
+      'Monday',
+      'Tuesday',
+      'Wednesday',
+      'Thursday',
+      'Friday',
+      'Saturday',
+    ];
+    const dayPatterns: Record<
+      number,
+      { times: number[]; completed: number; total: number }
+    > = {};
 
     for (const session of sessions) {
       const sessionDate = new Date(session.date);
       const dayOfWeek = sessionDate.getDay();
       const hour = sessionDate.getHours();
-      
+
       if (!dayPatterns[dayOfWeek]) {
         dayPatterns[dayOfWeek] = { times: [], completed: 0, total: 0 };
       }
-      
+
       dayPatterns[dayOfWeek].times.push(hour);
       dayPatterns[dayOfWeek].total++;
       if (session.completed) {
@@ -901,9 +997,11 @@ export class SessionSchedulingService {
     }
 
     return Object.entries(dayPatterns).map(([day, data]) => {
-      const avgHour = Math.round(data.times.reduce((sum, h) => sum + h, 0) / data.times.length);
+      const avgHour = Math.round(
+        data.times.reduce((sum, h) => sum + h, 0) / data.times.length
+      );
       const successRate = (data.completed / data.total) * 100;
-      
+
       return {
         day: dayNames[parseInt(day)],
         avgTime: `${avgHour.toString().padStart(2, '0')}:00`,
@@ -913,24 +1011,27 @@ export class SessionSchedulingService {
   }
 
   // Analyze energy patterns
-  private static analyzeEnergyPatterns(checkIns: CheckInData[]): { time: string; avgEnergy: number; recommendation: string }[] {
+  private static analyzeEnergyPatterns(
+    checkIns: CheckInData[]
+  ): { time: string; avgEnergy: number; recommendation: string }[] {
     const timeEnergy: Record<string, number[]> = {};
 
     for (const checkIn of checkIns) {
       const checkInDate = new Date(checkIn.date);
       const hour = checkInDate.getHours();
       const timeKey = `${hour.toString().padStart(2, '0')}:00`;
-      
+
       if (!timeEnergy[timeKey]) {
         timeEnergy[timeKey] = [];
       }
-      
+
       timeEnergy[timeKey].push(checkIn.energy);
     }
 
     return Object.entries(timeEnergy).map(([time, energies]) => {
-      const avgEnergy = energies.reduce((sum, e) => sum + e, 0) / energies.length;
-      
+      const avgEnergy =
+        energies.reduce((sum, e) => sum + e, 0) / energies.length;
+
       let recommendation = '';
       if (avgEnergy >= 7) {
         recommendation = 'Optimal time for high-intensity sessions';
@@ -950,34 +1051,47 @@ export class SessionSchedulingService {
 
   // Analyze recovery patterns
   private static analyzeRecoveryPatterns(
-    // eslint-disable-next-line no-unused-vars
     sessions: SessionData[],
-    // eslint-disable-next-line no-unused-vars
+
     checkIns: CheckInData[]
   ): { day: string; avgRecovery: number; recommendation: string }[] {
-    const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-    const dayRecovery: Record<number, { energy: number[]; soreness: number[]; sleep: number[] }> = {};
+    const dayNames = [
+      'Sunday',
+      'Monday',
+      'Tuesday',
+      'Wednesday',
+      'Thursday',
+      'Friday',
+      'Saturday',
+    ];
+    const dayRecovery: Record<
+      number,
+      { energy: number[]; soreness: number[]; sleep: number[] }
+    > = {};
 
     for (const checkIn of checkIns) {
       const checkInDate = new Date(checkIn.date);
       const dayOfWeek = checkInDate.getDay();
-      
+
       if (!dayRecovery[dayOfWeek]) {
         dayRecovery[dayOfWeek] = { energy: [], soreness: [], sleep: [] };
       }
-      
+
       dayRecovery[dayOfWeek].energy.push(checkIn.energy);
       dayRecovery[dayOfWeek].soreness.push(checkIn.soreness);
       dayRecovery[dayOfWeek].sleep.push(checkIn.sleep);
     }
 
     return Object.entries(dayRecovery).map(([day, data]) => {
-      const avgEnergy = data.energy.reduce((sum, e) => sum + e, 0) / data.energy.length;
-      const avgSoreness = data.soreness.reduce((sum, s) => sum + s, 0) / data.soreness.length;
-      const avgSleep = data.sleep.reduce((sum, s) => sum + s, 0) / data.sleep.length;
-      
+      const avgEnergy =
+        data.energy.reduce((sum, e) => sum + e, 0) / data.energy.length;
+      const avgSoreness =
+        data.soreness.reduce((sum, s) => sum + s, 0) / data.soreness.length;
+      const avgSleep =
+        data.sleep.reduce((sum, s) => sum + s, 0) / data.sleep.length;
+
       const recoveryScore = (avgEnergy + (10 - avgSoreness) + avgSleep) / 3;
-      
+
       let recommendation = '';
       if (recoveryScore >= 7) {
         recommendation = 'Excellent recovery day - ideal for intense sessions';

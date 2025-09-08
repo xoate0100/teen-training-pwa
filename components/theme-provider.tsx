@@ -1,7 +1,7 @@
 'use client';
 
 /* eslint-disable no-undef */
-/* eslint-disable no-unused-vars */
+
 import React, {
   createContext,
   useContext,

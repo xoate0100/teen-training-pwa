@@ -2,53 +2,77 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { predictiveUserExperience } from '@/lib/services/predictive-user-experience';
-import { 
-  AnticipatoryInterfaceChange, 
-  ProactiveContentDelivery, 
-  SmartRecommendationTiming, 
-  PersonalizedLearningPath 
+import {
+  AnticipatoryInterfaceChange,
+  ProactiveContentDelivery,
+  SmartRecommendationTiming,
+  PersonalizedLearningPath,
 } from '@/lib/services/predictive-user-experience';
 
 export interface UsePredictiveUserExperienceReturn {
   // Anticipatory Interface Changes
   anticipatoryChanges: AnticipatoryInterfaceChange[];
-  generateAnticipatoryChanges: (userId: string) => Promise<AnticipatoryInterfaceChange[]>;
-  
+  generateAnticipatoryChanges: (
+    userId: string
+  ) => Promise<AnticipatoryInterfaceChange[]>;
+
   // Proactive Content Delivery
   proactiveContent: ProactiveContentDelivery[];
-  generateProactiveContent: (userId: string) => Promise<ProactiveContentDelivery[]>;
-  
+  generateProactiveContent: (
+    userId: string
+  ) => Promise<ProactiveContentDelivery[]>;
+
   // Smart Recommendation Timing
   smartRecommendations: SmartRecommendationTiming[];
-  generateSmartRecommendations: (userId: string) => Promise<SmartRecommendationTiming[]>;
-  
+  generateSmartRecommendations: (
+    userId: string
+  ) => Promise<SmartRecommendationTiming[]>;
+
   // Personalized Learning Paths
   learningPaths: PersonalizedLearningPath[];
-  generateLearningPaths: (userId: string) => Promise<PersonalizedLearningPath[]>;
-  
+  generateLearningPaths: (
+    userId: string
+  ) => Promise<PersonalizedLearningPath[]>;
+
   // System Management
   destroy: () => void;
-  
+
   // Loading states
   isLoading: boolean;
   error: string | null;
 }
 
 export function usePredictiveUserExperience(): UsePredictiveUserExperienceReturn {
-  const [anticipatoryChanges, setAnticipatoryChanges] = useState<AnticipatoryInterfaceChange[]>([]);
-  const [proactiveContent, setProactiveContent] = useState<ProactiveContentDelivery[]>([]);
-  const [smartRecommendations, setSmartRecommendations] = useState<SmartRecommendationTiming[]>([]);
-  const [learningPaths, setLearningPaths] = useState<PersonalizedLearningPath[]>([]);
+  const [anticipatoryChanges, setAnticipatoryChanges] = useState<
+    AnticipatoryInterfaceChange[]
+  >([]);
+  const [proactiveContent, setProactiveContent] = useState<
+    ProactiveContentDelivery[]
+  >([]);
+  const [smartRecommendations, setSmartRecommendations] = useState<
+    SmartRecommendationTiming[]
+  >([]);
+  const [learningPaths, setLearningPaths] = useState<
+    PersonalizedLearningPath[]
+  >([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   // Update data periodically
   useEffect(() => {
     const updateData = () => {
-      setAnticipatoryChanges(predictiveUserExperience.getAnticipatoryChanges('current-user'));
-      setProactiveContent(predictiveUserExperience.getProactiveContent('current-user'));
-      setSmartRecommendations(predictiveUserExperience.getSmartRecommendations('current-user'));
-      setLearningPaths(predictiveUserExperience.getLearningPaths('current-user'));
+      setAnticipatoryChanges(
+        predictiveUserExperience.getAnticipatoryChanges('current-user')
+      );
+      setProactiveContent(
+        predictiveUserExperience.getProactiveContent('current-user')
+      );
+      setSmartRecommendations(
+        predictiveUserExperience.getSmartRecommendations('current-user')
+      );
+      setLearningPaths(
+        predictiveUserExperience.getLearningPaths('current-user')
+      );
     };
 
     updateData();
@@ -62,13 +86,19 @@ export function usePredictiveUserExperience(): UsePredictiveUserExperienceReturn
     try {
       setIsLoading(true);
       setError(null);
-      
-      const changes = await predictiveUserExperience.generateAnticipatoryInterfaceChanges(userId);
+
+      const changes =
+        await predictiveUserExperience.generateAnticipatoryInterfaceChanges(
+          userId
+        );
       setAnticipatoryChanges(changes);
-      
+
       return changes;
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Failed to generate anticipatory interface changes';
+      const errorMessage =
+        err instanceof Error
+          ? err.message
+          : 'Failed to generate anticipatory interface changes';
       setError(errorMessage);
       throw new Error(errorMessage);
     } finally {
@@ -81,13 +111,17 @@ export function usePredictiveUserExperience(): UsePredictiveUserExperienceReturn
     try {
       setIsLoading(true);
       setError(null);
-      
-      const content = await predictiveUserExperience.generateProactiveContent(userId);
+
+      const content =
+        await predictiveUserExperience.generateProactiveContent(userId);
       setProactiveContent(content);
-      
+
       return content;
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Failed to generate proactive content';
+      const errorMessage =
+        err instanceof Error
+          ? err.message
+          : 'Failed to generate proactive content';
       setError(errorMessage);
       throw new Error(errorMessage);
     } finally {
@@ -100,13 +134,17 @@ export function usePredictiveUserExperience(): UsePredictiveUserExperienceReturn
     try {
       setIsLoading(true);
       setError(null);
-      
-      const recommendations = await predictiveUserExperience.generateSmartRecommendations(userId);
+
+      const recommendations =
+        await predictiveUserExperience.generateSmartRecommendations(userId);
       setSmartRecommendations(recommendations);
-      
+
       return recommendations;
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Failed to generate smart recommendations';
+      const errorMessage =
+        err instanceof Error
+          ? err.message
+          : 'Failed to generate smart recommendations';
       setError(errorMessage);
       throw new Error(errorMessage);
     } finally {
@@ -119,13 +157,19 @@ export function usePredictiveUserExperience(): UsePredictiveUserExperienceReturn
     try {
       setIsLoading(true);
       setError(null);
-      
-      const paths = await predictiveUserExperience.generatePersonalizedLearningPaths(userId);
+
+      const paths =
+        await predictiveUserExperience.generatePersonalizedLearningPaths(
+          userId
+        );
       setLearningPaths(paths);
-      
+
       return paths;
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Failed to generate personalized learning paths';
+      const errorMessage =
+        err instanceof Error
+          ? err.message
+          : 'Failed to generate personalized learning paths';
       setError(errorMessage);
       throw new Error(errorMessage);
     } finally {

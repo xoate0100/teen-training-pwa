@@ -2,40 +2,50 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { offlineFirstService } from '@/lib/services/offline-first-service';
-import { OfflineCache, PendingChange, SyncStrategy } from '@/lib/services/offline-first-service';
+import {
+  OfflineCache,
+  PendingChange,
+  SyncStrategy,
+} from '@/lib/services/offline-first-service';
 
 export interface UseOfflineFirstReturn {
   // Cache status
   cache: OfflineCache;
   isOnline: boolean;
   pendingChangesCount: number;
-  
+
   // Cache actions
   cacheSessionData: (session: any) => Promise<void>;
   cacheCheckInData: (checkIn: any) => void;
   getCachedSessions: () => any[];
   getCachedCheckIns: () => any[];
   clearCache: () => void;
-  
+
   // Sync actions
   forceSync: () => Promise<void>;
   syncPendingChanges: () => Promise<void>;
-  
+
   // Sync strategy
   setSyncStrategy: (strategy: Partial<SyncStrategy>) => void;
-  
+
   // Event handlers
-  onOnline: (callback: () => void) => void; // eslint-disable-next-line no-unused-vars
-  onOffline: (callback: () => void) => void; // eslint-disable-next-line no-unused-vars
-  onPendingChangeAdded: (callback: (change: PendingChange) => void) => void; // eslint-disable-next-line no-unused-vars
-  onSyncError: (callback: (error: any) => void) => void; // eslint-disable-next-line no-unused-vars
-  onCacheCleared: (callback: () => void) => void; // eslint-disable-next-line no-unused-vars
+  onOnline: (callback: () => void) => void;
+  onOffline: (callback: () => void) => void;
+  onPendingChangeAdded: (callback: (change: PendingChange) => void) => void;
+  onSyncError: (callback: (error: any) => void) => void;
+  onCacheCleared: (callback: () => void) => void;
 }
 
 export function useOfflineFirst(): UseOfflineFirstReturn {
-  const [cache, setCache] = useState<OfflineCache>(offlineFirstService.getCacheStatus());
-  const [isOnline, setIsOnline] = useState<boolean>(offlineFirstService.isOnlineStatus());
-  const [pendingChangesCount, setPendingChangesCount] = useState<number>(offlineFirstService.getPendingChangesCount());
+  const [cache, setCache] = useState<OfflineCache>(
+    offlineFirstService.getCacheStatus()
+  );
+  const [isOnline, setIsOnline] = useState<boolean>(
+    offlineFirstService.isOnlineStatus()
+  );
+  const [pendingChangesCount, setPendingChangesCount] = useState<number>(
+    offlineFirstService.getPendingChangesCount()
+  );
 
   // Update cache status periodically
   useEffect(() => {
@@ -51,13 +61,13 @@ export function useOfflineFirst(): UseOfflineFirstReturn {
   }, []);
 
   // Cache session data
-  const cacheSessionData = useCallback(async (session: any) => { // eslint-disable-next-line no-unused-vars
+  const cacheSessionData = useCallback(async (session: any) => {
     await offlineFirstService.cacheSessionData(session);
     setCache(offlineFirstService.getCacheStatus());
   }, []);
 
   // Cache check-in data
-  const cacheCheckInData = useCallback((checkIn: any) => { // eslint-disable-next-line no-unused-vars
+  const cacheCheckInData = useCallback((checkIn: any) => {
     offlineFirstService.cacheCheckInData(checkIn);
     setCache(offlineFirstService.getCacheStatus());
   }, []);
@@ -91,28 +101,31 @@ export function useOfflineFirst(): UseOfflineFirstReturn {
   }, []);
 
   // Set sync strategy
-  const setSyncStrategy = useCallback((strategy: Partial<SyncStrategy>) => { // eslint-disable-next-line no-unused-vars
+  const setSyncStrategy = useCallback((strategy: Partial<SyncStrategy>) => {
     offlineFirstService.setSyncStrategy(strategy);
   }, []);
 
   // Event handlers
-  const onOnline = useCallback((callback: () => void) => { // eslint-disable-next-line no-unused-vars
+  const onOnline = useCallback((callback: () => void) => {
     offlineFirstService.on('online', callback);
   }, []);
 
-  const onOffline = useCallback((callback: () => void) => { // eslint-disable-next-line no-unused-vars
+  const onOffline = useCallback((callback: () => void) => {
     offlineFirstService.on('offline', callback);
   }, []);
 
-  const onPendingChangeAdded = useCallback((callback: (change: PendingChange) => void) => { // eslint-disable-next-line no-unused-vars
-    offlineFirstService.on('pendingChangeAdded', callback);
-  }, []);
+  const onPendingChangeAdded = useCallback(
+    (callback: (change: PendingChange) => void) => {
+      offlineFirstService.on('pendingChangeAdded', callback);
+    },
+    []
+  );
 
-  const onSyncError = useCallback((callback: (error: any) => void) => { // eslint-disable-next-line no-unused-vars
+  const onSyncError = useCallback((callback: (error: any) => void) => {
     offlineFirstService.on('syncError', callback);
   }, []);
 
-  const onCacheCleared = useCallback((callback: () => void) => { // eslint-disable-next-line no-unused-vars
+  const onCacheCleared = useCallback((callback: () => void) => {
     offlineFirstService.on('cacheCleared', callback);
   }, []);
 

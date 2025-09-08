@@ -1,10 +1,23 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { BehaviorAnalysisService, BehaviorInsights } from '@/lib/services/behavior-analysis-service';
-import { PerformancePredictionService, PerformanceForecast } from '@/lib/services/performance-prediction-service';
-import { AdaptiveRecommendationService, AdaptiveRecommendations } from '@/lib/services/adaptive-recommendation-service';
-import { SessionData, CheckInData, ProgressMetrics } from '@/lib/services/database-service';
+import {
+  BehaviorAnalysisService,
+  BehaviorInsights,
+} from '@/lib/services/behavior-analysis-service';
+import {
+  PerformancePredictionService,
+  PerformanceForecast,
+} from '@/lib/services/performance-prediction-service';
+import {
+  AdaptiveRecommendationService,
+  AdaptiveRecommendations,
+} from '@/lib/services/adaptive-recommendation-service';
+import {
+  SessionData,
+  CheckInData,
+  ProgressMetrics,
+} from '@/lib/services/database-service';
 
 export interface AIIntelligenceState {
   behaviorInsights: BehaviorInsights | null;
@@ -20,7 +33,11 @@ export interface AIIntelligenceActions {
   refreshBehaviorAnalysis: () => Promise<void>;
   refreshPerformancePrediction: () => Promise<void>;
   refreshAdaptiveRecommendations: () => Promise<void>;
-  updateUserData: (sessions: SessionData[], checkIns: CheckInData[], progressMetrics: ProgressMetrics[]) => void;
+  updateUserData: (
+    sessions: SessionData[],
+    checkIns: CheckInData[],
+    progressMetrics: ProgressMetrics[]
+  ) => void;
 }
 
 export function useAIIntelligence(
@@ -40,21 +57,23 @@ export function useAIIntelligence(
   });
 
   // Update user data and trigger analysis
-  const updateUserData = useCallback((
-    // eslint-disable-next-line no-unused-vars
-    newSessions: SessionData[],
-    // eslint-disable-next-line no-unused-vars
-    newCheckIns: CheckInData[],
-    // eslint-disable-next-line no-unused-vars
-    newProgressMetrics: ProgressMetrics[]
-  ) => {
-    // This would typically trigger a re-analysis
-    // For now, we'll just update the state
-    setState(prev => ({
-      ...prev,
-      lastUpdated: new Date().toISOString(),
-    }));
-  }, []);
+  const updateUserData = useCallback(
+    (
+      newSessions: SessionData[],
+
+      newCheckIns: CheckInData[],
+
+      newProgressMetrics: ProgressMetrics[]
+    ) => {
+      // This would typically trigger a re-analysis
+      // For now, we'll just update the state
+      setState(prev => ({
+        ...prev,
+        lastUpdated: new Date().toISOString(),
+      }));
+    },
+    []
+  );
 
   // Refresh behavior analysis
   const refreshBehaviorAnalysis = useCallback(async () => {
@@ -78,7 +97,8 @@ export function useAIIntelligence(
       console.error('Error analyzing behavior:', error);
       setState(prev => ({
         ...prev,
-        error: error instanceof Error ? error.message : 'Failed to analyze behavior',
+        error:
+          error instanceof Error ? error.message : 'Failed to analyze behavior',
       }));
     } finally {
       setState(prev => ({ ...prev, isLoading: false }));
@@ -92,13 +112,14 @@ export function useAIIntelligence(
     setState(prev => ({ ...prev, isLoading: true, error: null }));
 
     try {
-      const performanceForecast = PerformancePredictionService.generatePerformanceForecast(
-        sessions,
-        checkIns,
-        progressMetrics,
-        100, // Default goal strength
-        currentPhase
-      );
+      const performanceForecast =
+        PerformancePredictionService.generatePerformanceForecast(
+          sessions,
+          checkIns,
+          progressMetrics,
+          100, // Default goal strength
+          currentPhase
+        );
 
       setState(prev => ({
         ...prev,
@@ -109,7 +130,10 @@ export function useAIIntelligence(
       console.error('Error predicting performance:', error);
       setState(prev => ({
         ...prev,
-        error: error instanceof Error ? error.message : 'Failed to predict performance',
+        error:
+          error instanceof Error
+            ? error.message
+            : 'Failed to predict performance',
       }));
     } finally {
       setState(prev => ({ ...prev, isLoading: false }));
@@ -123,12 +147,13 @@ export function useAIIntelligence(
     setState(prev => ({ ...prev, isLoading: true, error: null }));
 
     try {
-      const adaptiveRecommendations = AdaptiveRecommendationService.generateAdaptiveRecommendations(
-        state.behaviorInsights,
-        state.performanceForecast,
-        currentPhase,
-        availableEquipment
-      );
+      const adaptiveRecommendations =
+        AdaptiveRecommendationService.generateAdaptiveRecommendations(
+          state.behaviorInsights,
+          state.performanceForecast,
+          currentPhase,
+          availableEquipment
+        );
 
       setState(prev => ({
         ...prev,
@@ -139,12 +164,20 @@ export function useAIIntelligence(
       console.error('Error generating adaptive recommendations:', error);
       setState(prev => ({
         ...prev,
-        error: error instanceof Error ? error.message : 'Failed to generate recommendations',
+        error:
+          error instanceof Error
+            ? error.message
+            : 'Failed to generate recommendations',
       }));
     } finally {
       setState(prev => ({ ...prev, isLoading: false }));
     }
-  }, [state.behaviorInsights, state.performanceForecast, currentPhase, availableEquipment]);
+  }, [
+    state.behaviorInsights,
+    state.performanceForecast,
+    currentPhase,
+    availableEquipment,
+  ]);
 
   // Refresh all AI intelligence
   const refreshAll = useCallback(async () => {
@@ -165,12 +198,19 @@ export function useAIIntelligence(
       console.error('Error refreshing AI intelligence:', error);
       setState(prev => ({
         ...prev,
-        error: error instanceof Error ? error.message : 'Failed to refresh AI intelligence',
+        error:
+          error instanceof Error
+            ? error.message
+            : 'Failed to refresh AI intelligence',
       }));
     } finally {
       setState(prev => ({ ...prev, isLoading: false }));
     }
-  }, [refreshBehaviorAnalysis, refreshPerformancePrediction, refreshAdaptiveRecommendations]);
+  }, [
+    refreshBehaviorAnalysis,
+    refreshPerformancePrediction,
+    refreshAdaptiveRecommendations,
+  ]);
 
   // Auto-refresh when data changes
   useEffect(() => {
@@ -181,10 +221,19 @@ export function useAIIntelligence(
 
   // Auto-refresh recommendations when insights change
   useEffect(() => {
-    if (state.behaviorInsights && state.performanceForecast && !state.adaptiveRecommendations) {
+    if (
+      state.behaviorInsights &&
+      state.performanceForecast &&
+      !state.adaptiveRecommendations
+    ) {
       refreshAdaptiveRecommendations();
     }
-  }, [state.behaviorInsights, state.performanceForecast, state.adaptiveRecommendations, refreshAdaptiveRecommendations]);
+  }, [
+    state.behaviorInsights,
+    state.performanceForecast,
+    state.adaptiveRecommendations,
+    refreshAdaptiveRecommendations,
+  ]);
 
   return {
     ...state,
@@ -197,7 +246,11 @@ export function useAIIntelligence(
 }
 
 // Specialized hooks for specific AI features
-export function useBehaviorAnalysis(sessions: SessionData[], checkIns: CheckInData[], progressMetrics: ProgressMetrics[]) {
+export function useBehaviorAnalysis(
+  sessions: SessionData[],
+  checkIns: CheckInData[],
+  progressMetrics: ProgressMetrics[]
+) {
   const [insights, setInsights] = useState<BehaviorInsights | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -217,7 +270,9 @@ export function useBehaviorAnalysis(sessions: SessionData[], checkIns: CheckInDa
       setInsights(behaviorInsights);
     } catch (err) {
       console.error('Error analyzing behavior:', err);
-      setError(err instanceof Error ? err.message : 'Failed to analyze behavior');
+      setError(
+        err instanceof Error ? err.message : 'Failed to analyze behavior'
+      );
     } finally {
       setIsLoading(false);
     }
@@ -248,17 +303,20 @@ export function usePerformancePrediction(
     setError(null);
 
     try {
-      const performanceForecast = PerformancePredictionService.generatePerformanceForecast(
-        sessions,
-        checkIns,
-        progressMetrics,
-        goalStrength,
-        currentPhase
-      );
+      const performanceForecast =
+        PerformancePredictionService.generatePerformanceForecast(
+          sessions,
+          checkIns,
+          progressMetrics,
+          goalStrength,
+          currentPhase
+        );
       setForecast(performanceForecast);
     } catch (err) {
       console.error('Error predicting performance:', err);
-      setError(err instanceof Error ? err.message : 'Failed to predict performance');
+      setError(
+        err instanceof Error ? err.message : 'Failed to predict performance'
+      );
     } finally {
       setIsLoading(false);
     }
@@ -277,7 +335,8 @@ export function useAdaptiveRecommendations(
   currentPhase: string = 'build',
   availableEquipment: string[] = []
 ) {
-  const [recommendations, setRecommendations] = useState<AdaptiveRecommendations | null>(null);
+  const [recommendations, setRecommendations] =
+    useState<AdaptiveRecommendations | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -288,16 +347,21 @@ export function useAdaptiveRecommendations(
     setError(null);
 
     try {
-      const adaptiveRecommendations = AdaptiveRecommendationService.generateAdaptiveRecommendations(
-        behaviorInsights,
-        performanceForecast,
-        currentPhase,
-        availableEquipment
-      );
+      const adaptiveRecommendations =
+        AdaptiveRecommendationService.generateAdaptiveRecommendations(
+          behaviorInsights,
+          performanceForecast,
+          currentPhase,
+          availableEquipment
+        );
       setRecommendations(adaptiveRecommendations);
     } catch (err) {
       console.error('Error generating adaptive recommendations:', err);
-      setError(err instanceof Error ? err.message : 'Failed to generate recommendations');
+      setError(
+        err instanceof Error
+          ? err.message
+          : 'Failed to generate recommendations'
+      );
     } finally {
       setIsLoading(false);
     }

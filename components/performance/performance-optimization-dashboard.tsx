@@ -6,13 +6,13 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { 
-  Zap, 
-  Database, 
-  MemoryStick, 
-  Clock, 
+import {
+  Zap,
+  Database,
+  MemoryStick,
+  Clock,
   RefreshCw,
-  Trash2
+  Trash2,
 } from 'lucide-react';
 import { usePerformanceOptimization } from '@/lib/hooks/use-performance-optimization';
 
@@ -33,8 +33,12 @@ export function PerformanceOptimizationDashboard() {
   } = usePerformanceOptimization();
 
   const [isExpanded, setIsExpanded] = useState(false);
-  const [cacheStrategy, setCacheStrategyState] = useState<'memory' | 'localStorage' | 'indexedDB' | 'none'>('memory');
-  const [evictionPolicy, setEvictionPolicy] = useState<'lru' | 'fifo' | 'random'>('lru');
+  const [cacheStrategy, setCacheStrategyState] = useState<
+    'memory' | 'localStorage' | 'indexedDB' | 'none'
+  >('memory');
+  const [evictionPolicy, setEvictionPolicy] = useState<
+    'lru' | 'fifo' | 'random'
+  >('lru');
   const [batchSize, setBatchSize] = useState(50);
   const [debounceDelay, setDebounceDelay] = useState(300);
 
@@ -56,7 +60,8 @@ export function PerformanceOptimizationDashboard() {
   const formatBytes = (bytes: number) => {
     if (bytes < 1024) return `${bytes} B`;
     if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
-    if (bytes < 1024 * 1024 * 1024) return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+    if (bytes < 1024 * 1024 * 1024)
+      return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
     return `${(bytes / (1024 * 1024 * 1024)).toFixed(1)} GB`;
   };
 
@@ -78,18 +83,18 @@ export function PerformanceOptimizationDashboard() {
   };
 
   return (
-    <div className="space-y-4">
+    <div className='space-y-4'>
       {/* Main Performance Card */}
       <Card>
         <CardHeader>
-          <CardTitle className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <Zap className="h-5 w-5" />
+          <CardTitle className='flex items-center justify-between'>
+            <div className='flex items-center gap-2'>
+              <Zap className='h-5 w-5' />
               Performance Optimization
             </div>
             <Button
-              variant="ghost"
-              size="sm"
+              variant='ghost'
+              size='sm'
               onClick={() => setIsExpanded(!isExpanded)}
             >
               {isExpanded ? 'Collapse' : 'Expand'}
@@ -97,113 +102,159 @@ export function PerformanceOptimizationDashboard() {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="space-y-4">
+          <div className='space-y-4'>
             {/* Performance Overview */}
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-              <div className="text-center">
-                <div className="text-2xl font-bold">{formatTime(metrics.queryTime)}</div>
-                <p className="text-sm text-muted-foreground">Query Time</p>
+            <div className='grid grid-cols-1 md:grid-cols-4 gap-4'>
+              <div className='text-center'>
+                <div className='text-2xl font-bold'>
+                  {formatTime(metrics.queryTime)}
+                </div>
+                <p className='text-sm text-muted-foreground'>Query Time</p>
                 <Badge className={getPerformanceBadge(metrics.queryTime, 1000)}>
-                  {metrics.queryTime < 500 ? 'Excellent' : metrics.queryTime < 1000 ? 'Good' : 'Slow'}
+                  {metrics.queryTime < 500
+                    ? 'Excellent'
+                    : metrics.queryTime < 1000
+                      ? 'Good'
+                      : 'Slow'}
                 </Badge>
               </div>
-              <div className="text-center">
-                <div className="text-2xl font-bold">{metrics.cacheHitRate.toFixed(1)}%</div>
-                <p className="text-sm text-muted-foreground">Cache Hit Rate</p>
-                <Badge className={getPerformanceBadge(100 - metrics.cacheHitRate, 50)}>
-                  {metrics.cacheHitRate > 80 ? 'Excellent' : metrics.cacheHitRate > 60 ? 'Good' : 'Poor'}
+              <div className='text-center'>
+                <div className='text-2xl font-bold'>
+                  {metrics.cacheHitRate.toFixed(1)}%
+                </div>
+                <p className='text-sm text-muted-foreground'>Cache Hit Rate</p>
+                <Badge
+                  className={getPerformanceBadge(
+                    100 - metrics.cacheHitRate,
+                    50
+                  )}
+                >
+                  {metrics.cacheHitRate > 80
+                    ? 'Excellent'
+                    : metrics.cacheHitRate > 60
+                      ? 'Good'
+                      : 'Poor'}
                 </Badge>
               </div>
-              <div className="text-center">
-                <div className="text-2xl font-bold">{formatBytes(metrics.memoryUsage)}</div>
-                <p className="text-sm text-muted-foreground">Memory Usage</p>
-                <Badge className={getPerformanceBadge(metrics.memoryUsage, 100)}>
-                  {metrics.memoryUsage < 50 ? 'Low' : metrics.memoryUsage < 100 ? 'Medium' : 'High'}
+              <div className='text-center'>
+                <div className='text-2xl font-bold'>
+                  {formatBytes(metrics.memoryUsage)}
+                </div>
+                <p className='text-sm text-muted-foreground'>Memory Usage</p>
+                <Badge
+                  className={getPerformanceBadge(metrics.memoryUsage, 100)}
+                >
+                  {metrics.memoryUsage < 50
+                    ? 'Low'
+                    : metrics.memoryUsage < 100
+                      ? 'Medium'
+                      : 'High'}
                 </Badge>
               </div>
-              <div className="text-center">
-                <div className="text-2xl font-bold">{metrics.networkRequests}</div>
-                <p className="text-sm text-muted-foreground">Network Requests</p>
-                <Badge className={getPerformanceBadge(metrics.networkRequests, 100)}>
-                  {metrics.networkRequests < 50 ? 'Low' : metrics.networkRequests < 100 ? 'Medium' : 'High'}
+              <div className='text-center'>
+                <div className='text-2xl font-bold'>
+                  {metrics.networkRequests}
+                </div>
+                <p className='text-sm text-muted-foreground'>
+                  Network Requests
+                </p>
+                <Badge
+                  className={getPerformanceBadge(metrics.networkRequests, 100)}
+                >
+                  {metrics.networkRequests < 50
+                    ? 'Low'
+                    : metrics.networkRequests < 100
+                      ? 'Medium'
+                      : 'High'}
                 </Badge>
               </div>
             </div>
 
             {/* Cache Status */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div className="text-center">
-                <div className="text-2xl font-bold">{getCacheSize()}</div>
-                <p className="text-sm text-muted-foreground">Cache Entries</p>
+            <div className='grid grid-cols-1 md:grid-cols-3 gap-4'>
+              <div className='text-center'>
+                <div className='text-2xl font-bold'>{getCacheSize()}</div>
+                <p className='text-sm text-muted-foreground'>Cache Entries</p>
               </div>
-              <div className="text-center">
-                <div className="text-2xl font-bold">{formatBytes(metrics.dataSize)}</div>
-                <p className="text-sm text-muted-foreground">Data Size</p>
+              <div className='text-center'>
+                <div className='text-2xl font-bold'>
+                  {formatBytes(metrics.dataSize)}
+                </div>
+                <p className='text-sm text-muted-foreground'>Data Size</p>
               </div>
-              <div className="text-center">
-                <div className="text-2xl font-bold">{formatTime(metrics.queryTime)}</div>
-                <p className="text-sm text-muted-foreground">Avg Query Time</p>
+              <div className='text-center'>
+                <div className='text-2xl font-bold'>
+                  {formatTime(metrics.queryTime)}
+                </div>
+                <p className='text-sm text-muted-foreground'>Avg Query Time</p>
               </div>
             </div>
 
             {/* Performance Alerts */}
             {metrics.queryTime > 1000 && (
               <Alert>
-                <Clock className="h-4 w-4" />
+                <Clock className='h-4 w-4' />
                 <AlertDescription>
-                  Query time is slow ({formatTime(metrics.queryTime)}). Consider optimizing queries or increasing cache size.
+                  Query time is slow ({formatTime(metrics.queryTime)}). Consider
+                  optimizing queries or increasing cache size.
                 </AlertDescription>
               </Alert>
             )}
 
             {metrics.cacheHitRate < 50 && (
               <Alert>
-                <Database className="h-4 w-4" />
+                <Database className='h-4 w-4' />
                 <AlertDescription>
-                  Cache hit rate is low ({metrics.cacheHitRate.toFixed(1)}%). Consider adjusting cache strategy.
+                  Cache hit rate is low ({metrics.cacheHitRate.toFixed(1)}%).
+                  Consider adjusting cache strategy.
                 </AlertDescription>
               </Alert>
             )}
 
             {metrics.memoryUsage > 100 && (
-              <Alert variant="destructive">
-                <MemoryStick className="h-4 w-4" />
+              <Alert variant='destructive'>
+                <MemoryStick className='h-4 w-4' />
                 <AlertDescription>
-                  Memory usage is high ({formatBytes(metrics.memoryUsage)}). Consider clearing cache or reducing data size.
+                  Memory usage is high ({formatBytes(metrics.memoryUsage)}).
+                  Consider clearing cache or reducing data size.
                 </AlertDescription>
               </Alert>
             )}
 
             {/* Expanded View */}
             {isExpanded && (
-              <div className="space-y-4 pt-4 border-t">
+              <div className='space-y-4 pt-4 border-t'>
                 {/* Cache Strategy Configuration */}
                 <div>
-                  <h4 className="font-medium mb-2">Cache Strategy</h4>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <h4 className='font-medium mb-2'>Cache Strategy</h4>
+                  <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
                     <div>
-                      <label className="text-sm font-medium">Cache Type</label>
+                      <label className='text-sm font-medium'>Cache Type</label>
                       <select
                         value={cacheStrategy}
-                        onChange={(e) => setCacheStrategyState(e.target.value as any)}
-                        className="w-full p-2 border rounded"
+                        onChange={e =>
+                          setCacheStrategyState(e.target.value as any)
+                        }
+                        className='w-full p-2 border rounded'
                       >
-                        <option value="memory">Memory</option>
-                        <option value="localStorage">Local Storage</option>
-                        <option value="indexedDB">IndexedDB</option>
-                        <option value="none">None</option>
+                        <option value='memory'>Memory</option>
+                        <option value='localStorage'>Local Storage</option>
+                        <option value='indexedDB'>IndexedDB</option>
+                        <option value='none'>None</option>
                       </select>
                     </div>
                     <div>
-                      <label className="text-sm font-medium">Eviction Policy</label>
+                      <label className='text-sm font-medium'>
+                        Eviction Policy
+                      </label>
                       <select
                         value={evictionPolicy}
-                        onChange={(e) => setEvictionPolicy(e.target.value as any)}
-                        className="w-full p-2 border rounded"
+                        onChange={e => setEvictionPolicy(e.target.value as any)}
+                        className='w-full p-2 border rounded'
                       >
-                        <option value="lru">Least Recently Used</option>
-                        <option value="fifo">First In, First Out</option>
-                        <option value="random">Random</option>
+                        <option value='lru'>Least Recently Used</option>
+                        <option value='fifo'>First In, First Out</option>
+                        <option value='random'>Random</option>
                       </select>
                     </div>
                   </div>
@@ -211,28 +262,32 @@ export function PerformanceOptimizationDashboard() {
 
                 {/* Query Optimization Configuration */}
                 <div>
-                  <h4 className="font-medium mb-2">Query Optimization</h4>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <h4 className='font-medium mb-2'>Query Optimization</h4>
+                  <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
                     <div>
-                      <label className="text-sm font-medium">Batch Size</label>
+                      <label className='text-sm font-medium'>Batch Size</label>
                       <input
-                        type="number"
+                        type='number'
                         value={batchSize}
-                        onChange={(e) => setBatchSize(parseInt(e.target.value))}
-                        className="w-full p-2 border rounded"
-                        min="1"
-                        max="1000"
+                        onChange={e => setBatchSize(parseInt(e.target.value))}
+                        className='w-full p-2 border rounded'
+                        min='1'
+                        max='1000'
                       />
                     </div>
                     <div>
-                      <label className="text-sm font-medium">Debounce Delay (ms)</label>
+                      <label className='text-sm font-medium'>
+                        Debounce Delay (ms)
+                      </label>
                       <input
-                        type="number"
+                        type='number'
                         value={debounceDelay}
-                        onChange={(e) => setDebounceDelay(parseInt(e.target.value))}
-                        className="w-full p-2 border rounded"
-                        min="0"
-                        max="5000"
+                        onChange={e =>
+                          setDebounceDelay(parseInt(e.target.value))
+                        }
+                        className='w-full p-2 border rounded'
+                        min='0'
+                        max='5000'
                       />
                     </div>
                   </div>
@@ -240,19 +295,15 @@ export function PerformanceOptimizationDashboard() {
 
                 {/* Performance Actions */}
                 <div>
-                  <h4 className="font-medium mb-2">Performance Actions</h4>
-                  <div className="flex gap-2">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={clearCache}
-                    >
-                      <Trash2 className="h-4 w-4 mr-2" />
+                  <h4 className='font-medium mb-2'>Performance Actions</h4>
+                  <div className='flex gap-2'>
+                    <Button variant='outline' size='sm' onClick={clearCache}>
+                      <Trash2 className='h-4 w-4 mr-2' />
                       Clear Cache
                     </Button>
                     <Button
-                      variant="outline"
-                      size="sm"
+                      variant='outline'
+                      size='sm'
                       onClick={() => {
                         // Force garbage collection if available
                         if (window.gc) {
@@ -260,12 +311,12 @@ export function PerformanceOptimizationDashboard() {
                         }
                       }}
                     >
-                      <RefreshCw className="h-4 w-4 mr-2" />
+                      <RefreshCw className='h-4 w-4 mr-2' />
                       Force GC
                     </Button>
                     <Button
-                      variant="outline"
-                      size="sm"
+                      variant='outline'
+                      size='sm'
                       onClick={() => {
                         // Optimize performance
                         setQueryOptimization({
@@ -275,7 +326,7 @@ export function PerformanceOptimizationDashboard() {
                         });
                       }}
                     >
-                      <Zap className="h-4 w-4 mr-2" />
+                      <Zap className='h-4 w-4 mr-2' />
                       Optimize
                     </Button>
                   </div>
@@ -283,35 +334,59 @@ export function PerformanceOptimizationDashboard() {
 
                 {/* Performance Metrics Chart */}
                 <div>
-                  <h4 className="font-medium mb-2">Performance Trends</h4>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <h4 className='font-medium mb-2'>Performance Trends</h4>
+                  <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
                     <div>
-                      <div className="flex items-center justify-between mb-2">
-                        <span className="text-sm font-medium">Query Time</span>
-                        <span className="text-sm text-muted-foreground">{formatTime(metrics.queryTime)}</span>
+                      <div className='flex items-center justify-between mb-2'>
+                        <span className='text-sm font-medium'>Query Time</span>
+                        <span className='text-sm text-muted-foreground'>
+                          {formatTime(metrics.queryTime)}
+                        </span>
                       </div>
-                      <Progress value={Math.min(100, (metrics.queryTime / 1000) * 100)} className="h-2" />
+                      <Progress
+                        value={Math.min(100, (metrics.queryTime / 1000) * 100)}
+                        className='h-2'
+                      />
                     </div>
                     <div>
-                      <div className="flex items-center justify-between mb-2">
-                        <span className="text-sm font-medium">Cache Hit Rate</span>
-                        <span className="text-sm text-muted-foreground">{metrics.cacheHitRate.toFixed(1)}%</span>
+                      <div className='flex items-center justify-between mb-2'>
+                        <span className='text-sm font-medium'>
+                          Cache Hit Rate
+                        </span>
+                        <span className='text-sm text-muted-foreground'>
+                          {metrics.cacheHitRate.toFixed(1)}%
+                        </span>
                       </div>
-                      <Progress value={metrics.cacheHitRate} className="h-2" />
+                      <Progress value={metrics.cacheHitRate} className='h-2' />
                     </div>
                     <div>
-                      <div className="flex items-center justify-between mb-2">
-                        <span className="text-sm font-medium">Memory Usage</span>
-                        <span className="text-sm text-muted-foreground">{formatBytes(metrics.memoryUsage)}</span>
+                      <div className='flex items-center justify-between mb-2'>
+                        <span className='text-sm font-medium'>
+                          Memory Usage
+                        </span>
+                        <span className='text-sm text-muted-foreground'>
+                          {formatBytes(metrics.memoryUsage)}
+                        </span>
                       </div>
-                      <Progress value={Math.min(100, (metrics.memoryUsage / 100) * 100)} className="h-2" />
+                      <Progress
+                        value={Math.min(100, (metrics.memoryUsage / 100) * 100)}
+                        className='h-2'
+                      />
                     </div>
                     <div>
-                      <div className="flex items-center justify-between mb-2">
-                        <span className="text-sm font-medium">Data Size</span>
-                        <span className="text-sm text-muted-foreground">{formatBytes(metrics.dataSize)}</span>
+                      <div className='flex items-center justify-between mb-2'>
+                        <span className='text-sm font-medium'>Data Size</span>
+                        <span className='text-sm text-muted-foreground'>
+                          {formatBytes(metrics.dataSize)}
+                        </span>
                       </div>
-                      <Progress value={Math.min(100, (metrics.dataSize / (1024 * 1024)) * 100)} className="h-2" />
+                      <Progress
+                        value={Math.min(
+                          100,
+                          (metrics.dataSize / (1024 * 1024)) * 100
+                        )}
+                        className='h-2'
+                      />
                     </div>
                   </div>
                 </div>

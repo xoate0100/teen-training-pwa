@@ -7,7 +7,13 @@ import { contextualIntelligence } from './contextual-intelligence';
 export interface AnticipatoryInterfaceChange {
   changeId: string;
   userId: string;
-  changeType: 'layout' | 'theme' | 'content' | 'navigation' | 'interaction' | 'notification';
+  changeType:
+    | 'layout'
+    | 'theme'
+    | 'content'
+    | 'navigation'
+    | 'interaction'
+    | 'notification';
   priority: 'high' | 'medium' | 'low';
   trigger: {
     type: 'time' | 'behavior' | 'context' | 'mood' | 'performance' | 'social';
@@ -38,10 +44,24 @@ export interface AnticipatoryInterfaceChange {
 export interface ProactiveContentDelivery {
   contentId: string;
   userId: string;
-  contentType: 'workout' | 'tip' | 'motivation' | 'education' | 'social' | 'achievement' | 'reminder';
+  contentType:
+    | 'workout'
+    | 'tip'
+    | 'motivation'
+    | 'education'
+    | 'social'
+    | 'achievement'
+    | 'reminder';
   priority: 'high' | 'medium' | 'low';
   trigger: {
-    type: 'time' | 'behavior' | 'context' | 'mood' | 'performance' | 'social' | 'achievement';
+    type:
+      | 'time'
+      | 'behavior'
+      | 'context'
+      | 'mood'
+      | 'performance'
+      | 'social'
+      | 'achievement';
     condition: string;
     confidence: number;
   };
@@ -79,10 +99,23 @@ export interface ProactiveContentDelivery {
 export interface SmartRecommendationTiming {
   recommendationId: string;
   userId: string;
-  recommendationType: 'exercise' | 'session' | 'goal' | 'social' | 'recovery' | 'nutrition';
+  recommendationType:
+    | 'exercise'
+    | 'session'
+    | 'goal'
+    | 'social'
+    | 'recovery'
+    | 'nutrition';
   priority: 'high' | 'medium' | 'low';
   trigger: {
-    type: 'time' | 'behavior' | 'context' | 'mood' | 'performance' | 'social' | 'achievement';
+    type:
+      | 'time'
+      | 'behavior'
+      | 'context'
+      | 'mood'
+      | 'performance'
+      | 'social'
+      | 'achievement';
     condition: string;
     confidence: number;
   };
@@ -113,10 +146,23 @@ export interface SmartRecommendationTiming {
 export interface PersonalizedLearningPath {
   pathId: string;
   userId: string;
-  pathType: 'strength' | 'volleyball' | 'plyometric' | 'recovery' | 'mixed' | 'custom';
+  pathType:
+    | 'strength'
+    | 'volleyball'
+    | 'plyometric'
+    | 'recovery'
+    | 'mixed'
+    | 'custom';
   priority: 'high' | 'medium' | 'low';
   trigger: {
-    type: 'time' | 'behavior' | 'context' | 'mood' | 'performance' | 'social' | 'achievement';
+    type:
+      | 'time'
+      | 'behavior'
+      | 'context'
+      | 'mood'
+      | 'performance'
+      | 'social'
+      | 'achievement';
     condition: string;
     confidence: number;
   };
@@ -157,7 +203,12 @@ export interface PersonalizedLearningPath {
 export interface PredictiveInsights {
   userId: string;
   insights: {
-    type: 'interface' | 'content' | 'recommendation' | 'learning_path' | 'combined';
+    type:
+      | 'interface'
+      | 'content'
+      | 'recommendation'
+      | 'learning_path'
+      | 'combined';
     title: string;
     description: string;
     confidence: number;
@@ -171,9 +222,11 @@ export interface PredictiveInsights {
 
 export class PredictiveUserExperienceService {
   private databaseService = new DatabaseService();
-  private anticipatoryChanges: Map<string, AnticipatoryInterfaceChange[]> = new Map();
+  private anticipatoryChanges: Map<string, AnticipatoryInterfaceChange[]> =
+    new Map();
   private proactiveContent: Map<string, ProactiveContentDelivery[]> = new Map();
-  private smartRecommendations: Map<string, SmartRecommendationTiming[]> = new Map();
+  private smartRecommendations: Map<string, SmartRecommendationTiming[]> =
+    new Map();
   private learningPaths: Map<string, PersonalizedLearningPath[]> = new Map();
   private predictiveInsights: Map<string, PredictiveInsights> = new Map();
   private predictiveAnalysisInterval: number | null = null;
@@ -188,20 +241,29 @@ export class PredictiveUserExperienceService {
   }
 
   // Anticipatory Interface Changes
-  async generateAnticipatoryInterfaceChanges(userId: string): Promise<AnticipatoryInterfaceChange[]> {
+  async generateAnticipatoryInterfaceChanges(
+    userId: string
+  ): Promise<AnticipatoryInterfaceChange[]> {
     try {
       const sessions = await this.databaseService.getSessions(userId);
       const checkIns = await this.databaseService.getCheckIns(userId);
-      const personalization = deepPersonalization.getLearningStyleProfile(userId);
+      const personalization =
+        deepPersonalization.getLearningStyleProfile(userId);
       const context = contextualIntelligence.getEnvironmentalContext(userId);
-      
+
       if (sessions.length < 3) {
         return this.getDefaultAnticipatoryChanges(userId);
       }
 
-      const changes = await this.calculateAnticipatoryChanges(userId, sessions, checkIns, personalization, context);
+      const changes = await this.calculateAnticipatoryChanges(
+        userId,
+        sessions,
+        checkIns,
+        personalization,
+        context
+      );
       this.anticipatoryChanges.set(userId, changes);
-      
+
       return changes;
     } catch (error) {
       console.error('Error generating anticipatory interface changes:', error);
@@ -219,27 +281,51 @@ export class PredictiveUserExperienceService {
     const changes: AnticipatoryInterfaceChange[] = [];
 
     // Time-based interface changes
-    const timeBasedChanges = this.generateTimeBasedInterfaceChanges(userId, sessions, checkIns, context);
+    const timeBasedChanges = this.generateTimeBasedInterfaceChanges(
+      userId,
+      sessions,
+      checkIns,
+      context
+    );
     changes.push(...timeBasedChanges);
 
     // Behavior-based interface changes
-    const behaviorBasedChanges = this.generateBehaviorBasedInterfaceChanges(userId, sessions, checkIns, personalization);
+    const behaviorBasedChanges = this.generateBehaviorBasedInterfaceChanges(
+      userId,
+      sessions,
+      checkIns,
+      personalization
+    );
     changes.push(...behaviorBasedChanges);
 
     // Context-based interface changes
-    const contextBasedChanges = this.generateContextBasedInterfaceChanges(userId, sessions, checkIns, context);
+    const contextBasedChanges = this.generateContextBasedInterfaceChanges(
+      userId,
+      sessions,
+      checkIns,
+      context
+    );
     changes.push(...contextBasedChanges);
 
     // Mood-based interface changes
-    const moodBasedChanges = this.generateMoodBasedInterfaceChanges(userId, sessions, checkIns);
+    const moodBasedChanges = this.generateMoodBasedInterfaceChanges(
+      userId,
+      sessions,
+      checkIns
+    );
     changes.push(...moodBasedChanges);
 
     // Performance-based interface changes
-    const performanceBasedChanges = this.generatePerformanceBasedInterfaceChanges(userId, sessions, checkIns);
+    const performanceBasedChanges =
+      this.generatePerformanceBasedInterfaceChanges(userId, sessions, checkIns);
     changes.push(...performanceBasedChanges);
 
     // Social-based interface changes
-    const socialBasedChanges = this.generateSocialBasedInterfaceChanges(userId, sessions, checkIns);
+    const socialBasedChanges = this.generateSocialBasedInterfaceChanges(
+      userId,
+      sessions,
+      checkIns
+    );
     changes.push(...socialBasedChanges);
 
     return changes;
@@ -475,10 +561,12 @@ export class PredictiveUserExperienceService {
   ): AnticipatoryInterfaceChange[] {
     const changes: AnticipatoryInterfaceChange[] = [];
     const recentCheckIns = checkIns.slice(-3);
-    
+
     if (recentCheckIns.length === 0) return changes;
 
-    const avgMotivation = recentCheckIns.reduce((sum, c) => sum + (c.motivation || 5), 0) / recentCheckIns.length;
+    const avgMotivation =
+      recentCheckIns.reduce((sum, c) => sum + (c.motivation || 5), 0) /
+      recentCheckIns.length;
 
     // High motivation changes
     if (avgMotivation > 7) {
@@ -552,16 +640,25 @@ export class PredictiveUserExperienceService {
   ): AnticipatoryInterfaceChange[] {
     const changes: AnticipatoryInterfaceChange[] = [];
     const recentSessions = sessions.slice(-5);
-    
+
     if (recentSessions.length === 0) return changes;
 
-    const avgPerformance = recentSessions.reduce((sum, session) => {
-      const duration = session.duration || 60;
-      const intensity = session.exercises.reduce((exSum, exercise) => {
-        return exSum + exercise.sets.reduce((setSum, set) => setSum + (set.rpe || 5), 0) / exercise.sets.length;
-      }, 0) / session.exercises.length;
-      return sum + (duration / 60) * (intensity / 10);
-    }, 0) / recentSessions.length;
+    const avgPerformance =
+      recentSessions.reduce((sum, session) => {
+        const duration = session.duration || 60;
+        const intensity =
+          session.exercises.reduce((exSum, exercise) => {
+            return (
+              exSum +
+              exercise.sets.reduce(
+                (setSum, set) => setSum + (set.rpe || 5),
+                0
+              ) /
+                exercise.sets.length
+            );
+          }, 0) / session.exercises.length;
+        return sum + (duration / 60) * (intensity / 10);
+      }, 0) / recentSessions.length;
 
     // High performance changes
     if (avgPerformance > 0.7) {
@@ -603,9 +700,11 @@ export class PredictiveUserExperienceService {
     checkIns: CheckInData[]
   ): AnticipatoryInterfaceChange[] {
     const changes: AnticipatoryInterfaceChange[] = [];
-    const groupSessions = sessions.filter(s => s.type === 'group' || s.type === 'team').length;
+    const groupSessions = sessions.filter(
+      s => s.type === 'group' || s.type === 'team'
+    ).length;
     const totalSessions = sessions.length;
-    
+
     if (totalSessions === 0) return changes;
 
     const socialRatio = groupSessions / totalSessions;
@@ -644,7 +743,9 @@ export class PredictiveUserExperienceService {
     return changes;
   }
 
-  private getDefaultAnticipatoryChanges(userId: string): AnticipatoryInterfaceChange[] {
+  private getDefaultAnticipatoryChanges(
+    userId: string
+  ): AnticipatoryInterfaceChange[] {
     return [
       {
         changeId: `default-${userId}`,
@@ -677,21 +778,31 @@ export class PredictiveUserExperienceService {
   }
 
   // Proactive Content Delivery
-  async generateProactiveContent(userId: string): Promise<ProactiveContentDelivery[]> {
+  async generateProactiveContent(
+    userId: string
+  ): Promise<ProactiveContentDelivery[]> {
     try {
       const sessions = await this.databaseService.getSessions(userId);
       const checkIns = await this.databaseService.getCheckIns(userId);
-      const personalization = deepPersonalization.getLearningStyleProfile(userId);
+      const personalization =
+        deepPersonalization.getLearningStyleProfile(userId);
       const motivation = deepPersonalization.getMotivationProfile(userId);
       const context = contextualIntelligence.getEnvironmentalContext(userId);
-      
+
       if (sessions.length < 3) {
         return this.getDefaultProactiveContent(userId);
       }
 
-      const content = await this.calculateProactiveContent(userId, sessions, checkIns, personalization, motivation, context);
+      const content = await this.calculateProactiveContent(
+        userId,
+        sessions,
+        checkIns,
+        personalization,
+        motivation,
+        context
+      );
       this.proactiveContent.set(userId, content);
-      
+
       return content;
     } catch (error) {
       console.error('Error generating proactive content:', error);
@@ -710,31 +821,62 @@ export class PredictiveUserExperienceService {
     const content: ProactiveContentDelivery[] = [];
 
     // Time-based content
-    const timeBasedContent = this.generateTimeBasedContent(userId, sessions, checkIns, context);
+    const timeBasedContent = this.generateTimeBasedContent(
+      userId,
+      sessions,
+      checkIns,
+      context
+    );
     content.push(...timeBasedContent);
 
     // Behavior-based content
-    const behaviorBasedContent = this.generateBehaviorBasedContent(userId, sessions, checkIns, personalization);
+    const behaviorBasedContent = this.generateBehaviorBasedContent(
+      userId,
+      sessions,
+      checkIns,
+      personalization
+    );
     content.push(...behaviorBasedContent);
 
     // Context-based content
-    const contextBasedContent = this.generateContextBasedContent(userId, sessions, checkIns, context);
+    const contextBasedContent = this.generateContextBasedContent(
+      userId,
+      sessions,
+      checkIns,
+      context
+    );
     content.push(...contextBasedContent);
 
     // Mood-based content
-    const moodBasedContent = this.generateMoodBasedContent(userId, sessions, checkIns);
+    const moodBasedContent = this.generateMoodBasedContent(
+      userId,
+      sessions,
+      checkIns
+    );
     content.push(...moodBasedContent);
 
     // Performance-based content
-    const performanceBasedContent = this.generatePerformanceBasedContent(userId, sessions, checkIns);
+    const performanceBasedContent = this.generatePerformanceBasedContent(
+      userId,
+      sessions,
+      checkIns
+    );
     content.push(...performanceBasedContent);
 
     // Social-based content
-    const socialBasedContent = this.generateSocialBasedContent(userId, sessions, checkIns);
+    const socialBasedContent = this.generateSocialBasedContent(
+      userId,
+      sessions,
+      checkIns
+    );
     content.push(...socialBasedContent);
 
     // Achievement-based content
-    const achievementBasedContent = this.generateAchievementBasedContent(userId, sessions, checkIns);
+    const achievementBasedContent = this.generateAchievementBasedContent(
+      userId,
+      sessions,
+      checkIns
+    );
     content.push(...achievementBasedContent);
 
     return content;
@@ -764,7 +906,8 @@ export class PredictiveUserExperienceService {
         },
         content: {
           title: 'Good Morning!',
-          description: 'Start your day with energy and purpose. Ready to crush your goals?',
+          description:
+            'Start your day with energy and purpose. Ready to crush your goals?',
           media: {
             type: 'image',
             url: '/images/morning-motivation.jpg',
@@ -807,7 +950,8 @@ export class PredictiveUserExperienceService {
         },
         content: {
           title: 'Time to Recover',
-          description: 'Your body has worked hard today. Let\'s focus on recovery and relaxation.',
+          description:
+            "Your body has worked hard today. Let's focus on recovery and relaxation.",
           media: {
             type: 'image',
             url: '/images/evening-recovery.jpg',
@@ -862,7 +1006,8 @@ export class PredictiveUserExperienceService {
         },
         content: {
           title: 'Visual Learning Tips',
-          description: 'Master your form with these visual cues and demonstrations.',
+          description:
+            'Master your form with these visual cues and demonstrations.',
           media: {
             type: 'video',
             url: '/videos/form-demonstration.mp4',
@@ -904,7 +1049,8 @@ export class PredictiveUserExperienceService {
         },
         content: {
           title: 'Hands-On Practice',
-          description: 'Ready to feel the movement? Let\'s get your body moving with this interactive workout.',
+          description:
+            "Ready to feel the movement? Let's get your body moving with this interactive workout.",
           media: {
             type: 'gif',
             url: '/gifs/exercise-demo.gif',
@@ -958,7 +1104,8 @@ export class PredictiveUserExperienceService {
         },
         content: {
           title: 'Perfect Weather for Training!',
-          description: 'Take advantage of this beautiful day with an outdoor workout session.',
+          description:
+            'Take advantage of this beautiful day with an outdoor workout session.',
           media: {
             type: 'image',
             url: '/images/outdoor-workout.jpg',
@@ -1001,7 +1148,8 @@ export class PredictiveUserExperienceService {
         },
         content: {
           title: 'Home Workout Ready',
-          description: 'Your home gym is set up perfectly. Let\'s make the most of it!',
+          description:
+            "Your home gym is set up perfectly. Let's make the most of it!",
           media: {
             type: 'image',
             url: '/images/home-gym.jpg',
@@ -1040,10 +1188,12 @@ export class PredictiveUserExperienceService {
   ): ProactiveContentDelivery[] {
     const content: ProactiveContentDelivery[] = [];
     const recentCheckIns = checkIns.slice(-3);
-    
+
     if (recentCheckIns.length === 0) return content;
 
-    const avgMotivation = recentCheckIns.reduce((sum, c) => sum + (c.motivation || 5), 0) / recentCheckIns.length;
+    const avgMotivation =
+      recentCheckIns.reduce((sum, c) => sum + (c.motivation || 5), 0) /
+      recentCheckIns.length;
 
     // High motivation content
     if (avgMotivation > 7) {
@@ -1058,8 +1208,9 @@ export class PredictiveUserExperienceService {
           confidence: 0.8,
         },
         content: {
-          title: 'You\'re on Fire!',
-          description: 'Your motivation is through the roof! Let\'s channel this energy into an amazing workout.',
+          title: "You're on Fire!",
+          description:
+            "Your motivation is through the roof! Let's channel this energy into an amazing workout.",
           media: {
             type: 'image',
             url: '/images/high-motivation.jpg',
@@ -1101,8 +1252,9 @@ export class PredictiveUserExperienceService {
           confidence: 0.8,
         },
         content: {
-          title: 'We\'ve Got Your Back',
-          description: 'Everyone has off days. Let\'s start small and build your momentum back up.',
+          title: "We've Got Your Back",
+          description:
+            "Everyone has off days. Let's start small and build your momentum back up.",
           media: {
             type: 'image',
             url: '/images/encouragement.jpg',
@@ -1141,16 +1293,25 @@ export class PredictiveUserExperienceService {
   ): ProactiveContentDelivery[] {
     const content: ProactiveContentDelivery[] = [];
     const recentSessions = sessions.slice(-5);
-    
+
     if (recentSessions.length === 0) return content;
 
-    const avgPerformance = recentSessions.reduce((sum, session) => {
-      const duration = session.duration || 60;
-      const intensity = session.exercises.reduce((exSum, exercise) => {
-        return exSum + exercise.sets.reduce((setSum, set) => setSum + (set.rpe || 5), 0) / exercise.sets.length;
-      }, 0) / session.exercises.length;
-      return sum + (duration / 60) * (intensity / 10);
-    }, 0) / recentSessions.length;
+    const avgPerformance =
+      recentSessions.reduce((sum, session) => {
+        const duration = session.duration || 60;
+        const intensity =
+          session.exercises.reduce((exSum, exercise) => {
+            return (
+              exSum +
+              exercise.sets.reduce(
+                (setSum, set) => setSum + (set.rpe || 5),
+                0
+              ) /
+                exercise.sets.length
+            );
+          }, 0) / session.exercises.length;
+        return sum + (duration / 60) * (intensity / 10);
+      }, 0) / recentSessions.length;
 
     // High performance content
     if (avgPerformance > 0.7) {
@@ -1166,7 +1327,8 @@ export class PredictiveUserExperienceService {
         },
         content: {
           title: 'Outstanding Performance!',
-          description: 'You\'ve been crushing it lately. Your consistency and effort are paying off!',
+          description:
+            "You've been crushing it lately. Your consistency and effort are paying off!",
           media: {
             type: 'image',
             url: '/images/achievement.jpg',
@@ -1203,9 +1365,11 @@ export class PredictiveUserExperienceService {
     checkIns: CheckInData[]
   ): ProactiveContentDelivery[] {
     const content: ProactiveContentDelivery[] = [];
-    const groupSessions = sessions.filter(s => s.type === 'group' || s.type === 'team').length;
+    const groupSessions = sessions.filter(
+      s => s.type === 'group' || s.type === 'team'
+    ).length;
     const totalSessions = sessions.length;
-    
+
     if (totalSessions === 0) return content;
 
     const socialRatio = groupSessions / totalSessions;
@@ -1224,7 +1388,8 @@ export class PredictiveUserExperienceService {
         },
         content: {
           title: 'Team Training Time!',
-          description: 'Your friends are online and ready to train together. Join the group session!',
+          description:
+            'Your friends are online and ready to train together. Join the group session!',
           media: {
             type: 'image',
             url: '/images/group-training.jpg',
@@ -1263,7 +1428,7 @@ export class PredictiveUserExperienceService {
   ): ProactiveContentDelivery[] {
     const content: ProactiveContentDelivery[] = [];
     const recentSessions = sessions.slice(-10);
-    
+
     if (recentSessions.length === 0) return content;
 
     // Check for streak achievements
@@ -1284,7 +1449,8 @@ export class PredictiveUserExperienceService {
         },
         content: {
           title: '7-Day Streak!',
-          description: 'Amazing! You\'ve trained for 7 consecutive days. Your dedication is inspiring!',
+          description:
+            "Amazing! You've trained for 7 consecutive days. Your dedication is inspiring!",
           media: {
             type: 'image',
             url: '/images/streak-achievement.jpg',
@@ -1316,7 +1482,9 @@ export class PredictiveUserExperienceService {
     return content;
   }
 
-  private getDefaultProactiveContent(userId: string): ProactiveContentDelivery[] {
+  private getDefaultProactiveContent(
+    userId: string
+  ): ProactiveContentDelivery[] {
     return [
       {
         contentId: `default-welcome-${userId}`,
@@ -1330,7 +1498,8 @@ export class PredictiveUserExperienceService {
         },
         content: {
           title: 'Welcome to Your Training Journey!',
-          description: 'Let\'s start building healthy habits together. Ready to begin?',
+          description:
+            "Let's start building healthy habits together. Ready to begin?",
           action: {
             type: 'start_session',
             target: '/session',
@@ -1362,14 +1531,19 @@ export class PredictiveUserExperienceService {
       if (storedChanges) {
         const changes = JSON.parse(storedChanges);
         Object.entries(changes).forEach(([key, value]) => {
-          this.anticipatoryChanges.set(key, value.map((change: any) => ({
-            ...change,
-            lastUpdated: new Date(change.lastUpdated),
-            timing: {
-              ...change.timing,
-              scheduleTime: change.timing.scheduleTime ? new Date(change.timing.scheduleTime) : undefined,
-            },
-          })));
+          this.anticipatoryChanges.set(
+            key,
+            value.map((change: any) => ({
+              ...change,
+              lastUpdated: new Date(change.lastUpdated),
+              timing: {
+                ...change.timing,
+                scheduleTime: change.timing.scheduleTime
+                  ? new Date(change.timing.scheduleTime)
+                  : undefined,
+              },
+            }))
+          );
         });
       }
 
@@ -1377,14 +1551,19 @@ export class PredictiveUserExperienceService {
       if (storedContent) {
         const content = JSON.parse(storedContent);
         Object.entries(content).forEach(([key, value]) => {
-          this.proactiveContent.set(key, value.map((item: any) => ({
-            ...item,
-            lastUpdated: new Date(item.lastUpdated),
-            delivery: {
-              ...item.delivery,
-              scheduleTime: item.delivery.scheduleTime ? new Date(item.delivery.scheduleTime) : undefined,
-            },
-          })));
+          this.proactiveContent.set(
+            key,
+            value.map((item: any) => ({
+              ...item,
+              lastUpdated: new Date(item.lastUpdated),
+              delivery: {
+                ...item.delivery,
+                scheduleTime: item.delivery.scheduleTime
+                  ? new Date(item.delivery.scheduleTime)
+                  : undefined,
+              },
+            }))
+          );
         });
       }
     } catch (error) {
@@ -1394,8 +1573,14 @@ export class PredictiveUserExperienceService {
 
   private saveData(): void {
     try {
-      localStorage.setItem('anticipatory_changes', JSON.stringify(Object.fromEntries(this.anticipatoryChanges)));
-      localStorage.setItem('proactive_content', JSON.stringify(Object.fromEntries(this.proactiveContent)));
+      localStorage.setItem(
+        'anticipatory_changes',
+        JSON.stringify(Object.fromEntries(this.anticipatoryChanges))
+      );
+      localStorage.setItem(
+        'proactive_content',
+        JSON.stringify(Object.fromEntries(this.proactiveContent))
+      );
     } catch (error) {
       console.error('Error saving data:', error);
     }
@@ -1420,33 +1605,42 @@ export class PredictiveUserExperienceService {
   private async performPredictiveAnalysis(): Promise<void> {
     try {
       const userIds = ['current-user']; // In a real app, this would be dynamic
-      
+
       for (const userId of userIds) {
         await this.generateAnticipatoryInterfaceChanges(userId);
         await this.generateProactiveContent(userId);
       }
-      
     } catch (error) {
       console.error('Error in predictive analysis:', error);
     }
   }
 
   // Smart Recommendation Timing
-  async generateSmartRecommendations(userId: string): Promise<SmartRecommendationTiming[]> {
+  async generateSmartRecommendations(
+    userId: string
+  ): Promise<SmartRecommendationTiming[]> {
     try {
       const sessions = await this.databaseService.getSessions(userId);
       const checkIns = await this.databaseService.getCheckIns(userId);
-      const personalization = deepPersonalization.getLearningStyleProfile(userId);
+      const personalization =
+        deepPersonalization.getLearningStyleProfile(userId);
       const motivation = deepPersonalization.getMotivationProfile(userId);
       const context = contextualIntelligence.getEnvironmentalContext(userId);
-      
+
       if (sessions.length < 3) {
         return this.getDefaultSmartRecommendations(userId);
       }
 
-      const recommendations = await this.calculateSmartRecommendations(userId, sessions, checkIns, personalization, motivation, context);
+      const recommendations = await this.calculateSmartRecommendations(
+        userId,
+        sessions,
+        checkIns,
+        personalization,
+        motivation,
+        context
+      );
       this.smartRecommendations.set(userId, recommendations);
-      
+
       return recommendations;
     } catch (error) {
       console.error('Error generating smart recommendations:', error);
@@ -1465,27 +1659,64 @@ export class PredictiveUserExperienceService {
     const recommendations: SmartRecommendationTiming[] = [];
 
     // Exercise recommendations
-    const exerciseRecommendations = this.generateExerciseRecommendations(userId, sessions, checkIns, personalization, motivation);
+    const exerciseRecommendations = this.generateExerciseRecommendations(
+      userId,
+      sessions,
+      checkIns,
+      personalization,
+      motivation
+    );
     recommendations.push(...exerciseRecommendations);
 
     // Session recommendations
-    const sessionRecommendations = this.generateSessionRecommendations(userId, sessions, checkIns, personalization, motivation, context);
+    const sessionRecommendations = this.generateSessionRecommendations(
+      userId,
+      sessions,
+      checkIns,
+      personalization,
+      motivation,
+      context
+    );
     recommendations.push(...sessionRecommendations);
 
     // Goal recommendations
-    const goalRecommendations = this.generateGoalRecommendations(userId, sessions, checkIns, personalization, motivation);
+    const goalRecommendations = this.generateGoalRecommendations(
+      userId,
+      sessions,
+      checkIns,
+      personalization,
+      motivation
+    );
     recommendations.push(...goalRecommendations);
 
     // Social recommendations
-    const socialRecommendations = this.generateSocialRecommendations(userId, sessions, checkIns, personalization, motivation);
+    const socialRecommendations = this.generateSocialRecommendations(
+      userId,
+      sessions,
+      checkIns,
+      personalization,
+      motivation
+    );
     recommendations.push(...socialRecommendations);
 
     // Recovery recommendations
-    const recoveryRecommendations = this.generateRecoveryRecommendations(userId, sessions, checkIns, personalization, motivation);
+    const recoveryRecommendations = this.generateRecoveryRecommendations(
+      userId,
+      sessions,
+      checkIns,
+      personalization,
+      motivation
+    );
     recommendations.push(...recoveryRecommendations);
 
     // Nutrition recommendations
-    const nutritionRecommendations = this.generateNutritionRecommendations(userId, sessions, checkIns, personalization, motivation);
+    const nutritionRecommendations = this.generateNutritionRecommendations(
+      userId,
+      sessions,
+      checkIns,
+      personalization,
+      motivation
+    );
     recommendations.push(...nutritionRecommendations);
 
     return recommendations;
@@ -1500,21 +1731,29 @@ export class PredictiveUserExperienceService {
   ): SmartRecommendationTiming[] {
     const recommendations: SmartRecommendationTiming[] = [];
     const recentSessions = sessions.slice(-5);
-    
+
     if (recentSessions.length === 0) return recommendations;
 
     // Analyze exercise patterns
     const exerciseCounts: Record<string, number> = {};
     recentSessions.forEach(session => {
       session.exercises.forEach(exercise => {
-        exerciseCounts[exercise.name] = (exerciseCounts[exercise.name] || 0) + 1;
+        exerciseCounts[exercise.name] =
+          (exerciseCounts[exercise.name] || 0) + 1;
       });
     });
 
     // Find underutilized exercises
-    const allExercises = ['Squats', 'Push-ups', 'Lunges', 'Planks', 'Burpees', 'Jumping Jacks'];
-    const underutilizedExercises = allExercises.filter(exercise => 
-      !exerciseCounts[exercise] || exerciseCounts[exercise] < 2
+    const allExercises = [
+      'Squats',
+      'Push-ups',
+      'Lunges',
+      'Planks',
+      'Burpees',
+      'Jumping Jacks',
+    ];
+    const underutilizedExercises = allExercises.filter(
+      exercise => !exerciseCounts[exercise] || exerciseCounts[exercise] < 2
     );
 
     if (underutilizedExercises.length > 0) {
@@ -1532,7 +1771,8 @@ export class PredictiveUserExperienceService {
           title: 'Try New Exercises',
           description: `Consider adding ${underutilizedExercises[0]} to your routine for variety and balanced development.`,
           value: underutilizedExercises[0],
-          reasoning: 'Adding variety to your workouts prevents plateaus and keeps training interesting.',
+          reasoning:
+            'Adding variety to your workouts prevents plateaus and keeps training interesting.',
           alternatives: underutilizedExercises.slice(1, 3),
         },
         timing: {
@@ -1541,8 +1781,20 @@ export class PredictiveUserExperienceService {
           frequency: 'weekly',
         },
         personalization: {
-          learningStyle: personalization ? [personalization.visualPreference > 0.5 ? 'visual' : 'kinesthetic'] : ['kinesthetic'],
-          motivationType: motivation ? [motivation.intrinsicMotivation > 0.5 ? 'intrinsic' : 'achievement'] : ['intrinsic'],
+          learningStyle: personalization
+            ? [
+                personalization.visualPreference > 0.5
+                  ? 'visual'
+                  : 'kinesthetic',
+              ]
+            : ['kinesthetic'],
+          motivationType: motivation
+            ? [
+                motivation.intrinsicMotivation > 0.5
+                  ? 'intrinsic'
+                  : 'achievement',
+              ]
+            : ['intrinsic'],
           challengeLevel: 6,
           socialPreference: 'individual',
           emotionalState: ['curious', 'motivated'],
@@ -1581,14 +1833,16 @@ export class PredictiveUserExperienceService {
         },
         recommendation: {
           title: 'Morning Energy Boost',
-          description: 'Start your day with a high-energy workout to boost your metabolism and mood.',
+          description:
+            'Start your day with a high-energy workout to boost your metabolism and mood.',
           value: {
             type: 'strength',
             duration: 30,
             intensity: 'moderate',
             exercises: ['Squats', 'Push-ups', 'Planks'],
           },
-          reasoning: 'Morning workouts increase energy levels and set a positive tone for the day.',
+          reasoning:
+            'Morning workouts increase energy levels and set a positive tone for the day.',
           alternatives: [
             { type: 'cardio', duration: 20, intensity: 'high' },
             { type: 'yoga', duration: 25, intensity: 'low' },
@@ -1600,8 +1854,20 @@ export class PredictiveUserExperienceService {
           frequency: 'daily',
         },
         personalization: {
-          learningStyle: personalization ? [personalization.kinestheticPreference > 0.5 ? 'kinesthetic' : 'visual'] : ['kinesthetic'],
-          motivationType: motivation ? [motivation.achievementMotivation > 0.5 ? 'achievement' : 'intrinsic'] : ['achievement'],
+          learningStyle: personalization
+            ? [
+                personalization.kinestheticPreference > 0.5
+                  ? 'kinesthetic'
+                  : 'visual',
+              ]
+            : ['kinesthetic'],
+          motivationType: motivation
+            ? [
+                motivation.achievementMotivation > 0.5
+                  ? 'achievement'
+                  : 'intrinsic',
+              ]
+            : ['achievement'],
           challengeLevel: 7,
           socialPreference: 'individual',
           emotionalState: ['energized', 'motivated'],
@@ -1625,14 +1891,16 @@ export class PredictiveUserExperienceService {
         },
         recommendation: {
           title: 'Outdoor Training Opportunity',
-          description: 'Perfect weather for an outdoor workout! Take advantage of the fresh air and natural light.',
+          description:
+            'Perfect weather for an outdoor workout! Take advantage of the fresh air and natural light.',
           value: {
             type: 'outdoor',
             duration: 45,
             intensity: 'moderate',
             exercises: ['Running', 'Bodyweight exercises', 'Stretching'],
           },
-          reasoning: 'Outdoor workouts provide vitamin D, fresh air, and a change of scenery.',
+          reasoning:
+            'Outdoor workouts provide vitamin D, fresh air, and a change of scenery.',
           alternatives: [
             { type: 'indoor', duration: 30, intensity: 'high' },
             { type: 'mixed', duration: 40, intensity: 'moderate' },
@@ -1667,16 +1935,30 @@ export class PredictiveUserExperienceService {
   ): SmartRecommendationTiming[] {
     const recommendations: SmartRecommendationTiming[] = [];
     const recentSessions = sessions.slice(-10);
-    
+
     if (recentSessions.length === 0) return recommendations;
 
     // Analyze progress patterns
-    const avgDuration = recentSessions.reduce((sum, s) => sum + (s.duration || 60), 0) / recentSessions.length;
-    const avgIntensity = recentSessions.reduce((sum, session) => {
-      return sum + session.exercises.reduce((exSum, exercise) => {
-        return exSum + exercise.sets.reduce((setSum, set) => setSum + (set.rpe || 5), 0) / exercise.sets.length;
-      }, 0) / session.exercises.length;
-    }, 0) / recentSessions.length;
+    const avgDuration =
+      recentSessions.reduce((sum, s) => sum + (s.duration || 60), 0) /
+      recentSessions.length;
+    const avgIntensity =
+      recentSessions.reduce((sum, session) => {
+        return (
+          sum +
+          session.exercises.reduce((exSum, exercise) => {
+            return (
+              exSum +
+              exercise.sets.reduce(
+                (setSum, set) => setSum + (set.rpe || 5),
+                0
+              ) /
+                exercise.sets.length
+            );
+          }, 0) /
+            session.exercises.length
+        );
+      }, 0) / recentSessions.length;
 
     // Progress-based goal recommendations
     if (avgDuration > 45 && avgIntensity > 6) {
@@ -1692,17 +1974,32 @@ export class PredictiveUserExperienceService {
         },
         recommendation: {
           title: 'Ready for Advanced Goals',
-          description: 'Your consistent high performance suggests you\'re ready for more challenging goals.',
+          description:
+            "Your consistent high performance suggests you're ready for more challenging goals.",
           value: {
             type: 'strength',
             target: 'Increase weight by 10%',
             timeframe: '4 weeks',
-            milestones: ['Week 1: +2.5%', 'Week 2: +5%', 'Week 3: +7.5%', 'Week 4: +10%'],
+            milestones: [
+              'Week 1: +2.5%',
+              'Week 2: +5%',
+              'Week 3: +7.5%',
+              'Week 4: +10%',
+            ],
           },
-          reasoning: 'Your current performance level indicates readiness for progressive overload.',
+          reasoning:
+            'Your current performance level indicates readiness for progressive overload.',
           alternatives: [
-            { type: 'endurance', target: 'Increase duration by 20%', timeframe: '3 weeks' },
-            { type: 'skill', target: 'Master new exercise', timeframe: '6 weeks' },
+            {
+              type: 'endurance',
+              target: 'Increase duration by 20%',
+              timeframe: '3 weeks',
+            },
+            {
+              type: 'skill',
+              target: 'Master new exercise',
+              timeframe: '6 weeks',
+            },
           ],
         },
         timing: {
@@ -1733,9 +2030,11 @@ export class PredictiveUserExperienceService {
     motivation: any
   ): SmartRecommendationTiming[] {
     const recommendations: SmartRecommendationTiming[] = [];
-    const groupSessions = sessions.filter(s => s.type === 'group' || s.type === 'team').length;
+    const groupSessions = sessions.filter(
+      s => s.type === 'group' || s.type === 'team'
+    ).length;
     const totalSessions = sessions.length;
-    
+
     if (totalSessions === 0) return recommendations;
 
     const socialRatio = groupSessions / totalSessions;
@@ -1754,17 +2053,27 @@ export class PredictiveUserExperienceService {
         },
         recommendation: {
           title: 'Connect with Others',
-          description: 'Join a group training session or find a workout partner to boost your motivation.',
+          description:
+            'Join a group training session or find a workout partner to boost your motivation.',
           value: {
             type: 'group_session',
             participants: '2-4 people',
             duration: '45 minutes',
             focus: 'strength_training',
           },
-          reasoning: 'Social training can increase motivation, accountability, and enjoyment.',
+          reasoning:
+            'Social training can increase motivation, accountability, and enjoyment.',
           alternatives: [
-            { type: 'workout_partner', participants: '1 person', duration: '30 minutes' },
-            { type: 'online_community', participants: 'virtual', duration: 'flexible' },
+            {
+              type: 'workout_partner',
+              participants: '1 person',
+              duration: '30 minutes',
+            },
+            {
+              type: 'online_community',
+              participants: 'virtual',
+              duration: 'flexible',
+            },
           ],
         },
         timing: {
@@ -1796,16 +2105,31 @@ export class PredictiveUserExperienceService {
   ): SmartRecommendationTiming[] {
     const recommendations: SmartRecommendationTiming[] = [];
     const recentSessions = sessions.slice(-7);
-    
+
     if (recentSessions.length === 0) return recommendations;
 
     // Analyze training load
-    const totalDuration = recentSessions.reduce((sum, s) => sum + (s.duration || 60), 0);
-    const avgIntensity = recentSessions.reduce((sum, session) => {
-      return sum + session.exercises.reduce((exSum, exercise) => {
-        return exSum + exercise.sets.reduce((setSum, set) => setSum + (set.rpe || 5), 0) / exercise.sets.length;
-      }, 0) / session.exercises.length;
-    }, 0) / recentSessions.length;
+    const totalDuration = recentSessions.reduce(
+      (sum, s) => sum + (s.duration || 60),
+      0
+    );
+    const avgIntensity =
+      recentSessions.reduce((sum, session) => {
+        return (
+          sum +
+          session.exercises.reduce((exSum, exercise) => {
+            return (
+              exSum +
+              exercise.sets.reduce(
+                (setSum, set) => setSum + (set.rpe || 5),
+                0
+              ) /
+                exercise.sets.length
+            );
+          }, 0) /
+            session.exercises.length
+        );
+      }, 0) / recentSessions.length;
 
     const trainingLoad = totalDuration * avgIntensity;
 
@@ -1823,17 +2147,27 @@ export class PredictiveUserExperienceService {
         },
         recommendation: {
           title: 'Recovery Day Needed',
-          description: 'Your training load has been high. Consider a recovery day to prevent overtraining.',
+          description:
+            'Your training load has been high. Consider a recovery day to prevent overtraining.',
           value: {
             type: 'active_recovery',
             activities: ['Light stretching', 'Walking', 'Yoga', 'Meditation'],
             duration: '30-45 minutes',
             intensity: 'very_low',
           },
-          reasoning: 'High training load requires adequate recovery to prevent injury and maintain performance.',
+          reasoning:
+            'High training load requires adequate recovery to prevent injury and maintain performance.',
           alternatives: [
-            { type: 'complete_rest', activities: ['Rest', 'Sleep', 'Hydration'], duration: 'full_day' },
-            { type: 'light_movement', activities: ['Gentle yoga', 'Walking'], duration: '20 minutes' },
+            {
+              type: 'complete_rest',
+              activities: ['Rest', 'Sleep', 'Hydration'],
+              duration: 'full_day',
+            },
+            {
+              type: 'light_movement',
+              activities: ['Gentle yoga', 'Walking'],
+              duration: '20 minutes',
+            },
           ],
         },
         timing: {
@@ -1865,7 +2199,7 @@ export class PredictiveUserExperienceService {
   ): SmartRecommendationTiming[] {
     const recommendations: SmartRecommendationTiming[] = [];
     const recentSessions = sessions.slice(-3);
-    
+
     if (recentSessions.length === 0) return recommendations;
 
     // Analyze session timing and intensity
@@ -1874,11 +2208,23 @@ export class PredictiveUserExperienceService {
       return hour >= 6 && hour < 12;
     }).length;
 
-    const avgIntensity = recentSessions.reduce((sum, session) => {
-      return sum + session.exercises.reduce((exSum, exercise) => {
-        return exSum + exercise.sets.reduce((setSum, set) => setSum + (set.rpe || 5), 0) / exercise.sets.length;
-      }, 0) / session.exercises.length;
-    }, 0) / recentSessions.length;
+    const avgIntensity =
+      recentSessions.reduce((sum, session) => {
+        return (
+          sum +
+          session.exercises.reduce((exSum, exercise) => {
+            return (
+              exSum +
+              exercise.sets.reduce(
+                (setSum, set) => setSum + (set.rpe || 5),
+                0
+              ) /
+                exercise.sets.length
+            );
+          }, 0) /
+            session.exercises.length
+        );
+      }, 0) / recentSessions.length;
 
     // Pre-workout nutrition recommendations
     if (morningSessions > 0 && avgIntensity > 6) {
@@ -1894,17 +2240,27 @@ export class PredictiveUserExperienceService {
         },
         recommendation: {
           title: 'Pre-Workout Nutrition',
-          description: 'Fuel your morning workouts with proper pre-workout nutrition for optimal performance.',
+          description:
+            'Fuel your morning workouts with proper pre-workout nutrition for optimal performance.',
           value: {
             type: 'pre_workout',
             timing: '30-60 minutes before',
             foods: ['Banana', 'Oatmeal', 'Greek yogurt', 'Water'],
             avoid: ['Heavy meals', 'High fiber', 'Excessive caffeine'],
           },
-          reasoning: 'Proper pre-workout nutrition provides energy and prevents fatigue during high-intensity sessions.',
+          reasoning:
+            'Proper pre-workout nutrition provides energy and prevents fatigue during high-intensity sessions.',
           alternatives: [
-            { type: 'light_snack', timing: '15-30 minutes before', foods: ['Fruit', 'Nuts'] },
-            { type: 'hydration_focus', timing: '1-2 hours before', foods: ['Water', 'Electrolytes'] },
+            {
+              type: 'light_snack',
+              timing: '15-30 minutes before',
+              foods: ['Fruit', 'Nuts'],
+            },
+            {
+              type: 'hydration_focus',
+              timing: '1-2 hours before',
+              foods: ['Water', 'Electrolytes'],
+            },
           ],
         },
         timing: {
@@ -1927,7 +2283,9 @@ export class PredictiveUserExperienceService {
     return recommendations;
   }
 
-  private getDefaultSmartRecommendations(userId: string): SmartRecommendationTiming[] {
+  private getDefaultSmartRecommendations(
+    userId: string
+  ): SmartRecommendationTiming[] {
     return [
       {
         recommendationId: `default-exercise-${userId}`,
@@ -1941,9 +2299,11 @@ export class PredictiveUserExperienceService {
         },
         recommendation: {
           title: 'Start with Basics',
-          description: 'Begin with fundamental exercises to build a strong foundation.',
+          description:
+            'Begin with fundamental exercises to build a strong foundation.',
           value: 'Squats',
-          reasoning: 'Basic exercises provide a solid foundation for more advanced movements.',
+          reasoning:
+            'Basic exercises provide a solid foundation for more advanced movements.',
           alternatives: ['Push-ups', 'Planks'],
         },
         timing: {
@@ -1965,21 +2325,31 @@ export class PredictiveUserExperienceService {
   }
 
   // Personalized Learning Paths
-  async generatePersonalizedLearningPaths(userId: string): Promise<PersonalizedLearningPath[]> {
+  async generatePersonalizedLearningPaths(
+    userId: string
+  ): Promise<PersonalizedLearningPath[]> {
     try {
       const sessions = await this.databaseService.getSessions(userId);
       const checkIns = await this.databaseService.getCheckIns(userId);
-      const personalization = deepPersonalization.getLearningStyleProfile(userId);
+      const personalization =
+        deepPersonalization.getLearningStyleProfile(userId);
       const motivation = deepPersonalization.getMotivationProfile(userId);
       const context = contextualIntelligence.getEnvironmentalContext(userId);
-      
+
       if (sessions.length < 5) {
         return this.getDefaultLearningPaths(userId);
       }
 
-      const paths = await this.calculatePersonalizedLearningPaths(userId, sessions, checkIns, personalization, motivation, context);
+      const paths = await this.calculatePersonalizedLearningPaths(
+        userId,
+        sessions,
+        checkIns,
+        personalization,
+        motivation,
+        context
+      );
       this.learningPaths.set(userId, paths);
-      
+
       return paths;
     } catch (error) {
       console.error('Error generating personalized learning paths:', error);
@@ -1998,23 +2368,54 @@ export class PredictiveUserExperienceService {
     const paths: PersonalizedLearningPath[] = [];
 
     // Strength training path
-    const strengthPath = this.generateStrengthTrainingPath(userId, sessions, checkIns, personalization, motivation);
+    const strengthPath = this.generateStrengthTrainingPath(
+      userId,
+      sessions,
+      checkIns,
+      personalization,
+      motivation
+    );
     if (strengthPath) paths.push(strengthPath);
 
     // Volleyball skills path
-    const volleyballPath = this.generateVolleyballSkillsPath(userId, sessions, checkIns, personalization, motivation);
+    const volleyballPath = this.generateVolleyballSkillsPath(
+      userId,
+      sessions,
+      checkIns,
+      personalization,
+      motivation
+    );
     if (volleyballPath) paths.push(volleyballPath);
 
     // Plyometric training path
-    const plyometricPath = this.generatePlyometricTrainingPath(userId, sessions, checkIns, personalization, motivation);
+    const plyometricPath = this.generatePlyometricTrainingPath(
+      userId,
+      sessions,
+      checkIns,
+      personalization,
+      motivation
+    );
     if (plyometricPath) paths.push(plyometricPath);
 
     // Recovery and wellness path
-    const recoveryPath = this.generateRecoveryWellnessPath(userId, sessions, checkIns, personalization, motivation);
+    const recoveryPath = this.generateRecoveryWellnessPath(
+      userId,
+      sessions,
+      checkIns,
+      personalization,
+      motivation
+    );
     if (recoveryPath) paths.push(recoveryPath);
 
     // Mixed training path
-    const mixedPath = this.generateMixedTrainingPath(userId, sessions, checkIns, personalization, motivation, context);
+    const mixedPath = this.generateMixedTrainingPath(
+      userId,
+      sessions,
+      checkIns,
+      personalization,
+      motivation,
+      context
+    );
     if (mixedPath) paths.push(mixedPath);
 
     return paths;
@@ -2027,11 +2428,16 @@ export class PredictiveUserExperienceService {
     personalization: any,
     motivation: any
   ): PersonalizedLearningPath | null {
-    const strengthSessions = sessions.filter(s => s.type === 'strength' || s.exercises.some(e => 
-      e.name.toLowerCase().includes('squat') || 
-      e.name.toLowerCase().includes('push') || 
-      e.name.toLowerCase().includes('pull')
-    )).length;
+    const strengthSessions = sessions.filter(
+      s =>
+        s.type === 'strength' ||
+        s.exercises.some(
+          e =>
+            e.name.toLowerCase().includes('squat') ||
+            e.name.toLowerCase().includes('push') ||
+            e.name.toLowerCase().includes('pull')
+        )
+    ).length;
 
     if (strengthSessions < 3) return null;
 
@@ -2047,14 +2453,16 @@ export class PredictiveUserExperienceService {
       },
       path: {
         name: 'Progressive Strength Development',
-        description: 'A comprehensive strength training program designed to build muscle, increase power, and improve overall fitness.',
+        description:
+          'A comprehensive strength training program designed to build muscle, increase power, and improve overall fitness.',
         duration: 12, // weeks
         difficulty: 7,
         phases: [
           {
             phaseId: 'foundation',
             name: 'Foundation Phase',
-            description: 'Build fundamental movement patterns and base strength',
+            description:
+              'Build fundamental movement patterns and base strength',
             duration: 3,
             focus: ['Form', 'Stability', 'Basic movements'],
             exercises: ['Squats', 'Push-ups', 'Planks', 'Lunges'],
@@ -2069,7 +2477,12 @@ export class PredictiveUserExperienceService {
             description: 'Focus on increasing strength and muscle mass',
             duration: 4,
             focus: ['Strength', 'Hypertrophy', 'Progressive overload'],
-            exercises: ['Weighted squats', 'Bench press', 'Deadlifts', 'Pull-ups'],
+            exercises: [
+              'Weighted squats',
+              'Bench press',
+              'Deadlifts',
+              'Pull-ups',
+            ],
             progression: {
               type: 'periodized',
               parameters: { cycles: '4-week blocks' },
@@ -2081,7 +2494,11 @@ export class PredictiveUserExperienceService {
             description: 'Develop explosive power and athletic performance',
             duration: 3,
             focus: ['Power', 'Speed', 'Explosiveness'],
-            exercises: ['Jump squats', 'Plyometric push-ups', 'Medicine ball throws'],
+            exercises: [
+              'Jump squats',
+              'Plyometric push-ups',
+              'Medicine ball throws',
+            ],
             progression: {
               type: 'adaptive',
               parameters: { based_on: 'performance' },
@@ -2093,7 +2510,11 @@ export class PredictiveUserExperienceService {
             description: 'Maximize performance and test strength gains',
             duration: 2,
             focus: ['Peak performance', 'Testing', 'Recovery'],
-            exercises: ['Max effort lifts', 'Performance tests', 'Active recovery'],
+            exercises: [
+              'Max effort lifts',
+              'Performance tests',
+              'Active recovery',
+            ],
             progression: {
               type: 'custom',
               parameters: { tapering: 'performance-based' },
@@ -2119,8 +2540,20 @@ export class PredictiveUserExperienceService {
         ],
       },
       personalization: {
-        learningStyle: personalization ? [personalization.kinestheticPreference > 0.5 ? 'kinesthetic' : 'visual'] : ['kinesthetic'],
-        motivationType: motivation ? [motivation.achievementMotivation > 0.5 ? 'achievement' : 'intrinsic'] : ['achievement'],
+        learningStyle: personalization
+          ? [
+              personalization.kinestheticPreference > 0.5
+                ? 'kinesthetic'
+                : 'visual',
+            ]
+          : ['kinesthetic'],
+        motivationType: motivation
+          ? [
+              motivation.achievementMotivation > 0.5
+                ? 'achievement'
+                : 'intrinsic',
+            ]
+          : ['achievement'],
         challengeLevel: 7,
         socialPreference: 'individual',
         emotionalState: ['motivated', 'focused'],
@@ -2137,11 +2570,16 @@ export class PredictiveUserExperienceService {
     personalization: any,
     motivation: any
   ): PersonalizedLearningPath | null {
-    const volleyballSessions = sessions.filter(s => s.type === 'volleyball' || s.exercises.some(e => 
-      e.name.toLowerCase().includes('volleyball') || 
-      e.name.toLowerCase().includes('spike') || 
-      e.name.toLowerCase().includes('serve')
-    )).length;
+    const volleyballSessions = sessions.filter(
+      s =>
+        s.type === 'volleyball' ||
+        s.exercises.some(
+          e =>
+            e.name.toLowerCase().includes('volleyball') ||
+            e.name.toLowerCase().includes('spike') ||
+            e.name.toLowerCase().includes('serve')
+        )
+    ).length;
 
     if (volleyballSessions < 2) return null;
 
@@ -2157,7 +2595,8 @@ export class PredictiveUserExperienceService {
       },
       path: {
         name: 'Complete Volleyball Skills Development',
-        description: 'Master all aspects of volleyball from basic skills to advanced techniques and game strategy.',
+        description:
+          'Master all aspects of volleyball from basic skills to advanced techniques and game strategy.',
         duration: 16, // weeks
         difficulty: 6,
         phases: [
@@ -2167,7 +2606,12 @@ export class PredictiveUserExperienceService {
             description: 'Learn basic volleyball skills and movement patterns',
             duration: 4,
             focus: ['Passing', 'Setting', 'Serving', 'Footwork'],
-            exercises: ['Wall passes', 'Partner setting', 'Underhand serve', 'Lateral movement'],
+            exercises: [
+              'Wall passes',
+              'Partner setting',
+              'Underhand serve',
+              'Lateral movement',
+            ],
             progression: {
               type: 'linear',
               parameters: { frequency: 'daily practice' },
@@ -2179,7 +2623,11 @@ export class PredictiveUserExperienceService {
             description: 'Refine technique and develop consistency',
             duration: 4,
             focus: ['Accuracy', 'Consistency', 'Timing', 'Positioning'],
-            exercises: ['Target practice', 'Repetitive drills', 'Timing exercises'],
+            exercises: [
+              'Target practice',
+              'Repetitive drills',
+              'Timing exercises',
+            ],
             progression: {
               type: 'periodized',
               parameters: { intensity: 'progressive' },
@@ -2202,7 +2650,11 @@ export class PredictiveUserExperienceService {
             name: 'Competition Phase',
             description: 'Prepare for competitive play and tournaments',
             duration: 4,
-            focus: ['Game situations', 'Pressure handling', 'Team coordination'],
+            focus: [
+              'Game situations',
+              'Pressure handling',
+              'Team coordination',
+            ],
             exercises: ['Scrimmages', 'Pressure drills', 'Team practices'],
             progression: {
               type: 'custom',
@@ -2229,8 +2681,12 @@ export class PredictiveUserExperienceService {
         ],
       },
       personalization: {
-        learningStyle: personalization ? [personalization.visualPreference > 0.5 ? 'visual' : 'kinesthetic'] : ['visual'],
-        motivationType: motivation ? [motivation.socialMotivation > 0.5 ? 'social' : 'achievement'] : ['social'],
+        learningStyle: personalization
+          ? [personalization.visualPreference > 0.5 ? 'visual' : 'kinesthetic']
+          : ['visual'],
+        motivationType: motivation
+          ? [motivation.socialMotivation > 0.5 ? 'social' : 'achievement']
+          : ['social'],
         challengeLevel: 6,
         socialPreference: 'group',
         emotionalState: ['excited', 'focused'],
@@ -2247,11 +2703,16 @@ export class PredictiveUserExperienceService {
     personalization: any,
     motivation: any
   ): PersonalizedLearningPath | null {
-    const plyometricSessions = sessions.filter(s => s.type === 'plyometric' || s.exercises.some(e => 
-      e.name.toLowerCase().includes('jump') || 
-      e.name.toLowerCase().includes('explosive') || 
-      e.name.toLowerCase().includes('plyometric')
-    )).length;
+    const plyometricSessions = sessions.filter(
+      s =>
+        s.type === 'plyometric' ||
+        s.exercises.some(
+          e =>
+            e.name.toLowerCase().includes('jump') ||
+            e.name.toLowerCase().includes('explosive') ||
+            e.name.toLowerCase().includes('plyometric')
+        )
+    ).length;
 
     if (plyometricSessions < 2) return null;
 
@@ -2267,14 +2728,16 @@ export class PredictiveUserExperienceService {
       },
       path: {
         name: 'Explosive Power Development',
-        description: 'Build explosive power, speed, and athletic performance through progressive plyometric training.',
+        description:
+          'Build explosive power, speed, and athletic performance through progressive plyometric training.',
         duration: 8, // weeks
         difficulty: 8,
         phases: [
           {
             phaseId: 'preparation',
             name: 'Preparation Phase',
-            description: 'Build foundation and prepare body for plyometric training',
+            description:
+              'Build foundation and prepare body for plyometric training',
             duration: 2,
             focus: ['Stability', 'Mobility', 'Basic movements'],
             exercises: ['Squats', 'Lunges', 'Calf raises', 'Balance exercises'],
@@ -2301,7 +2764,11 @@ export class PredictiveUserExperienceService {
             description: 'Increase intensity and complexity of movements',
             duration: 2,
             focus: ['Power', 'Speed', 'Coordination'],
-            exercises: ['Depth jumps', 'Single-leg hops', 'Medicine ball throws'],
+            exercises: [
+              'Depth jumps',
+              'Single-leg hops',
+              'Medicine ball throws',
+            ],
             progression: {
               type: 'periodized',
               parameters: { intensity: 'progressive' },
@@ -2313,7 +2780,11 @@ export class PredictiveUserExperienceService {
             description: 'High-intensity explosive movements for maximum power',
             duration: 2,
             focus: ['Maximum power', 'Sport-specific', 'Recovery'],
-            exercises: ['Plyometric push-ups', 'Sprint drills', 'Complex combinations'],
+            exercises: [
+              'Plyometric push-ups',
+              'Sprint drills',
+              'Complex combinations',
+            ],
             progression: {
               type: 'adaptive',
               parameters: { based_on: 'performance' },
@@ -2339,8 +2810,20 @@ export class PredictiveUserExperienceService {
         ],
       },
       personalization: {
-        learningStyle: personalization ? [personalization.kinestheticPreference > 0.5 ? 'kinesthetic' : 'visual'] : ['kinesthetic'],
-        motivationType: motivation ? [motivation.achievementMotivation > 0.5 ? 'achievement' : 'intrinsic'] : ['achievement'],
+        learningStyle: personalization
+          ? [
+              personalization.kinestheticPreference > 0.5
+                ? 'kinesthetic'
+                : 'visual',
+            ]
+          : ['kinesthetic'],
+        motivationType: motivation
+          ? [
+              motivation.achievementMotivation > 0.5
+                ? 'achievement'
+                : 'intrinsic',
+            ]
+          : ['achievement'],
         challengeLevel: 8,
         socialPreference: 'individual',
         emotionalState: ['energized', 'focused'],
@@ -2357,11 +2840,16 @@ export class PredictiveUserExperienceService {
     personalization: any,
     motivation: any
   ): PersonalizedLearningPath | null {
-    const recoverySessions = sessions.filter(s => s.type === 'recovery' || s.exercises.some(e => 
-      e.name.toLowerCase().includes('stretch') || 
-      e.name.toLowerCase().includes('yoga') || 
-      e.name.toLowerCase().includes('recovery')
-    )).length;
+    const recoverySessions = sessions.filter(
+      s =>
+        s.type === 'recovery' ||
+        s.exercises.some(
+          e =>
+            e.name.toLowerCase().includes('stretch') ||
+            e.name.toLowerCase().includes('yoga') ||
+            e.name.toLowerCase().includes('recovery')
+        )
+    ).length;
 
     if (recoverySessions < 2) return null;
 
@@ -2377,7 +2865,8 @@ export class PredictiveUserExperienceService {
       },
       path: {
         name: 'Holistic Recovery & Wellness',
-        description: 'Comprehensive recovery program focusing on physical, mental, and emotional wellness.',
+        description:
+          'Comprehensive recovery program focusing on physical, mental, and emotional wellness.',
         duration: 6, // weeks
         difficulty: 3,
         phases: [
@@ -2387,7 +2876,11 @@ export class PredictiveUserExperienceService {
             description: 'Establish basic recovery habits and routines',
             duration: 2,
             focus: ['Sleep', 'Hydration', 'Basic stretching'],
-            exercises: ['Gentle stretching', 'Breathing exercises', 'Sleep hygiene'],
+            exercises: [
+              'Gentle stretching',
+              'Breathing exercises',
+              'Sleep hygiene',
+            ],
             progression: {
               type: 'linear',
               parameters: { consistency: 'daily practice' },
@@ -2437,8 +2930,12 @@ export class PredictiveUserExperienceService {
         ],
       },
       personalization: {
-        learningStyle: personalization ? [personalization.auditoryPreference > 0.5 ? 'auditory' : 'visual'] : ['visual'],
-        motivationType: motivation ? [motivation.intrinsicMotivation > 0.5 ? 'intrinsic' : 'mastery'] : ['intrinsic'],
+        learningStyle: personalization
+          ? [personalization.auditoryPreference > 0.5 ? 'auditory' : 'visual']
+          : ['visual'],
+        motivationType: motivation
+          ? [motivation.intrinsicMotivation > 0.5 ? 'intrinsic' : 'mastery']
+          : ['intrinsic'],
         challengeLevel: 3,
         socialPreference: 'individual',
         emotionalState: ['calm', 'focused'],
@@ -2471,17 +2968,23 @@ export class PredictiveUserExperienceService {
       },
       path: {
         name: 'Balanced Athletic Development',
-        description: 'Comprehensive training program combining strength, skill, power, and recovery for complete athletic development.',
+        description:
+          'Comprehensive training program combining strength, skill, power, and recovery for complete athletic development.',
         duration: 12, // weeks
         difficulty: 6,
         phases: [
           {
             phaseId: 'foundation',
             name: 'Foundation Phase',
-            description: 'Build balanced foundation across all training modalities',
+            description:
+              'Build balanced foundation across all training modalities',
             duration: 3,
             focus: ['Movement quality', 'Basic strength', 'Skill development'],
-            exercises: ['Fundamental movements', 'Basic skills', 'Recovery practices'],
+            exercises: [
+              'Fundamental movements',
+              'Basic skills',
+              'Recovery practices',
+            ],
             progression: {
               type: 'linear',
               parameters: { frequency: 'balanced approach' },
@@ -2493,7 +2996,11 @@ export class PredictiveUserExperienceService {
             description: 'Develop specific qualities while maintaining balance',
             duration: 4,
             focus: ['Strength', 'Power', 'Skills', 'Recovery'],
-            exercises: ['Progressive strength', 'Plyometric training', 'Skill practice'],
+            exercises: [
+              'Progressive strength',
+              'Plyometric training',
+              'Skill practice',
+            ],
             progression: {
               type: 'periodized',
               parameters: { emphasis: 'rotating focus' },
@@ -2502,10 +3009,15 @@ export class PredictiveUserExperienceService {
           {
             phaseId: 'integration',
             name: 'Integration Phase',
-            description: 'Integrate all training components for optimal performance',
+            description:
+              'Integrate all training components for optimal performance',
             duration: 3,
             focus: ['Integration', 'Performance', 'Recovery'],
-            exercises: ['Complex movements', 'Performance testing', 'Active recovery'],
+            exercises: [
+              'Complex movements',
+              'Performance testing',
+              'Active recovery',
+            ],
             progression: {
               type: 'adaptive',
               parameters: { based_on: 'performance_metrics' },
@@ -2548,14 +3060,20 @@ export class PredictiveUserExperienceService {
         ],
       },
       personalization: {
-        learningStyle: personalization ? [
-          personalization.visualPreference > 0.5 ? 'visual' : 'kinesthetic',
-          personalization.auditoryPreference > 0.5 ? 'auditory' : 'visual'
-        ] : ['visual', 'kinesthetic'],
-        motivationType: motivation ? [
-          motivation.intrinsicMotivation > 0.5 ? 'intrinsic' : 'achievement',
-          motivation.socialMotivation > 0.5 ? 'social' : 'mastery'
-        ] : ['intrinsic', 'achievement'],
+        learningStyle: personalization
+          ? [
+              personalization.visualPreference > 0.5 ? 'visual' : 'kinesthetic',
+              personalization.auditoryPreference > 0.5 ? 'auditory' : 'visual',
+            ]
+          : ['visual', 'kinesthetic'],
+        motivationType: motivation
+          ? [
+              motivation.intrinsicMotivation > 0.5
+                ? 'intrinsic'
+                : 'achievement',
+              motivation.socialMotivation > 0.5 ? 'social' : 'mastery',
+            ]
+          : ['intrinsic', 'achievement'],
         challengeLevel: 6,
         socialPreference: 'mixed',
         emotionalState: ['motivated', 'focused'],
@@ -2578,8 +3096,9 @@ export class PredictiveUserExperienceService {
           confidence: 0.5,
         },
         path: {
-          name: 'Beginner\'s Journey',
-          description: 'A gentle introduction to fitness with a focus on building healthy habits.',
+          name: "Beginner's Journey",
+          description:
+            'A gentle introduction to fitness with a focus on building healthy habits.',
           duration: 4,
           difficulty: 3,
           phases: [
@@ -2601,7 +3120,12 @@ export class PredictiveUserExperienceService {
               description: 'Increase intensity and add variety',
               duration: 2,
               focus: ['Progression', 'Variety', 'Consistency'],
-              exercises: ['Lunges', 'Modified push-ups', 'Holding planks', 'Light jogging'],
+              exercises: [
+                'Lunges',
+                'Modified push-ups',
+                'Holding planks',
+                'Light jogging',
+              ],
               progression: {
                 type: 'linear',
                 parameters: { intensity: 'gradual increase' },

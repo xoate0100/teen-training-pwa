@@ -127,15 +127,14 @@ export class OfflineHandler {
 
   // Process sync queue when back online
   static async processSyncQueue(syncFunctions: {
-    // eslint-disable-next-line no-unused-vars
     syncSession: (data: any) => Promise<void>;
-    // eslint-disable-next-line no-unused-vars
+
     syncCheckIn: (data: any) => Promise<void>;
-    // eslint-disable-next-line no-unused-vars
+
     syncProgressMetric: (data: any) => Promise<void>;
-    // eslint-disable-next-line no-unused-vars
+
     syncAchievement: (data: any) => Promise<void>;
-    // eslint-disable-next-line no-unused-vars
+
     syncNotification: (data: any) => Promise<void>;
   }): Promise<{ success: number; failed: number }> {
     const queue = this.getSyncQueue();

@@ -1,6 +1,5 @@
 'use client';
 
-/* eslint-disable no-unused-vars */
 import React, { useState } from 'react';
 import { useTheme } from '@/components/theme-provider';
 import {

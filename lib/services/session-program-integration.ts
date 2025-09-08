@@ -564,7 +564,7 @@ export class SessionProgramIntegration {
   async generateSessionProgram(
     userId: string,
     sessionType: string,
-    // eslint-disable-next-line no-unused-vars
+
     customizations?: Record<string, any>
   ): Promise<SessionProgram> {
     const context = await this.fetchProgramData(userId);
@@ -595,7 +595,7 @@ export class SessionProgramIntegration {
   }
 
   // Get current day of the week
-  // eslint-disable-next-line no-unused-vars
+
   getCurrentDay(context: SessionContext): number {
     const today = new Date();
     return today.getDay(); // 0 = Sunday, 1 = Monday, etc.

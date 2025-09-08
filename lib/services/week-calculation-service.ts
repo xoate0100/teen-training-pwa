@@ -52,15 +52,15 @@ export class WeekCalculationService {
   ): { week: number; day: number } {
     const start = new Date(programStartDate);
     const current = new Date(currentDate);
-    
+
     // Calculate days since start
     const timeDiff = current.getTime() - start.getTime();
     const daysSinceStart = Math.floor(timeDiff / (1000 * 60 * 60 * 24));
-    
+
     // Calculate week and day
     const week = Math.floor(daysSinceStart / 7) + 1;
     const day = (daysSinceStart % 7) + 1;
-    
+
     return { week, day };
   }
 
@@ -90,34 +90,34 @@ export class WeekCalculationService {
   ): string | null {
     const current = new Date(currentDate);
     const sessionsThisWeek = this.getSessionsForWeek(sessions, currentDate);
-    
+
     // If we haven't reached the session frequency for this week, find next available day
     if (sessionsThisWeek.length < config.sessionFrequency) {
       for (let i = 1; i <= 7; i++) {
         const nextDate = new Date(current);
         nextDate.setDate(current.getDate() + i);
         const dayOfWeek = nextDate.getDay();
-        
+
         if (!this.isRestDay(dayOfWeek, config)) {
           return nextDate.toISOString().split('T')[0];
         }
       }
     }
-    
+
     // If we've completed this week's sessions, find next week's first session
     const nextWeekStart = new Date(current);
     nextWeekStart.setDate(current.getDate() + (7 - current.getDay()));
-    
+
     for (let i = 0; i < 7; i++) {
       const checkDate = new Date(nextWeekStart);
       checkDate.setDate(nextWeekStart.getDate() + i);
       const dayOfWeek = checkDate.getDay();
-      
+
       if (!this.isRestDay(dayOfWeek, config)) {
         return checkDate.toISOString().split('T')[0];
       }
     }
-    
+
     return null;
   }
 
@@ -131,7 +131,7 @@ export class WeekCalculationService {
     weekStart.setDate(targetDate.getDate() - targetDate.getDay());
     const weekEnd = new Date(weekStart);
     weekEnd.setDate(weekStart.getDate() + 6);
-    
+
     return sessions.filter(session => {
       const sessionDate = new Date(session.date);
       return sessionDate >= weekStart && sessionDate <= weekEnd;
@@ -147,7 +147,7 @@ export class WeekCalculationService {
     const { week: currentWeek } = this.calculateCurrentWeek(programStartDate);
     const expectedSessions = (currentWeek - 1) * config.sessionFrequency;
     const actualSessions = sessions.filter(s => s.completed).length;
-    
+
     return Math.max(0, expectedSessions - actualSessions);
   }
 
@@ -167,10 +167,10 @@ export class WeekCalculationService {
     const start = new Date(programStartDate);
     const weekStart = new Date(start);
     weekStart.setDate(start.getDate() + (weekNumber - 1) * 7);
-    
+
     const weekEnd = new Date(weekStart);
     weekEnd.setDate(weekStart.getDate() + 6);
-    
+
     return {
       startDate: weekStart.toISOString().split('T')[0],
       endDate: weekEnd.toISOString().split('T')[0],
@@ -187,7 +187,7 @@ export class WeekCalculationService {
     if (weekCalculation.isDeloadWeek) {
       return 'low';
     }
-    
+
     // Check recent wellness data
     const recentCheckIn = recentCheckIns[0];
     if (recentCheckIn) {
@@ -195,7 +195,7 @@ export class WeekCalculationService {
       if (avgWellness <= 4) return 'low';
       if (avgWellness <= 6) return 'moderate';
     }
-    
+
     // Check recent session intensity
     const recentSession = recentSessions[0];
     if (recentSession) {
@@ -203,10 +203,10 @@ export class WeekCalculationService {
       if (avgRPE >= 8) return 'low'; // High RPE last session, go lighter
       if (avgRPE <= 5) return 'high'; // Low RPE last session, can go harder
     }
-    
+
     // Check missed sessions
     if (weekCalculation.missedSessions > 2) return 'low';
-    
+
     // Default to moderate
     return 'moderate';
   }
@@ -223,7 +223,7 @@ export class WeekCalculationService {
       programStartDate,
       currentDate
     );
-    
+
     const isDeloadWeek = this.isDeloadWeek(currentWeek, config);
     const isRestDay = this.isRestDay(new Date(currentDate).getDay(), config);
     const nextSessionDate = this.calculateNextSessionDate(
@@ -239,7 +239,7 @@ export class WeekCalculationService {
     const programProgress = this.calculateProgramProgress(currentWeek, config);
     const weekDates = this.getWeekDates(currentWeek, programStartDate);
     const sessionsThisWeek = this.getSessionsForWeek(sessions, currentDate);
-    
+
     const weekCalculation: WeekCalculation = {
       currentWeek,
       currentDay,
@@ -253,14 +253,14 @@ export class WeekCalculationService {
       sessionsThisWeek,
       recommendedIntensity: 'moderate',
     };
-    
+
     // Calculate recommended intensity
     weekCalculation.recommendedIntensity = this.calculateRecommendedIntensity(
       weekCalculation,
       checkIns,
       sessions
     );
-    
+
     return weekCalculation;
   }
 
@@ -268,17 +268,18 @@ export class WeekCalculationService {
   static generateSessionRecommendation(
     weekCalculation: WeekCalculation,
     recentCheckIns: CheckInData[],
-    // eslint-disable-next-line no-unused-vars
+
     recentSessions: SessionData[]
   ): SessionRecommendation {
     const shouldTrain = !weekCalculation.isRestDay;
     let reason = '';
-    let recommendedType: 'strength' | 'volleyball' | 'conditioning' | 'rest' = 'strength';
+    let recommendedType: 'strength' | 'volleyball' | 'conditioning' | 'rest' =
+      'strength';
     let intensity = weekCalculation.recommendedIntensity;
     let duration = 60; // Default 60 minutes
     let focus: string[] = [];
-    let warnings: string[] = [];
-    
+    const warnings: string[] = [];
+
     // Determine if should train
     if (weekCalculation.isRestDay) {
       reason = 'Rest day scheduled';
@@ -292,7 +293,7 @@ export class WeekCalculationService {
     } else {
       reason = 'Ready for training';
     }
-    
+
     // Determine session type based on week and progress
     if (weekCalculation.isDeloadWeek) {
       recommendedType = 'conditioning';
@@ -309,7 +310,7 @@ export class WeekCalculationService {
         focus = ['compound movements', 'progressive overload'];
       }
     }
-    
+
     // Adjust based on recent wellness
     const recentCheckIn = recentCheckIns[0];
     if (recentCheckIn) {
@@ -318,23 +319,23 @@ export class WeekCalculationService {
         intensity = 'low';
         duration = Math.min(duration, 45);
       }
-      
+
       if (recentCheckIn.sleep < 6) {
         warnings.push('Poor sleep quality - monitor fatigue');
         intensity = 'moderate';
       }
-      
+
       if (recentCheckIn.energy <= 3) {
         warnings.push('Low energy - consider postponing session');
         recommendedType = 'rest';
         reason = 'Low energy levels detected';
       }
     }
-    
+
     // Adjust duration based on intensity
     if (intensity === 'low') duration = 45;
     else if (intensity === 'high') duration = 90;
-    
+
     return {
       shouldTrain,
       reason,
@@ -347,10 +348,7 @@ export class WeekCalculationService {
   }
 
   // Get program configuration for a user
-  static getProgramConfig(
-    // eslint-disable-next-line no-unused-vars
-    userId: string
-  ): ProgramConfig {
+  static getProgramConfig(userId: string): ProgramConfig {
     // In a real implementation, this would fetch from database
     // For now, return default config
     return { ...this.DEFAULT_CONFIG };

@@ -45,13 +45,22 @@ export class ProgramPhaseService {
     {
       id: 'foundation',
       name: 'Foundation Phase',
-      description: 'Building basic movement patterns and establishing consistency',
+      description:
+        'Building basic movement patterns and establishing consistency',
       duration: 4,
       intensity: 'low',
       volume: 'moderate',
       focus: ['movement quality', 'consistency', 'basic strength'],
-      characteristics: ['Learning exercises', 'Building habits', 'Low intensity'],
-      recommendations: ['Focus on form', 'Consistent schedule', 'Gradual progression'],
+      characteristics: [
+        'Learning exercises',
+        'Building habits',
+        'Low intensity',
+      ],
+      recommendations: [
+        'Focus on form',
+        'Consistent schedule',
+        'Gradual progression',
+      ],
     },
     {
       id: 'strength',
@@ -62,7 +71,11 @@ export class ProgramPhaseService {
       volume: 'moderate',
       focus: ['progressive overload', 'strength gains', 'compound movements'],
       characteristics: ['Heavy weights', 'Low reps', 'Long rest periods'],
-      recommendations: ['Track progression', 'Prioritize recovery', 'Monitor form'],
+      recommendations: [
+        'Track progression',
+        'Prioritize recovery',
+        'Monitor form',
+      ],
     },
     {
       id: 'hypertrophy',
@@ -73,7 +86,11 @@ export class ProgramPhaseService {
       volume: 'high',
       focus: ['muscle growth', 'time under tension', 'pump'],
       characteristics: ['Moderate weights', 'Higher reps', 'Shorter rest'],
-      recommendations: ['Focus on mind-muscle connection', 'Control tempo', 'Adequate protein'],
+      recommendations: [
+        'Focus on mind-muscle connection',
+        'Control tempo',
+        'Adequate protein',
+      ],
     },
     {
       id: 'power',
@@ -84,7 +101,11 @@ export class ProgramPhaseService {
       volume: 'low',
       focus: ['explosive movements', 'speed', 'athletic performance'],
       characteristics: ['Explosive exercises', 'Low volume', 'High intensity'],
-      recommendations: ['Warm up thoroughly', 'Focus on speed', 'Adequate recovery'],
+      recommendations: [
+        'Warm up thoroughly',
+        'Focus on speed',
+        'Adequate recovery',
+      ],
     },
     {
       id: 'deload',
@@ -104,36 +125,67 @@ export class ProgramPhaseService {
       fromPhase: 'foundation',
       toPhase: 'strength',
       trigger: 'Consistent training for 4 weeks',
-      conditions: ['No missed sessions for 2 weeks', 'Form is solid', 'No injuries'],
-      recommendations: ['Gradually increase intensity', 'Focus on compound movements'],
+      conditions: [
+        'No missed sessions for 2 weeks',
+        'Form is solid',
+        'No injuries',
+      ],
+      recommendations: [
+        'Gradually increase intensity',
+        'Focus on compound movements',
+      ],
     },
     {
       fromPhase: 'strength',
       toPhase: 'hypertrophy',
       trigger: 'Strength gains plateau',
-      conditions: ['No strength gains for 2 weeks', 'Recovery is good', 'No overtraining'],
+      conditions: [
+        'No strength gains for 2 weeks',
+        'Recovery is good',
+        'No overtraining',
+      ],
       recommendations: ['Increase volume', 'Focus on muscle growth'],
     },
     {
       fromPhase: 'hypertrophy',
       toPhase: 'power',
       trigger: 'Hypertrophy goals achieved',
-      conditions: ['Muscle growth goals met', 'Strength maintained', 'Ready for intensity'],
-      recommendations: ['Reduce volume', 'Increase intensity', 'Focus on speed'],
+      conditions: [
+        'Muscle growth goals met',
+        'Strength maintained',
+        'Ready for intensity',
+      ],
+      recommendations: [
+        'Reduce volume',
+        'Increase intensity',
+        'Focus on speed',
+      ],
     },
     {
       fromPhase: 'power',
       toPhase: 'deload',
       trigger: 'Power phase completed',
       conditions: ['3 weeks completed', 'High fatigue levels', 'Need recovery'],
-      recommendations: ['Reduce all training', 'Focus on recovery', 'Prepare for next cycle'],
+      recommendations: [
+        'Reduce all training',
+        'Focus on recovery',
+        'Prepare for next cycle',
+      ],
     },
     {
       fromPhase: 'deload',
       toPhase: 'strength',
       trigger: 'Deload week completed',
-      conditions: ['Recovery is complete', 'Energy levels restored', 'Ready for intensity'],
-      recommendations: ['Resume normal training', 'Start new cycle', 'Apply lessons learned'],
+      conditions: [
+        'Recovery is complete',
+        'Energy levels restored',
+        'Ready for intensity',
+      ],
+      recommendations: [
+        'Resume normal training',
+        'Start new cycle',
+        'Apply lessons learned',
+      ],
     },
   ];
 
@@ -145,7 +197,7 @@ export class ProgramPhaseService {
   ): ProgramPhase {
     // Simple phase determination based on week number
     // In a real implementation, this would be more sophisticated
-    
+
     if (weekNumber <= 4) {
       return this.PHASES.find(p => p.id === 'foundation')!;
     } else if (weekNumber <= 10) {
@@ -166,36 +218,48 @@ export class ProgramPhaseService {
   ): number {
     // Calculate which week within the current phase
     let phaseStartWeek = 1;
-    
+
     if (currentPhase.id === 'strength') phaseStartWeek = 5;
     else if (currentPhase.id === 'hypertrophy') phaseStartWeek = 11;
     else if (currentPhase.id === 'power') phaseStartWeek = 15;
     else if (currentPhase.id === 'deload') phaseStartWeek = 18;
-    
+
     const weeksIntoPhase = weekNumber - phaseStartWeek + 1;
     return Math.min(100, (weeksIntoPhase / currentPhase.duration) * 100);
   }
 
   // Determine next phase
   static determineNextPhase(currentPhase: ProgramPhase): ProgramPhase | null {
-    const transition = this.TRANSITIONS.find(t => t.fromPhase === currentPhase.id);
+    const transition = this.TRANSITIONS.find(
+      t => t.fromPhase === currentPhase.id
+    );
     if (!transition) return null;
-    
+
     return this.PHASES.find(p => p.id === transition.toPhase) || null;
   }
 
   // Calculate transition readiness
   static calculateTransitionReadiness(
     currentPhase: ProgramPhase,
-    // eslint-disable-next-line no-unused-vars
+
     sessions: SessionData[],
-    // eslint-disable-next-line no-unused-vars
+
     checkIns: CheckInData[]
   ): number {
     // Use parameters to avoid linting errors
-    console.debug('Calculating transition readiness for phase:', currentPhase.id, 'with', sessions.length, 'sessions and', checkIns.length, 'check-ins');
-    
-    const transition = this.TRANSITIONS.find(t => t.fromPhase === currentPhase.id);
+    console.debug(
+      'Calculating transition readiness for phase:',
+      currentPhase.id,
+      'with',
+      sessions.length,
+      'sessions and',
+      checkIns.length,
+      'check-ins'
+    );
+
+    const transition = this.TRANSITIONS.find(
+      t => t.fromPhase === currentPhase.id
+    );
     if (!transition) return 0;
 
     let readiness = 0;
@@ -211,7 +275,9 @@ export class ProgramPhaseService {
     // Check form quality (based on RPE consistency)
     if (conditions.includes('Form is solid')) {
       const recentSessions = sessions.slice(0, 7);
-      const avgRPE = recentSessions.reduce((sum, s) => sum + s.totalRPE, 0) / recentSessions.length;
+      const avgRPE =
+        recentSessions.reduce((sum, s) => sum + s.totalRPE, 0) /
+        recentSessions.length;
       if (avgRPE < 7) readiness += 25; // Low RPE suggests good form
     }
 
@@ -329,7 +395,11 @@ export class ProgramPhaseService {
     sessions: SessionData[],
     checkIns: CheckInData[]
   ): PhaseAnalysis {
-    const currentPhase = this.determineCurrentPhase(weekNumber, sessions, checkIns);
+    const currentPhase = this.determineCurrentPhase(
+      weekNumber,
+      sessions,
+      checkIns
+    );
     const phaseProgress = this.calculatePhaseProgress(currentPhase, weekNumber);
     const nextPhase = this.determineNextPhase(currentPhase);
     const transitionReadiness = this.calculateTransitionReadiness(
@@ -342,7 +412,8 @@ export class ProgramPhaseService {
       phaseProgress,
       transitionReadiness
     );
-    const intensityAdjustments = this.calculateIntensityAdjustments(currentPhase);
+    const intensityAdjustments =
+      this.calculateIntensityAdjustments(currentPhase);
     const volumeAdjustments = this.calculateVolumeAdjustments(currentPhase);
 
     return {

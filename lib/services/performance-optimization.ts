@@ -55,7 +55,10 @@ export interface PerformanceMetrics {
 
 export class PerformanceOptimizationService {
   private databaseService = new DatabaseService();
-  private memoryCache: Map<string, { data: any; timestamp: number; accessCount: number }> = new Map();
+  private memoryCache: Map<
+    string,
+    { data: any; timestamp: number; accessCount: number }
+  > = new Map();
   private cacheStrategy: CacheStrategy = {
     type: 'memory',
     ttl: 300000, // 5 minutes
@@ -128,13 +131,13 @@ export class PerformanceOptimizationService {
   private performCleanup() {
     // Clean expired cache entries
     this.cleanExpiredCacheEntries();
-    
+
     // Clean up memory cache if size exceeds limit
     this.cleanMemoryCache();
-    
+
     // Clear debounce timers
     this.clearDebounceTimers();
-    
+
     // Update performance metrics
     this.updatePerformanceMetrics();
   }
@@ -153,7 +156,7 @@ export class PerformanceOptimizationService {
   private cleanMemoryCache() {
     if (this.memoryCache.size > this.cacheStrategy.maxSize) {
       const entries = Array.from(this.memoryCache.entries());
-      
+
       switch (this.cacheStrategy.evictionPolicy) {
         case 'lru':
           // Remove least recently used entries
@@ -168,9 +171,12 @@ export class PerformanceOptimizationService {
           entries.sort(() => Math.random() - 0.5);
           break;
       }
-      
+
       // Remove excess entries
-      const toRemove = entries.slice(0, entries.length - this.cacheStrategy.maxSize);
+      const toRemove = entries.slice(
+        0,
+        entries.length - this.cacheStrategy.maxSize
+      );
       toRemove.forEach(([key]) => this.memoryCache.delete(key));
     }
   }
@@ -179,7 +185,7 @@ export class PerformanceOptimizationService {
   private clearDebounceTimers() {
     for (const [key, timer] of this.debounceTimers.entries()) {
       // eslint-disable-next-line no-undef
-clearTimeout(timer);
+      clearTimeout(timer);
       this.debounceTimers.delete(key);
     }
   }
@@ -188,8 +194,8 @@ clearTimeout(timer);
   private updateMemoryUsage() {
     // eslint-disable-next-line no-undef
     if (performance.memory) {
-      // eslint-disable-next-line no-undef
-      this.performanceMetrics.memoryUsage = performance.memory.usedJSHeapSize / (1024 * 1024); // Convert to MB
+      this.performanceMetrics.memoryUsage =
+        performance.memory.usedJSHeapSize / (1024 * 1024); // Convert to MB
     }
   }
 
@@ -202,8 +208,14 @@ clearTimeout(timer);
 
   // Calculate cache hit rate
   private calculateCacheHitRate(): number {
-    const totalAccesses = Array.from(this.memoryCache.values()).reduce((sum, entry) => sum + entry.accessCount, 0);
-    const cacheHits = Array.from(this.memoryCache.values()).reduce((sum, entry) => sum + (entry.accessCount > 1 ? 1 : 0), 0);
+    const totalAccesses = Array.from(this.memoryCache.values()).reduce(
+      (sum, entry) => sum + entry.accessCount,
+      0
+    );
+    const cacheHits = Array.from(this.memoryCache.values()).reduce(
+      (sum, entry) => sum + (entry.accessCount > 1 ? 1 : 0),
+      0
+    );
     return totalAccesses > 0 ? (cacheHits / totalAccesses) * 100 : 0;
   }
 
@@ -217,23 +229,24 @@ clearTimeout(timer);
   }
 
   // Paginate sessions
-  async paginateSessions(options: PaginationOptions): Promise<PaginatedResult<SessionData>> {
-    const startTime = // eslint-disable-next-line no-undef
-performance.now();
-    
+  async paginateSessions(
+    options: PaginationOptions
+  ): Promise<PaginatedResult<SessionData>> {
+    const startTime = performance.now();
+
     try {
       // Check cache first
       const cacheKey = `sessions_${JSON.stringify(options)}`;
       const cached = this.getFromCache(cacheKey);
       if (cached) {
-        this.performanceMetrics.queryTime = // eslint-disable-next-line no-undef
-performance.now() - startTime;
+        this.performanceMetrics.queryTime = performance.now() - startTime;
         return cached;
       }
 
       // Fetch data from database
-      const allSessions = await this.databaseService.getSessions('current-user');
-      
+      const allSessions =
+        await this.databaseService.getSessions('current-user');
+
       // Apply filters
       let filteredSessions = allSessions;
       if (options.filters) {
@@ -242,7 +255,11 @@ performance.now() - startTime;
 
       // Apply sorting
       if (options.sortBy) {
-        filteredSessions = this.applySorting(filteredSessions, options.sortBy, options.sortOrder || 'asc');
+        filteredSessions = this.applySorting(
+          filteredSessions,
+          options.sortBy,
+          options.sortOrder || 'asc'
+        );
       }
 
       // Apply pagination
@@ -266,9 +283,8 @@ performance.now() - startTime;
 
       // Cache the result
       this.setCache(cacheKey, result);
-      
-      this.performanceMetrics.queryTime = // eslint-disable-next-line no-undef
-performance.now() - startTime;
+
+      this.performanceMetrics.queryTime = performance.now() - startTime;
       return result;
     } catch (error) {
       console.error('Error paginating sessions:', error);
@@ -277,23 +293,24 @@ performance.now() - startTime;
   }
 
   // Paginate check-ins
-  async paginateCheckIns(options: PaginationOptions): Promise<PaginatedResult<CheckInData>> {
-    const startTime = // eslint-disable-next-line no-undef
-performance.now();
-    
+  async paginateCheckIns(
+    options: PaginationOptions
+  ): Promise<PaginatedResult<CheckInData>> {
+    const startTime = performance.now();
+
     try {
       // Check cache first
       const cacheKey = `checkins_${JSON.stringify(options)}`;
       const cached = this.getFromCache(cacheKey);
       if (cached) {
-        this.performanceMetrics.queryTime = // eslint-disable-next-line no-undef
-performance.now() - startTime;
+        this.performanceMetrics.queryTime = performance.now() - startTime;
         return cached;
       }
 
       // Fetch data from database
-      const allCheckIns = await this.databaseService.getCheckIns('current-user');
-      
+      const allCheckIns =
+        await this.databaseService.getCheckIns('current-user');
+
       // Apply filters
       let filteredCheckIns = allCheckIns;
       if (options.filters) {
@@ -302,7 +319,11 @@ performance.now() - startTime;
 
       // Apply sorting
       if (options.sortBy) {
-        filteredCheckIns = this.applySorting(filteredCheckIns, options.sortBy, options.sortOrder || 'asc');
+        filteredCheckIns = this.applySorting(
+          filteredCheckIns,
+          options.sortBy,
+          options.sortOrder || 'asc'
+        );
       }
 
       // Apply pagination
@@ -326,9 +347,8 @@ performance.now() - startTime;
 
       // Cache the result
       this.setCache(cacheKey, result);
-      
-      this.performanceMetrics.queryTime = // eslint-disable-next-line no-undef
-performance.now() - startTime;
+
+      this.performanceMetrics.queryTime = performance.now() - startTime;
       return result;
     } catch (error) {
       console.error('Error paginating check-ins:', error);
@@ -343,7 +363,9 @@ performance.now() - startTime;
         if (value !== undefined && value !== null && value !== '') {
           const itemValue = (item as any)[key];
           if (typeof value === 'string') {
-            if (!itemValue?.toString().toLowerCase().includes(value.toLowerCase())) {
+            if (
+              !itemValue?.toString().toLowerCase().includes(value.toLowerCase())
+            ) {
               return false;
             }
           } else if (typeof value === 'number') {
@@ -362,11 +384,15 @@ performance.now() - startTime;
   }
 
   // Apply sorting
-  private applySorting<T>(data: T[], sortBy: string, sortOrder: 'asc' | 'desc'): T[] {
+  private applySorting<T>(
+    data: T[],
+    sortBy: string,
+    sortOrder: 'asc' | 'desc'
+  ): T[] {
     return data.sort((a, b) => {
       const aValue = (a as any)[sortBy];
       const bValue = (b as any)[sortBy];
-      
+
       if (aValue < bValue) {
         return sortOrder === 'asc' ? -1 : 1;
       }
@@ -407,12 +433,11 @@ performance.now() - startTime;
       const existingTimer = this.debounceTimers.get(key);
       if (existingTimer) {
         // eslint-disable-next-line no-undef
-clearTimeout(existingTimer);
+        clearTimeout(existingTimer);
       }
 
       // Set new timer
-      const timer = // eslint-disable-next-line no-undef
-setTimeout(async () => {
+      const timer = setTimeout(async () => {
         try {
           const result = await queryFn();
           resolve(result);
@@ -432,13 +457,13 @@ setTimeout(async () => {
     batchSize: number = this.queryOptimization.batchSize
   ): Promise<T[]> {
     const results: T[] = [];
-    
+
     for (let i = 0; i < operations.length; i += batchSize) {
       const batch = operations.slice(i, i + batchSize);
       const batchResults = await Promise.all(batch.map(op => op()));
       results.push(...batchResults);
     }
-    
+
     return results;
   }
 
@@ -448,13 +473,13 @@ setTimeout(async () => {
       // Remove unnecessary whitespace
       query = query.replace(/\s+/g, ' ').trim();
     }
-    
+
     if (this.queryOptimization.enableDeduplication) {
       // Remove duplicate conditions
       // This is a simplified example - in practice, you'd have more sophisticated logic
       query = query.replace(/(\w+)\s*=\s*\1/g, '$1');
     }
-    
+
     return query;
   }
 
@@ -502,7 +527,7 @@ setTimeout(async () => {
   destroy(): void {
     if (this.cleanupInterval) {
       // eslint-disable-next-line no-undef
-clearInterval(this.cleanupInterval);
+      clearInterval(this.cleanupInterval);
     }
     this.clearDebounceTimers();
     this.memoryCache.clear();

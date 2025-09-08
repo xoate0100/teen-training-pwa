@@ -12,7 +12,6 @@ interface HapticFeedbackProps {
 
 export function useHapticFeedback() {
   const triggerHaptic = ({
-    /* eslint-disable-next-line no-unused-vars */
     intensity = 'medium',
     duration = 100,
     pattern = 'single',

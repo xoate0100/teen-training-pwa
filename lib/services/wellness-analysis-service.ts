@@ -1,6 +1,5 @@
 'use client';
 
-/* eslint-disable no-unused-vars */
 import { SessionData } from '@/lib/services/database-service';
 
 export interface MoodData {

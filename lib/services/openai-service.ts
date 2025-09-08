@@ -105,7 +105,13 @@ Please provide:
 4. Next steps for improvement
 
 Keep it encouraging and age-appropriate for a teenager.`,
-      contextVariables: ['exerciseName', 'userLevel', 'currentPhase', 'recentPerformance', 'concerns'],
+      contextVariables: [
+        'exerciseName',
+        'userLevel',
+        'currentPhase',
+        'recentPerformance',
+        'concerns',
+      ],
       maxTokens: 300,
       temperature: 0.7,
     },
@@ -134,7 +140,14 @@ Message Type: {messageType}
 Intensity: {intensity}
 
 Please provide an encouraging, personalized message that will motivate and support them.`,
-      contextVariables: ['context', 'userState', 'recentProgress', 'currentChallenge', 'messageType', 'intensity'],
+      contextVariables: [
+        'context',
+        'userState',
+        'recentProgress',
+        'currentChallenge',
+        'messageType',
+        'intensity',
+      ],
       maxTokens: 150,
       temperature: 0.8,
     },
@@ -167,7 +180,13 @@ Please provide:
 3. Step-by-step improvement process
 4. Progressions and regressions
 5. Safety considerations`,
-      contextVariables: ['exerciseName', 'currentLevel', 'specificIssues', 'equipment', 'goals'],
+      contextVariables: [
+        'exerciseName',
+        'currentLevel',
+        'specificIssues',
+        'equipment',
+        'goals',
+      ],
       maxTokens: 400,
       temperature: 0.6,
     },
@@ -197,7 +216,15 @@ Equipment: {equipment}
 Phase: {phase}
 
 Please create an engaging description that explains what they'll be doing and why it's beneficial.`,
-      contextVariables: ['sessionType', 'duration', 'intensity', 'focusAreas', 'userPreferences', 'equipment', 'phase'],
+      contextVariables: [
+        'sessionType',
+        'duration',
+        'intensity',
+        'focusAreas',
+        'userPreferences',
+        'equipment',
+        'phase',
+      ],
       maxTokens: 250,
       temperature: 0.8,
     },
@@ -225,7 +252,13 @@ Goals: {goals}
 Challenges Overcome: {challengesOvercome}
 
 Please create a personalized celebration message that acknowledges their specific progress and encourages continued effort.`,
-      contextVariables: ['achievement', 'progressMade', 'timePeriod', 'goals', 'challengesOvercome'],
+      contextVariables: [
+        'achievement',
+        'progressMade',
+        'timePeriod',
+        'goals',
+        'challengesOvercome',
+      ],
       maxTokens: 200,
       temperature: 0.9,
     },
@@ -255,7 +288,10 @@ Please create a personalized celebration message that acknowledges their specifi
     // Replace template variables
     let userPrompt = template.userPromptTemplate;
     for (const [key, value] of Object.entries(contextData)) {
-      userPrompt = userPrompt.replace(new RegExp(`{${key}}`, 'g'), String(value));
+      userPrompt = userPrompt.replace(
+        new RegExp(`{${key}}`, 'g'),
+        String(value)
+      );
     }
 
     return userPrompt;
@@ -275,9 +311,17 @@ Please create a personalized celebration message that acknowledges their specifi
 
       // Build conversation history
       const messages: ConversationMessage[] = [
-        { role: 'system', content: systemPrompt, timestamp: new Date().toISOString() },
+        {
+          role: 'system',
+          content: systemPrompt,
+          timestamp: new Date().toISOString(),
+        },
         ...context.conversationHistory.slice(-this.MAX_CONVERSATION_HISTORY),
-        { role: 'user', content: userPrompt, timestamp: new Date().toISOString() },
+        {
+          role: 'user',
+          content: userPrompt,
+          timestamp: new Date().toISOString(),
+        },
       ];
 
       // Call OpenAI API (mock implementation for now)
@@ -381,7 +425,7 @@ Please create a personalized celebration message that acknowledges their specifi
   static async generateProgressCelebration(
     achievement: string,
     context: ConversationContext,
-    // eslint-disable-next-line no-unused-vars
+
     progressData: any
   ): Promise<string> {
     const response = await this.generateConversation(
@@ -396,9 +440,9 @@ Please create a personalized celebration message that acknowledges their specifi
   // Multi-modal input processing
   static async processMultiModalInput(
     textInput: string,
-    // eslint-disable-next-line no-unused-vars
+
     imageData?: string,
-    // eslint-disable-next-line no-unused-vars
+
     audioData?: string,
     context: ConversationContext
   ): Promise<AIResponse> {
@@ -447,13 +491,22 @@ Please create a personalized celebration message that acknowledges their specifi
   }
 
   // Helper methods
-  private static async callOpenAIAPI(/* eslint-disable-next-line no-unused-vars */ messages: ConversationMessage[]): Promise<any> {
+  private static async callOpenAIAPI(
+    messages: ConversationMessage[]
+  ): Promise<any> {
     // Mock implementation - in a real app, this would call the actual OpenAI API
     const mockResponse = {
-      content: "This is a mock response from OpenAI. In a real implementation, this would be replaced with actual API calls to GPT-4.",
+      content:
+        'This is a mock response from OpenAI. In a real implementation, this would be replaced with actual API calls to GPT-4.',
       confidence: 0.85,
-      suggestions: ["Consider adding more specific feedback", "Include safety reminders"],
-      followUpQuestions: ["How did that feel?", "Any discomfort during the exercise?"],
+      suggestions: [
+        'Consider adding more specific feedback',
+        'Include safety reminders',
+      ],
+      followUpQuestions: [
+        'How did that feel?',
+        'Any discomfort during the exercise?',
+      ],
     };
 
     // Simulate API delay
@@ -462,36 +515,43 @@ Please create a personalized celebration message that acknowledges their specifi
     return mockResponse;
   }
 
-  private static assessUserLevel(/* eslint-disable-next-line no-unused-vars */ context: ConversationContext): string {
+  private static assessUserLevel(context: ConversationContext): string {
     if (!context.behaviorInsights) return 'beginner';
-    
-    const consistency = context.behaviorInsights.patterns.consistency.weeklyFrequency;
+
+    const consistency =
+      context.behaviorInsights.patterns.consistency.weeklyFrequency;
     const experience = context.behaviorInsights.habits.workoutHabit.strength;
-    
+
     if (consistency >= 4 && experience >= 0.8) return 'advanced';
     if (consistency >= 3 && experience >= 0.6) return 'intermediate';
     return 'beginner';
   }
 
-  private static summarizeRecentPerformance(context: ConversationContext): string {
+  private static summarizeRecentPerformance(
+    context: ConversationContext
+  ): string {
     if (!context.performanceForecast) return 'No recent performance data';
-    
+
     const strength = context.performanceForecast.strength;
     const fatigue = context.performanceForecast.fatigue;
-    
+
     return `Strength: ${strength.trend} (${strength.rate}%/week), Fatigue: ${fatigue.currentFatigue}/10`;
   }
 
-  private static determineResponseIntensity(context: ConversationContext): 'low' | 'moderate' | 'high' {
+  private static determineResponseIntensity(
+    context: ConversationContext
+  ): 'low' | 'moderate' | 'high' {
     if (!context.performanceForecast) return 'moderate';
-    
+
     const fatigue = context.performanceForecast.fatigue.currentFatigue;
     if (fatigue > 7) return 'low';
     if (fatigue < 4) return 'high';
     return 'moderate';
   }
 
-  private static determineOptimalTiming(context: ConversationContext): 'pre-workout' | 'during-workout' | 'post-workout' | 'anytime' {
+  private static determineOptimalTiming(
+    context: ConversationContext
+  ): 'pre-workout' | 'during-workout' | 'post-workout' | 'anytime' {
     // This would be determined by context analysis
     return 'anytime';
   }
@@ -500,52 +560,66 @@ Please create a personalized celebration message that acknowledges their specifi
     // Simple extraction - in a real implementation, this would use NLP
     const corrections: string[] = [];
     const lines = content.split('\n');
-    
+
     for (const line of lines) {
-      if (line.toLowerCase().includes('correction') || line.toLowerCase().includes('fix')) {
+      if (
+        line.toLowerCase().includes('correction') ||
+        line.toLowerCase().includes('fix')
+      ) {
         corrections.push(line.trim());
       }
     }
-    
+
     return corrections;
   }
 
   private static extractImprovements(content: string): string[] {
     const improvements: string[] = [];
     const lines = content.split('\n');
-    
+
     for (const line of lines) {
-      if (line.toLowerCase().includes('improve') || line.toLowerCase().includes('better')) {
+      if (
+        line.toLowerCase().includes('improve') ||
+        line.toLowerCase().includes('better')
+      ) {
         improvements.push(line.trim());
       }
     }
-    
+
     return improvements;
   }
 
   private static extractSafetyNotes(content: string): string[] {
     const safetyNotes: string[] = [];
     const lines = content.split('\n');
-    
+
     for (const line of lines) {
-      if (line.toLowerCase().includes('safety') || line.toLowerCase().includes('injury') || line.toLowerCase().includes('careful')) {
+      if (
+        line.toLowerCase().includes('safety') ||
+        line.toLowerCase().includes('injury') ||
+        line.toLowerCase().includes('careful')
+      ) {
         safetyNotes.push(line.trim());
       }
     }
-    
+
     return safetyNotes;
   }
 
   private static extractNextSteps(content: string): string[] {
     const nextSteps: string[] = [];
     const lines = content.split('\n');
-    
+
     for (const line of lines) {
-      if (line.toLowerCase().includes('next') || line.toLowerCase().includes('step') || line.toLowerCase().includes('practice')) {
+      if (
+        line.toLowerCase().includes('next') ||
+        line.toLowerCase().includes('step') ||
+        line.toLowerCase().includes('practice')
+      ) {
         nextSteps.push(line.trim());
       }
     }
-    
+
     return nextSteps;
   }
 
@@ -553,7 +627,7 @@ Please create a personalized celebration message that acknowledges their specifi
     // Simple check - in a real implementation, this would use a content moderation API
     const inappropriateWords = ['bad', 'terrible', 'awful']; // Simplified list
     const lowerContent = content.toLowerCase();
-    
+
     return inappropriateWords.some(word => lowerContent.includes(word));
   }
 }

@@ -1089,38 +1089,6 @@ export default function Dashboard() {
               <RealTimeAchievements />
             </TabsContent>
 
-            <TabsContent value='profile' className='space-y-6'>
-              <Card>
-                <CardHeader>
-                  <CardTitle>Athlete Profile</CardTitle>
-                </CardHeader>
-                <CardContent className='space-y-4'>
-                  <div className='text-center'>
-                    <div className='w-20 h-20 bg-primary rounded-full flex items-center justify-center text-primary-foreground text-2xl font-bold mx-auto mb-4'>
-                      AT
-                    </div>
-                    <h3 className='text-xl font-semibold'>Athlete Teen</h3>
-                    <p className='text-muted-foreground'>
-                      Age: 12 • Program Week: 6/11
-                    </p>
-                  </div>
-                  <div className='grid grid-cols-2 gap-4 pt-4'>
-                    <div className='text-center p-4 bg-muted rounded-lg'>
-                      <p className='text-2xl font-bold text-primary'>42</p>
-                      <p className='text-sm text-muted-foreground'>
-                        Sessions Completed
-                      </p>
-                    </div>
-                    <div className='text-center p-4 bg-muted rounded-lg'>
-                      <p className='text-2xl font-bold text-primary'>8</p>
-                      <p className='text-sm text-muted-foreground'>
-                        Current Streak
-                      </p>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            </TabsContent>
 
             <TabsContent value='smart' className='space-y-6'>
               <div className='grid gap-6 md:grid-cols-2'>
@@ -1156,13 +1124,6 @@ export default function Dashboard() {
               />
             </TabsContent>
 
-            <TabsContent value='themes' className='space-y-6'>
-              <SessionTypeShowcase
-                onSessionSelect={sessionType => {
-                  console.log('Selected session type:', sessionType);
-                }}
-              />
-            </TabsContent>
 
             <TabsContent value='achievements' className='space-y-6'>
               <GamificationDashboard sessions={[]} checkIns={[]} />
@@ -1207,11 +1168,6 @@ export default function Dashboard() {
               </ThemeProvider>
             </TabsContent>
 
-            <TabsContent value='personalization' className='space-y-6'>
-              <PersonalizationDashboard
-                userId={currentUser?.id || 'default-user'}
-              />
-            </TabsContent>
 
             <TabsContent value='wellness' className='space-y-6'>
               <WellnessIntelligenceDisplay

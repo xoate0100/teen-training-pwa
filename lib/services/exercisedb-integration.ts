@@ -1,6 +1,6 @@
 'use client';
 
-import { DatabaseService } from './database-service'; // eslint-disable-next-line no-unused-vars
+import { DatabaseService } from './database-service';
 
 export interface ExerciseRecommendation {
   id: string;
@@ -43,10 +43,22 @@ export interface RecommendationContext {
 }
 
 export interface SmartRecommendationEngine {
-  getRecommendations(context: RecommendationContext, count: number): Promise<ExerciseRecommendation[]>; // eslint-disable-next-line no-unused-vars
-  getAlternativeExercises(exerciseId: string, context: RecommendationContext): Promise<ExerciseRecommendation[]>; // eslint-disable-next-line no-unused-vars
-  getProgressionExercises(exerciseId: string, context: RecommendationContext): Promise<ExerciseRecommendation[]>; // eslint-disable-next-line no-unused-vars
-  analyzeExerciseCompatibility(exerciseId: string, context: RecommendationContext): Promise<{ // eslint-disable-next-line no-unused-vars
+  getRecommendations(
+    context: RecommendationContext,
+    count: number
+  ): Promise<ExerciseRecommendation[]>;
+  getAlternativeExercises(
+    exerciseId: string,
+    context: RecommendationContext
+  ): Promise<ExerciseRecommendation[]>;
+  getProgressionExercises(
+    exerciseId: string,
+    context: RecommendationContext
+  ): Promise<ExerciseRecommendation[]>;
+  analyzeExerciseCompatibility(
+    exerciseId: string,
+    context: RecommendationContext
+  ): Promise<{
     compatibility: number;
     reasons: string[];
     warnings: string[];
@@ -73,7 +85,9 @@ export class ExerciseDBIntegrationService {
   private recommendationEngine: SmartRecommendationEngine;
 
   constructor() {
-    this.recommendationEngine = new SmartRecommendationEngineImpl(this.exerciseDatabase);
+    this.recommendationEngine = new SmartRecommendationEngineImpl(
+      this.exerciseDatabase
+    );
     this.initializeExerciseDatabase();
   }
 
@@ -93,7 +107,7 @@ export class ExerciseDBIntegrationService {
     // This would typically load from an external API like ExerciseDB
     // For now, we'll create a comprehensive local database
     const exercises = this.createLocalExerciseDatabase();
-    
+
     exercises.forEach(exercise => {
       this.exerciseDatabase.exercises.set(exercise.id, exercise);
     });
@@ -110,30 +124,31 @@ export class ExerciseDBIntegrationService {
         difficulty: 'beginner',
         equipment: ['none'],
         muscleGroups: ['quadriceps', 'glutes', 'hamstrings'],
-        description: 'A fundamental lower body exercise that targets the quadriceps, glutes, and hamstrings.',
+        description:
+          'A fundamental lower body exercise that targets the quadriceps, glutes, and hamstrings.',
         instructions: [
           'Stand with feet shoulder-width apart',
           'Lower your body by bending at the hips and knees',
           'Keep your chest up and core engaged',
           'Lower until thighs are parallel to the ground',
-          'Push through heels to return to starting position'
+          'Push through heels to return to starting position',
         ],
         tips: [
           'Keep your knees in line with your toes',
-          'Don\'t let your knees cave inward',
-          'Maintain a neutral spine throughout the movement'
+          "Don't let your knees cave inward",
+          'Maintain a neutral spine throughout the movement',
         ],
         alternatives: ['goblet-squat', 'jump-squat', 'single-leg-squat'],
         progression: {
           next: ['goblet-squat', 'weighted-squat'],
-          prerequisites: []
+          prerequisites: [],
         },
         metadata: {
           popularity: 95,
           effectiveness: 90,
           safety: 85,
-          lastUpdated: new Date()
-        }
+          lastUpdated: new Date(),
+        },
       },
       {
         id: 'push-up',
@@ -142,30 +157,31 @@ export class ExerciseDBIntegrationService {
         difficulty: 'beginner',
         equipment: ['none'],
         muscleGroups: ['chest', 'shoulders', 'triceps'],
-        description: 'A classic upper body exercise that builds chest, shoulder, and tricep strength.',
+        description:
+          'A classic upper body exercise that builds chest, shoulder, and tricep strength.',
         instructions: [
           'Start in plank position with hands slightly wider than shoulders',
           'Lower your body until chest nearly touches the ground',
           'Keep your body in a straight line',
           'Push up to starting position',
-          'Maintain core engagement throughout'
+          'Maintain core engagement throughout',
         ],
         tips: [
           'Keep your body in a straight line',
-          'Don\'t let your hips sag or pike up',
-          'Breathe out on the way up'
+          "Don't let your hips sag or pike up",
+          'Breathe out on the way up',
         ],
         alternatives: ['knee-push-up', 'incline-push-up', 'diamond-push-up'],
         progression: {
           next: ['diamond-push-up', 'decline-push-up'],
-          prerequisites: []
+          prerequisites: [],
         },
         metadata: {
           popularity: 90,
           effectiveness: 85,
           safety: 80,
-          lastUpdated: new Date()
-        }
+          lastUpdated: new Date(),
+        },
       },
       // Volleyball Skills Exercises
       {
@@ -175,30 +191,31 @@ export class ExerciseDBIntegrationService {
         difficulty: 'beginner',
         equipment: ['wall'],
         muscleGroups: ['quadriceps', 'glutes'],
-        description: 'An isometric exercise that builds leg endurance and stability for volleyball.',
+        description:
+          'An isometric exercise that builds leg endurance and stability for volleyball.',
         instructions: [
           'Stand with your back against a wall',
           'Slide down until your thighs are parallel to the ground',
           'Keep your back flat against the wall',
           'Hold the position for the specified time',
-          'Push through heels to return to standing'
+          'Push through heels to return to standing',
         ],
         tips: [
           'Keep your knees at 90 degrees',
-          'Don\'t let your knees go past your toes',
-          'Breathe normally throughout the hold'
+          "Don't let your knees go past your toes",
+          'Breathe normally throughout the hold',
         ],
         alternatives: ['single-leg-wall-sit', 'weighted-wall-sit'],
         progression: {
           next: ['single-leg-wall-sit', 'weighted-wall-sit'],
-          prerequisites: []
+          prerequisites: [],
         },
         metadata: {
           popularity: 75,
           effectiveness: 80,
           safety: 90,
-          lastUpdated: new Date()
-        }
+          lastUpdated: new Date(),
+        },
       },
       // Plyometric Exercises
       {
@@ -214,24 +231,24 @@ export class ExerciseDBIntegrationService {
           'Explosively jump up as high as possible',
           'Land softly on the balls of your feet',
           'Immediately return to squat position',
-          'Repeat for specified reps'
+          'Repeat for specified reps',
         ],
         tips: [
           'Land softly to reduce impact',
           'Keep your knees in line with your toes',
-          'Use your arms to help generate power'
+          'Use your arms to help generate power',
         ],
         alternatives: ['box-jump', 'tuck-jump', 'single-leg-hop'],
         progression: {
           next: ['box-jump', 'tuck-jump'],
-          prerequisites: ['squat']
+          prerequisites: ['squat'],
         },
         metadata: {
           popularity: 80,
           effectiveness: 85,
           safety: 70,
-          lastUpdated: new Date()
-        }
+          lastUpdated: new Date(),
+        },
       },
       // Recovery Exercises
       {
@@ -241,31 +258,32 @@ export class ExerciseDBIntegrationService {
         difficulty: 'beginner',
         equipment: ['none'],
         muscleGroups: ['spine', 'core'],
-        description: 'A gentle spinal mobility exercise for recovery and flexibility.',
+        description:
+          'A gentle spinal mobility exercise for recovery and flexibility.',
         instructions: [
           'Start on hands and knees',
           'Arch your back and look up (cow position)',
           'Round your back and tuck your chin (cat position)',
           'Move slowly between positions',
-          'Repeat for specified reps'
+          'Repeat for specified reps',
         ],
         tips: [
           'Move slowly and controlled',
           'Focus on spinal movement',
-          'Breathe with the movement'
+          'Breathe with the movement',
         ],
         alternatives: ['child-pose', 'spinal-twist'],
         progression: {
           next: ['spinal-twist', 'thread-the-needle'],
-          prerequisites: []
+          prerequisites: [],
         },
         metadata: {
           popularity: 70,
           effectiveness: 75,
           safety: 95,
-          lastUpdated: new Date()
-        }
-      }
+          lastUpdated: new Date(),
+        },
+      },
     ];
   }
 
@@ -311,49 +329,84 @@ export class ExerciseDBIntegrationService {
   }
 
   // Get smart recommendations
-  async getSmartRecommendations(context: RecommendationContext, count: number = 5): Promise<ExerciseRecommendation[]> {
+  async getSmartRecommendations(
+    context: RecommendationContext,
+    count: number = 5
+  ): Promise<ExerciseRecommendation[]> {
     return await this.recommendationEngine.getRecommendations(context, count);
   }
 
   // Get alternative exercises
-  async getAlternativeExercises(exerciseId: string, context: RecommendationContext): Promise<ExerciseRecommendation[]> {
-    return await this.recommendationEngine.getAlternativeExercises(exerciseId, context);
+  async getAlternativeExercises(
+    exerciseId: string,
+    context: RecommendationContext
+  ): Promise<ExerciseRecommendation[]> {
+    return await this.recommendationEngine.getAlternativeExercises(
+      exerciseId,
+      context
+    );
   }
 
   // Get progression exercises
-  async getProgressionExercises(exerciseId: string, context: RecommendationContext): Promise<ExerciseRecommendation[]> {
-    return await this.recommendationEngine.getProgressionExercises(exerciseId, context);
+  async getProgressionExercises(
+    exerciseId: string,
+    context: RecommendationContext
+  ): Promise<ExerciseRecommendation[]> {
+    return await this.recommendationEngine.getProgressionExercises(
+      exerciseId,
+      context
+    );
   }
 
   // Analyze exercise compatibility
-  async analyzeExerciseCompatibility(exerciseId: string, context: RecommendationContext) {
-    return await this.recommendationEngine.analyzeExerciseCompatibility(exerciseId, context);
+  async analyzeExerciseCompatibility(
+    exerciseId: string,
+    context: RecommendationContext
+  ) {
+    return await this.recommendationEngine.analyzeExerciseCompatibility(
+      exerciseId,
+      context
+    );
   }
 
   // Search exercises
-  async searchExercises(query: string, filters?: {
-    category?: string;
-    difficulty?: string;
-    equipment?: string[];
-    muscleGroups?: string[];
-  }): Promise<ExerciseRecommendation[]> {
+  async searchExercises(
+    query: string,
+    filters?: {
+      category?: string;
+      difficulty?: string;
+      equipment?: string[];
+      muscleGroups?: string[];
+    }
+  ): Promise<ExerciseRecommendation[]> {
     const results: ExerciseRecommendation[] = [];
     const queryLower = query.toLowerCase();
 
     for (const [id, exercise] of this.exerciseDatabase.exercises) {
       // Text search
-      const matchesText = exercise.name.toLowerCase().includes(queryLower) ||
-                         exercise.description.toLowerCase().includes(queryLower) ||
-                         exercise.category.toLowerCase().includes(queryLower);
+      const matchesText =
+        exercise.name.toLowerCase().includes(queryLower) ||
+        exercise.description.toLowerCase().includes(queryLower) ||
+        exercise.category.toLowerCase().includes(queryLower);
 
       if (!matchesText) continue;
 
       // Apply filters
       if (filters) {
-        if (filters.category && exercise.category !== filters.category) continue;
-        if (filters.difficulty && exercise.difficulty !== filters.difficulty) continue;
-        if (filters.equipment && !filters.equipment.some(eq => exercise.equipment.includes(eq))) continue;
-        if (filters.muscleGroups && !filters.muscleGroups.some(mg => exercise.muscleGroups.includes(mg))) continue;
+        if (filters.category && exercise.category !== filters.category)
+          continue;
+        if (filters.difficulty && exercise.difficulty !== filters.difficulty)
+          continue;
+        if (
+          filters.equipment &&
+          !filters.equipment.some(eq => exercise.equipment.includes(eq))
+        )
+          continue;
+        if (
+          filters.muscleGroups &&
+          !filters.muscleGroups.some(mg => exercise.muscleGroups.includes(mg))
+        )
+          continue;
       }
 
       results.push(exercise);
@@ -375,19 +428,20 @@ export class ExerciseDBIntegrationService {
   // Get exercises by category
   getExercisesByCategory(category: string): ExerciseRecommendation[] {
     const exerciseIds = this.exerciseDatabase.categories.get(category) || [];
-    return exerciseIds.map(id => this.exerciseDatabase.exercises.get(id)!); // eslint-disable-next-line no-unused-vars
+    return exerciseIds.map(id => this.exerciseDatabase.exercises.get(id)!);
   }
 
   // Get exercises by equipment
   getExercisesByEquipment(equipment: string): ExerciseRecommendation[] {
     const exerciseIds = this.exerciseDatabase.equipment.get(equipment) || [];
-    return exerciseIds.map(id => this.exerciseDatabase.exercises.get(id)!); // eslint-disable-next-line no-unused-vars
+    return exerciseIds.map(id => this.exerciseDatabase.exercises.get(id)!);
   }
 
   // Get exercises by muscle group
   getExercisesByMuscleGroup(muscleGroup: string): ExerciseRecommendation[] {
-    const exerciseIds = this.exerciseDatabase.muscleGroups.get(muscleGroup) || [];
-    return exerciseIds.map(id => this.exerciseDatabase.exercises.get(id)!); // eslint-disable-next-line no-unused-vars
+    const exerciseIds =
+      this.exerciseDatabase.muscleGroups.get(muscleGroup) || [];
+    return exerciseIds.map(id => this.exerciseDatabase.exercises.get(id)!);
   }
 
   // Get all categories
@@ -410,8 +464,12 @@ export class ExerciseDBIntegrationService {
 class SmartRecommendationEngineImpl implements SmartRecommendationEngine {
   constructor(private exerciseDatabase: ExerciseDatabase) {}
 
-  async getRecommendations(context: RecommendationContext, count: number): Promise<ExerciseRecommendation[]> {
-    const candidates: { exercise: ExerciseRecommendation; score: number }[] = [];
+  async getRecommendations(
+    context: RecommendationContext,
+    count: number
+  ): Promise<ExerciseRecommendation[]> {
+    const candidates: { exercise: ExerciseRecommendation; score: number }[] =
+      [];
 
     for (const [id, exercise] of this.exerciseDatabase.exercises) {
       const score = this.calculateRecommendationScore(exercise, context);
@@ -425,20 +483,23 @@ class SmartRecommendationEngineImpl implements SmartRecommendationEngine {
     return candidates.slice(0, count).map(c => c.exercise);
   }
 
-  async getAlternativeExercises(exerciseId: string, context: RecommendationContext): Promise<ExerciseRecommendation[]> {
+  async getAlternativeExercises(
+    exerciseId: string,
+    context: RecommendationContext
+  ): Promise<ExerciseRecommendation[]> {
     const exercise = this.exerciseDatabase.exercises.get(exerciseId);
     if (!exercise) return [];
 
     const alternatives: ExerciseRecommendation[] = [];
-    
+
     // Get exercises with similar muscle groups
     for (const [id, altExercise] of this.exerciseDatabase.exercises) {
       if (id === exerciseId) continue;
-      
-      const commonMuscleGroups = exercise.muscleGroups.filter(mg => 
+
+      const commonMuscleGroups = exercise.muscleGroups.filter(mg =>
         altExercise.muscleGroups.includes(mg)
       );
-      
+
       if (commonMuscleGroups.length > 0) {
         alternatives.push(altExercise);
       }
@@ -454,12 +515,15 @@ class SmartRecommendationEngineImpl implements SmartRecommendationEngine {
       .slice(0, 5);
   }
 
-  async getProgressionExercises(exerciseId: string, context: RecommendationContext): Promise<ExerciseRecommendation[]> {
+  async getProgressionExercises(
+    exerciseId: string,
+    context: RecommendationContext
+  ): Promise<ExerciseRecommendation[]> {
     const exercise = this.exerciseDatabase.exercises.get(exerciseId);
     if (!exercise) return [];
 
     const progressions: ExerciseRecommendation[] = [];
-    
+
     for (const nextId of exercise.progression.next) {
       const nextExercise = this.exerciseDatabase.exercises.get(nextId);
       if (nextExercise) {
@@ -470,13 +534,16 @@ class SmartRecommendationEngineImpl implements SmartRecommendationEngine {
     return progressions;
   }
 
-  async analyzeExerciseCompatibility(exerciseId: string, context: RecommendationContext) {
+  async analyzeExerciseCompatibility(
+    exerciseId: string,
+    context: RecommendationContext
+  ) {
     const exercise = this.exerciseDatabase.exercises.get(exerciseId);
     if (!exercise) {
       return {
         compatibility: 0,
         reasons: ['Exercise not found'],
-        warnings: []
+        warnings: [],
       };
     }
 
@@ -485,14 +552,17 @@ class SmartRecommendationEngineImpl implements SmartRecommendationEngine {
     const warnings: string[] = [];
 
     // Check difficulty compatibility
-    if (exercise.difficulty === 'advanced' && context.userLevel === 'beginner') {
+    if (
+      exercise.difficulty === 'advanced' &&
+      context.userLevel === 'beginner'
+    ) {
       compatibility -= 30;
       warnings.push('Exercise may be too advanced for your current level');
     }
 
     // Check equipment availability
-    const missingEquipment = exercise.equipment.filter(eq => 
-      !context.availableEquipment.includes(eq) && eq !== 'none'
+    const missingEquipment = exercise.equipment.filter(
+      eq => !context.availableEquipment.includes(eq) && eq !== 'none'
     );
     if (missingEquipment.length > 0) {
       compatibility -= 20;
@@ -501,19 +571,23 @@ class SmartRecommendationEngineImpl implements SmartRecommendationEngine {
 
     // Check injury compatibility
     const incompatibleInjuries = exercise.muscleGroups.filter(mg =>
-      context.limitations.injuries.some(injury => 
+      context.limitations.injuries.some(injury =>
         injury.toLowerCase().includes(mg.toLowerCase())
       )
     );
     if (incompatibleInjuries.length > 0) {
       compatibility -= 40;
-      warnings.push(`May aggravate injuries: ${incompatibleInjuries.join(', ')}`);
+      warnings.push(
+        `May aggravate injuries: ${incompatibleInjuries.join(', ')}`
+      );
     }
 
     // Check session type compatibility
     if (exercise.category !== context.sessionType) {
       compatibility -= 10;
-      reasons.push(`Exercise category (${exercise.category}) doesn't match session type (${context.sessionType})`);
+      reasons.push(
+        `Exercise category (${exercise.category}) doesn't match session type (${context.sessionType})`
+      );
     }
 
     // Check muscle group targeting
@@ -522,7 +596,9 @@ class SmartRecommendationEngineImpl implements SmartRecommendationEngine {
     );
     if (targetMuscleGroups.length > 0) {
       compatibility += 20;
-      reasons.push(`Targets desired muscle groups: ${targetMuscleGroups.join(', ')}`);
+      reasons.push(
+        `Targets desired muscle groups: ${targetMuscleGroups.join(', ')}`
+      );
     }
 
     // Check if exercise was recently used
@@ -534,11 +610,14 @@ class SmartRecommendationEngineImpl implements SmartRecommendationEngine {
     return {
       compatibility: Math.max(0, Math.min(100, compatibility)),
       reasons,
-      warnings
+      warnings,
     };
   }
 
-  private calculateRecommendationScore(exercise: ExerciseRecommendation, context: RecommendationContext): number {
+  private calculateRecommendationScore(
+    exercise: ExerciseRecommendation,
+    context: RecommendationContext
+  ): number {
     let score = 0;
 
     // Base score from metadata
@@ -549,15 +628,21 @@ class SmartRecommendationEngineImpl implements SmartRecommendationEngine {
     // Difficulty bonus
     if (exercise.difficulty === context.userLevel) {
       score += 20;
-    } else if (exercise.difficulty === 'beginner' && context.userLevel === 'intermediate') {
+    } else if (
+      exercise.difficulty === 'beginner' &&
+      context.userLevel === 'intermediate'
+    ) {
       score += 10;
-    } else if (exercise.difficulty === 'intermediate' && context.userLevel === 'advanced') {
+    } else if (
+      exercise.difficulty === 'intermediate' &&
+      context.userLevel === 'advanced'
+    ) {
       score += 10;
     }
 
     // Equipment availability bonus
-    const availableEquipment = exercise.equipment.filter(eq => 
-      context.availableEquipment.includes(eq) || eq === 'none'
+    const availableEquipment = exercise.equipment.filter(
+      eq => context.availableEquipment.includes(eq) || eq === 'none'
     );
     if (availableEquipment.length === exercise.equipment.length) {
       score += 15;
@@ -581,7 +666,7 @@ class SmartRecommendationEngineImpl implements SmartRecommendationEngine {
 
     // Injury compatibility penalty
     const incompatibleInjuries = exercise.muscleGroups.filter(mg =>
-      context.limitations.injuries.some(injury => 
+      context.limitations.injuries.some(injury =>
         injury.toLowerCase().includes(mg.toLowerCase())
       )
     );

@@ -108,7 +108,9 @@ export class OfflineFirstService {
           ...parsedCache,
           sessions: parsedCache.sessions || [],
           checkIns: parsedCache.checkIns || [],
-          lastSyncTime: parsedCache.lastSyncTime ? new Date(parsedCache.lastSyncTime) : null,
+          lastSyncTime: parsedCache.lastSyncTime
+            ? new Date(parsedCache.lastSyncTime)
+            : null,
           pendingChanges: parsedCache.pendingChanges || [],
         };
       }
@@ -134,16 +136,16 @@ export class OfflineFirstService {
   private startBackgroundSync() {
     if (this.syncInterval) {
       // eslint-disable-next-line no-undef
-clearInterval(this.syncInterval);
+      clearInterval(this.syncInterval);
     }
 
     if (this.syncStrategy.type === 'background') {
       this.syncInterval = // eslint-disable-next-line no-undef
-setInterval(() => {
-        if (this.isOnline && this.cache.pendingChanges.length > 0) {
-          this.syncPendingChanges();
-        }
-      }, this.syncStrategy.interval);
+        setInterval(() => {
+          if (this.isOnline && this.cache.pendingChanges.length > 0) {
+            this.syncPendingChanges();
+          }
+        }, this.syncStrategy.interval);
     }
   }
 
@@ -154,7 +156,7 @@ setInterval(() => {
     }
 
     const changesToSync = [...this.cache.pendingChanges];
-    
+
     for (const change of changesToSync) {
       try {
         await this.processPendingChange(change);
@@ -162,15 +164,18 @@ setInterval(() => {
       } catch (error) {
         console.error('Error syncing change:', error);
         change.retryCount++;
-        
+
         if (change.retryCount >= change.maxRetries) {
           this.removePendingChange(change.id);
           this.emit('syncError', { change, error });
         } else {
           // Reschedule for retry
-          setTimeout(() => {
-            this.syncPendingChanges();
-          }, this.syncStrategy.retryDelay * Math.pow(2, change.retryCount));
+          setTimeout(
+            () => {
+              this.syncPendingChanges();
+            },
+            this.syncStrategy.retryDelay * Math.pow(2, change.retryCount)
+          );
         }
       }
     }
@@ -239,7 +244,9 @@ setInterval(() => {
   }
 
   // Add pending change
-  addPendingChange(change: Omit<PendingChange, 'id' | 'timestamp' | 'retryCount'>): void {
+  addPendingChange(
+    change: Omit<PendingChange, 'id' | 'timestamp' | 'retryCount'>
+  ): void {
     const pendingChange: PendingChange = {
       ...change,
       id: `pending_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
@@ -275,7 +282,9 @@ setInterval(() => {
     }
 
     // Add to cache
-    const existingIndex = this.cache.sessions.findIndex(s => s.id === session.id);
+    const existingIndex = this.cache.sessions.findIndex(
+      s => s.id === session.id
+    );
     if (existingIndex > -1) {
       this.cache.sessions[existingIndex] = session;
     } else {
@@ -295,7 +304,9 @@ setInterval(() => {
     }
 
     // Add to cache
-    const existingIndex = this.cache.checkIns.findIndex(c => c.id === checkIn.id);
+    const existingIndex = this.cache.checkIns.findIndex(
+      c => c.id === checkIn.id
+    );
     if (existingIndex > -1) {
       this.cache.checkIns[existingIndex] = checkIn;
     } else {
@@ -330,12 +341,12 @@ setInterval(() => {
   // Cleanup cache
   private async cleanupCache(): Promise<void> {
     // Remove oldest entries to make space
-    const sortedSessions = this.cache.sessions.sort((a, b) => 
-      new Date(a.date).getTime() - new Date(b.date).getTime()
+    const sortedSessions = this.cache.sessions.sort(
+      (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
     );
-    
-    const sortedCheckIns = this.cache.checkIns.sort((a, b) => 
-      new Date(a.date).getTime() - new Date(b.date).getTime()
+
+    const sortedCheckIns = this.cache.checkIns.sort(
+      (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
     );
 
     // Remove oldest 25% of each type
@@ -353,9 +364,18 @@ setInterval(() => {
   // Calculate cache size
   private calculateCacheSize(): number {
     let size = 0;
-    size += this.cache.sessions.reduce((sum, session) => sum + JSON.stringify(session).length, 0);
-    size += this.cache.checkIns.reduce((sum, checkIn) => sum + JSON.stringify(checkIn).length, 0);
-    size += this.cache.pendingChanges.reduce((sum, change) => sum + JSON.stringify(change).length, 0);
+    size += this.cache.sessions.reduce(
+      (sum, session) => sum + JSON.stringify(session).length,
+      0
+    );
+    size += this.cache.checkIns.reduce(
+      (sum, checkIn) => sum + JSON.stringify(checkIn).length,
+      0
+    );
+    size += this.cache.pendingChanges.reduce(
+      (sum, change) => sum + JSON.stringify(change).length,
+      0
+    );
     return size;
   }
 
@@ -427,7 +447,7 @@ setInterval(() => {
   destroy(): void {
     if (this.syncInterval) {
       // eslint-disable-next-line no-undef
-clearInterval(this.syncInterval);
+      clearInterval(this.syncInterval);
     }
     this.eventListeners.clear();
   }

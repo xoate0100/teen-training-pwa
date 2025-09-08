@@ -57,13 +57,13 @@ interface UserContextType {
   users: BetaUser[];
   isLoading: boolean;
   error: string | null;
-  // eslint-disable-next-line no-unused-vars
+
   switchUser: (userId: string) => Promise<void>;
-  // eslint-disable-next-line no-unused-vars
+
   createUser: (userData: CreateUserRequest) => Promise<void>;
-  // eslint-disable-next-line no-unused-vars
+
   updateUser: (userId: string, updates: Partial<BetaUser>) => Promise<void>;
-  // eslint-disable-next-line no-unused-vars
+
   deleteUser: (userId: string) => Promise<void>;
   refreshUsers: () => Promise<void>;
 }

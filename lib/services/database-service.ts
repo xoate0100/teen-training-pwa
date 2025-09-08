@@ -425,7 +425,6 @@ export class DatabaseService {
 
   // Real-time subscriptions
   subscribeToSessions(
-    // eslint-disable-next-line no-unused-vars
     callback: (_sessions: SessionData[]) => void,
     userId?: string
   ) {
@@ -457,7 +456,7 @@ export class DatabaseService {
   // Subscribe to specific session changes
   subscribeToSession(
     sessionId: string,
-    // eslint-disable-next-line no-unused-vars
+
     callback: (_session: SessionData | null) => void
   ) {
     return this.supabase
@@ -479,7 +478,6 @@ export class DatabaseService {
   }
 
   subscribeToCheckIns(
-    // eslint-disable-next-line no-unused-vars
     callback: (_checkIns: CheckInData[]) => void,
     userId?: string
   ) {
@@ -510,7 +508,6 @@ export class DatabaseService {
 
   // Subscribe to achievements
   subscribeToAchievements(
-    // eslint-disable-next-line no-unused-vars
     callback: (_achievements: Achievement[]) => void,
     userId?: string
   ) {
@@ -541,7 +538,6 @@ export class DatabaseService {
 
   // Subscribe to notifications
   subscribeToNotifications(
-    // eslint-disable-next-line no-unused-vars
     callback: (_notifications: Notification[]) => void,
     userId?: string
   ) {
@@ -572,7 +568,6 @@ export class DatabaseService {
 
   // Subscribe to progress metrics
   subscribeToProgressMetrics(
-    // eslint-disable-next-line no-unused-vars
     callback: (_metrics: ProgressMetrics[]) => void,
     userId?: string
   ) {

@@ -2,7 +2,11 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { intelligentSessionManager } from '@/lib/services/intelligent-session-manager';
-import { AutomaticSchedule, ConflictResolution, MissedSessionRecovery } from '@/lib/services/session-scheduling-service';
+import {
+  AutomaticSchedule,
+  ConflictResolution,
+  MissedSessionRecovery,
+} from '@/lib/services/session-scheduling-service';
 
 export interface UseIntelligentSchedulingReturn {
   // Schedule data
@@ -22,29 +26,38 @@ export interface UseIntelligentSchedulingReturn {
   error: string | null;
 
   // Actions
-  // eslint-disable-next-line no-unused-vars
-  generateWeeklySchedule: (weekStart: string, userPreferences?: any) => Promise<void>;
+
+  generateWeeklySchedule: (
+    weekStart: string,
+    userPreferences?: any
+  ) => Promise<void>;
   resolveConflicts: () => Promise<void>;
-  // eslint-disable-next-line no-unused-vars
+
   handleMissedSessions: (missedSessionIds: string[]) => Promise<void>;
   applyResolutions: () => Promise<void>;
   saveSchedule: () => Promise<void>;
   refreshDashboard: () => Promise<void>;
 
   // Schedule management
-  // eslint-disable-next-line no-unused-vars
+
   updateSession: (sessionId: string, updates: Partial<any>) => void;
-  // eslint-disable-next-line no-unused-vars
+
   removeSession: (sessionId: string) => void;
-  // eslint-disable-next-line no-unused-vars
+
   addSession: (session: any) => void;
 }
 
-export function useIntelligentScheduling(userId: string): UseIntelligentSchedulingReturn {
+export function useIntelligentScheduling(
+  userId: string
+): UseIntelligentSchedulingReturn {
   // State
-  const [currentWeekSchedule, setCurrentWeekSchedule] = useState<AutomaticSchedule | null>(null);
-  const [nextWeekSchedule, setNextWeekSchedule] = useState<AutomaticSchedule | null>(null);
-  const [missedSessions, setMissedSessions] = useState<MissedSessionRecovery[]>([]);
+  const [currentWeekSchedule, setCurrentWeekSchedule] =
+    useState<AutomaticSchedule | null>(null);
+  const [nextWeekSchedule, setNextWeekSchedule] =
+    useState<AutomaticSchedule | null>(null);
+  const [missedSessions, setMissedSessions] = useState<MissedSessionRecovery[]>(
+    []
+  );
   const [timingRecommendations, setTimingRecommendations] = useState<any>(null);
   const [conflicts, setConflicts] = useState<ConflictResolution[]>([]);
 
@@ -52,7 +65,8 @@ export function useIntelligentScheduling(userId: string): UseIntelligentScheduli
   const [isLoading, setIsLoading] = useState(false);
   const [isGeneratingSchedule, setIsGeneratingSchedule] = useState(false);
   const [isResolvingConflicts, setIsResolvingConflicts] = useState(false);
-  const [isHandlingMissedSessions, setIsHandlingMissedSessions] = useState(false);
+  const [isHandlingMissedSessions, setIsHandlingMissedSessions] =
+    useState(false);
 
   // Error state
   const [error, setError] = useState<string | null>(null);
@@ -72,51 +86,63 @@ export function useIntelligentScheduling(userId: string): UseIntelligentScheduli
     setError(null);
 
     try {
-      const dashboardData = await intelligentSessionManager.getSessionManagementDashboard(userId);
-      
+      const dashboardData =
+        await intelligentSessionManager.getSessionManagementDashboard(userId);
+
       setCurrentWeekSchedule(dashboardData.currentWeekSchedule);
       setNextWeekSchedule(dashboardData.nextWeekSchedule);
       setMissedSessions(dashboardData.missedSessions);
       setTimingRecommendations(dashboardData.timingRecommendations);
       setConflicts(dashboardData.conflicts);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to load dashboard data');
+      setError(
+        err instanceof Error ? err.message : 'Failed to load dashboard data'
+      );
     } finally {
       setIsLoading(false);
     }
   }, [userId]);
 
   // Generate weekly schedule
-  // eslint-disable-next-line no-unused-vars
-  const generateWeeklySchedule = useCallback(async (weekStart: string, userPreferences?: any) => {
-    if (!userId) return;
 
-    setIsGeneratingSchedule(true);
-    setError(null);
+  const generateWeeklySchedule = useCallback(
+    async (weekStart: string, userPreferences?: any) => {
+      if (!userId) return;
 
-    try {
-      const schedule = await intelligentSessionManager.generateWeeklySchedule(
-        userId,
-        weekStart,
-        userPreferences
-      );
+      setIsGeneratingSchedule(true);
+      setError(null);
 
-      // Determine if this is current week or next week
-      const today = new Date();
-      const weekStartDate = new Date(weekStart);
-      const isCurrentWeek = weekStartDate <= today && today <= new Date(weekStartDate.getTime() + 6 * 24 * 60 * 60 * 1000);
+      try {
+        const schedule = await intelligentSessionManager.generateWeeklySchedule(
+          userId,
+          weekStart,
+          userPreferences
+        );
 
-      if (isCurrentWeek) {
-        setCurrentWeekSchedule(schedule);
-      } else {
-        setNextWeekSchedule(schedule);
+        // Determine if this is current week or next week
+        const today = new Date();
+        const weekStartDate = new Date(weekStart);
+        const isCurrentWeek =
+          weekStartDate <= today &&
+          today <= new Date(weekStartDate.getTime() + 6 * 24 * 60 * 60 * 1000);
+
+        if (isCurrentWeek) {
+          setCurrentWeekSchedule(schedule);
+        } else {
+          setNextWeekSchedule(schedule);
+        }
+      } catch (err) {
+        setError(
+          err instanceof Error
+            ? err.message
+            : 'Failed to generate weekly schedule'
+        );
+      } finally {
+        setIsGeneratingSchedule(false);
       }
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to generate weekly schedule');
-    } finally {
-      setIsGeneratingSchedule(false);
-    }
-  }, [userId]);
+    },
+    [userId]
+  );
 
   // Resolve conflicts
   const resolveConflicts = useCallback(async () => {
@@ -126,51 +152,64 @@ export function useIntelligentScheduling(userId: string): UseIntelligentScheduli
     setError(null);
 
     try {
-      const resolutions = await intelligentSessionManager.resolveScheduleConflicts(
-        currentWeekSchedule,
-        userId
-      );
+      const resolutions =
+        await intelligentSessionManager.resolveScheduleConflicts(
+          currentWeekSchedule,
+          userId
+        );
       setConflicts(resolutions);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to resolve conflicts');
+      setError(
+        err instanceof Error ? err.message : 'Failed to resolve conflicts'
+      );
     } finally {
       setIsResolvingConflicts(false);
     }
   }, [currentWeekSchedule, userId]);
 
   // Handle missed sessions
-  const handleMissedSessions = useCallback(async (missedSessionIds: string[]) => {
-    if (!userId) return;
+  const handleMissedSessions = useCallback(
+    async (missedSessionIds: string[]) => {
+      if (!userId) return;
 
-    setIsHandlingMissedSessions(true);
-    setError(null);
+      setIsHandlingMissedSessions(true);
+      setError(null);
 
-    try {
-      const recoveries = await intelligentSessionManager.handleMissedSessions(
-        userId,
-        missedSessionIds
-      );
-      setMissedSessions(prev => [...prev, ...recoveries]);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to handle missed sessions');
-    } finally {
-      setIsHandlingMissedSessions(false);
-    }
-  }, [userId]);
+      try {
+        const recoveries = await intelligentSessionManager.handleMissedSessions(
+          userId,
+          missedSessionIds
+        );
+        setMissedSessions(prev => [...prev, ...recoveries]);
+      } catch (err) {
+        setError(
+          err instanceof Error
+            ? err.message
+            : 'Failed to handle missed sessions'
+        );
+      } finally {
+        setIsHandlingMissedSessions(false);
+      }
+    },
+    [userId]
+  );
 
   // Apply conflict resolutions
   const applyResolutions = useCallback(async () => {
     if (!currentWeekSchedule || conflicts.length === 0) return;
 
     try {
-      const updatedSchedule = await intelligentSessionManager.applyConflictResolutions(
-        currentWeekSchedule,
-        conflicts
-      );
+      const updatedSchedule =
+        await intelligentSessionManager.applyConflictResolutions(
+          currentWeekSchedule,
+          conflicts
+        );
       setCurrentWeekSchedule(updatedSchedule);
       setConflicts([]); // Clear resolved conflicts
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to apply resolutions');
+      setError(
+        err instanceof Error ? err.message : 'Failed to apply resolutions'
+      );
     }
   }, [currentWeekSchedule, conflicts]);
 
@@ -179,7 +218,10 @@ export function useIntelligentScheduling(userId: string): UseIntelligentScheduli
     if (!currentWeekSchedule || !userId) return;
 
     try {
-      await intelligentSessionManager.saveResolvedSchedule(currentWeekSchedule, userId);
+      await intelligentSessionManager.saveResolvedSchedule(
+        currentWeekSchedule,
+        userId
+      );
       // Refresh dashboard after saving
       await refreshDashboard();
     } catch (err) {
@@ -188,55 +230,66 @@ export function useIntelligentScheduling(userId: string): UseIntelligentScheduli
   }, [currentWeekSchedule, userId, refreshDashboard]);
 
   // Update session in current schedule
-  // eslint-disable-next-line no-unused-vars
-  const updateSession = useCallback((sessionId: string, updates: Partial<any>) => {
-    if (!currentWeekSchedule) return;
 
-    setCurrentWeekSchedule(prev => {
-      if (!prev) return null;
+  const updateSession = useCallback(
+    (sessionId: string, updates: Partial<any>) => {
+      if (!currentWeekSchedule) return;
 
-      const updatedSessions = prev.sessions.map(session =>
-        session.id === sessionId ? { ...session, ...updates } : session
-      );
+      setCurrentWeekSchedule(prev => {
+        if (!prev) return null;
 
-      return {
-        ...prev,
-        sessions: updatedSessions,
-      };
-    });
-  }, [currentWeekSchedule]);
+        const updatedSessions = prev.sessions.map(session =>
+          session.id === sessionId ? { ...session, ...updates } : session
+        );
+
+        return {
+          ...prev,
+          sessions: updatedSessions,
+        };
+      });
+    },
+    [currentWeekSchedule]
+  );
 
   // Remove session from current schedule
-  // eslint-disable-next-line no-unused-vars
-  const removeSession = useCallback((sessionId: string) => {
-    if (!currentWeekSchedule) return;
 
-    setCurrentWeekSchedule(prev => {
-      if (!prev) return null;
+  const removeSession = useCallback(
+    (sessionId: string) => {
+      if (!currentWeekSchedule) return;
 
-      const updatedSessions = prev.sessions.filter(session => session.id !== sessionId);
+      setCurrentWeekSchedule(prev => {
+        if (!prev) return null;
 
-      return {
-        ...prev,
-        sessions: updatedSessions,
-      };
-    });
-  }, [currentWeekSchedule]);
+        const updatedSessions = prev.sessions.filter(
+          session => session.id !== sessionId
+        );
+
+        return {
+          ...prev,
+          sessions: updatedSessions,
+        };
+      });
+    },
+    [currentWeekSchedule]
+  );
 
   // Add session to current schedule
-  // eslint-disable-next-line no-unused-vars
-  const addSession = useCallback((session: any) => {
-    if (!currentWeekSchedule) return;
 
-    setCurrentWeekSchedule(prev => {
-      if (!prev) return null;
+  const addSession = useCallback(
+    (session: any) => {
+      if (!currentWeekSchedule) return;
 
-      return {
-        ...prev,
-        sessions: [...prev.sessions, session],
-      };
-    });
-  }, [currentWeekSchedule]);
+      setCurrentWeekSchedule(prev => {
+        if (!prev) return null;
+
+        return {
+          ...prev,
+          sessions: [...prev.sessions, session],
+        };
+      });
+    },
+    [currentWeekSchedule]
+  );
 
   return {
     // Schedule data

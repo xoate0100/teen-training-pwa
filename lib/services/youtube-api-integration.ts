@@ -93,7 +93,7 @@ export class YouTubeAPIIntegrationService {
     pageToken?: string
   ): Promise<YouTubeSearchResult> {
     const cacheKey = `search_${query}_${JSON.stringify(context)}_${pageToken || 'first'}`;
-    
+
     // Check cache first
     if (this.isCacheValid(cacheKey)) {
       const cached = this.searchCache.get(cacheKey);
@@ -120,16 +120,20 @@ export class YouTubeAPIIntegrationService {
         searchParams.append('pageToken', pageToken);
       }
 
-      const response = await fetch(`${this.config.baseUrl}/search?${searchParams}`);
-      
+      const response = await fetch(
+        `${this.config.baseUrl}/search?${searchParams}`
+      );
+
       if (!response.ok) {
-        throw new Error(`YouTube API error: ${response.status} ${response.statusText}`);
+        throw new Error(
+          `YouTube API error: ${response.status} ${response.statusText}`
+        );
       }
 
       const data = await response.json();
-      
+
       const videos: YouTubeVideo[] = [];
-      
+
       if (data.items) {
         for (const item of data.items) {
           const video = await this.getVideoDetails(item.id.videoId);
@@ -169,11 +173,13 @@ export class YouTubeAPIIntegrationService {
       );
 
       if (!response.ok) {
-        throw new Error(`YouTube API error: ${response.status} ${response.statusText}`);
+        throw new Error(
+          `YouTube API error: ${response.status} ${response.statusText}`
+        );
       }
 
       const data = await response.json();
-      
+
       if (!data.items || data.items.length === 0) {
         return null;
       }
@@ -183,7 +189,9 @@ export class YouTubeAPIIntegrationService {
         id: item.id,
         title: item.snippet.title,
         description: item.snippet.description,
-        thumbnail: item.snippet.thumbnails.high?.url || item.snippet.thumbnails.default?.url,
+        thumbnail:
+          item.snippet.thumbnails.high?.url ||
+          item.snippet.thumbnails.default?.url,
         duration: item.contentDetails.duration,
         viewCount: parseInt(item.statistics.viewCount || '0'),
         likeCount: parseInt(item.statistics.likeCount || '0'),
@@ -193,7 +201,8 @@ export class YouTubeAPIIntegrationService {
         categoryId: item.snippet.categoryId,
         defaultLanguage: item.snippet.defaultLanguage || 'en',
         contentRating: {
-          ytRating: item.contentDetails.contentRating?.ytRating || 'ytUnspecified',
+          ytRating:
+            item.contentDetails.contentRating?.ytRating || 'ytUnspecified',
         },
       };
 
@@ -208,7 +217,9 @@ export class YouTubeAPIIntegrationService {
   }
 
   // Get contextual video recommendations
-  async getContextualRecommendations(context: VideoRecommendationContext): Promise<VideoRecommendation[]> {
+  async getContextualRecommendations(
+    context: VideoRecommendationContext
+  ): Promise<VideoRecommendation[]> {
     const queries = this.generateSearchQueries(context);
     const allVideos: YouTubeVideo[] = [];
 
@@ -241,10 +252,30 @@ export class YouTubeAPIIntegrationService {
 
     // Base exercise type queries
     const exerciseTypeQueries = {
-      strength: ['strength training', 'weightlifting', 'resistance training', 'muscle building'],
-      volleyball: ['volleyball training', 'volleyball skills', 'volleyball drills', 'volleyball conditioning'],
-      plyometric: ['plyometric training', 'jump training', 'explosive training', 'athletic performance'],
-      recovery: ['recovery exercises', 'stretching', 'mobility', 'rehabilitation'],
+      strength: [
+        'strength training',
+        'weightlifting',
+        'resistance training',
+        'muscle building',
+      ],
+      volleyball: [
+        'volleyball training',
+        'volleyball skills',
+        'volleyball drills',
+        'volleyball conditioning',
+      ],
+      plyometric: [
+        'plyometric training',
+        'jump training',
+        'explosive training',
+        'athletic performance',
+      ],
+      recovery: [
+        'recovery exercises',
+        'stretching',
+        'mobility',
+        'rehabilitation',
+      ],
     };
 
     const baseQueries = exerciseTypeQueries[context.exerciseType] || [];
@@ -259,8 +290,10 @@ export class YouTubeAPIIntegrationService {
     const skillQueries = skillLevelQueries[context.skillLevel] || [];
 
     // Add muscle group specific queries
-    const muscleGroupQueries = context.targetMuscleGroups.map(mg => 
-      `${mg} exercises`, `${mg} training`, `${mg} workout`
+    const muscleGroupQueries = context.targetMuscleGroups.map(
+      mg => `${mg} exercises`,
+      `${mg} training`,
+      `${mg} workout`
     );
 
     // Add equipment specific queries
@@ -283,11 +316,11 @@ export class YouTubeAPIIntegrationService {
       for (const skillQuery of skillQueries) {
         queries.push(`${baseQuery} ${skillQuery}`);
       }
-      
+
       for (const muscleQuery of muscleGroupQueries) {
         queries.push(`${baseQuery} ${muscleQuery}`);
       }
-      
+
       for (const equipmentQuery of equipmentQueries) {
         queries.push(`${baseQuery} ${equipmentQuery}`);
       }
@@ -305,7 +338,10 @@ export class YouTubeAPIIntegrationService {
   }
 
   // Score video based on context
-  private scoreVideo(video: YouTubeVideo, context: VideoRecommendationContext): VideoRecommendation {
+  private scoreVideo(
+    video: YouTubeVideo,
+    context: VideoRecommendationContext
+  ): VideoRecommendation {
     let score = 0;
     const reasons: string[] = [];
     const warnings: string[] = [];
@@ -327,9 +363,11 @@ export class YouTubeAPIIntegrationService {
     };
 
     const keywords = exerciseTypeKeywords[context.exerciseType] || [];
-    const titleMatches = keywords.filter(keyword => titleLower.includes(keyword)).length;
+    const titleMatches = keywords.filter(keyword =>
+      titleLower.includes(keyword)
+    ).length;
     score += titleMatches * 20;
-    
+
     if (titleMatches > 0) {
       reasons.push(`Title matches ${context.exerciseType} keywords`);
     }
@@ -342,8 +380,9 @@ export class YouTubeAPIIntegrationService {
     };
 
     const skillKeywords = skillLevelKeywords[context.skillLevel] || [];
-    const skillMatches = skillKeywords.filter(keyword => 
-      titleLower.includes(keyword) || descriptionLower.includes(keyword)
+    const skillMatches = skillKeywords.filter(
+      keyword =>
+        titleLower.includes(keyword) || descriptionLower.includes(keyword)
     ).length;
     score += skillMatches * 15;
 
@@ -352,19 +391,31 @@ export class YouTubeAPIIntegrationService {
     }
 
     // Muscle group relevance
-    const muscleGroupMatches = context.targetMuscleGroups.filter(mg =>
-      titleLower.includes(mg.toLowerCase()) || descriptionLower.includes(mg.toLowerCase())
+    const muscleGroupMatches = context.targetMuscleGroups.filter(
+      mg =>
+        titleLower.includes(mg.toLowerCase()) ||
+        descriptionLower.includes(mg.toLowerCase())
     ).length;
     score += muscleGroupMatches * 10;
 
     if (muscleGroupMatches > 0) {
-      reasons.push(`Targets desired muscle groups: ${context.targetMuscleGroups.slice(0, muscleGroupMatches).join(', ')}`);
+      reasons.push(
+        `Targets desired muscle groups: ${context.targetMuscleGroups.slice(0, muscleGroupMatches).join(', ')}`
+      );
     }
 
     // Form demonstration bonus
-    const formKeywords = ['form', 'technique', 'proper', 'correct', 'demonstration', 'how to'];
-    const formMatches = formKeywords.filter(keyword =>
-      titleLower.includes(keyword) || descriptionLower.includes(keyword)
+    const formKeywords = [
+      'form',
+      'technique',
+      'proper',
+      'correct',
+      'demonstration',
+      'how to',
+    ];
+    const formMatches = formKeywords.filter(
+      keyword =>
+        titleLower.includes(keyword) || descriptionLower.includes(keyword)
     ).length;
     score += formMatches * 25;
 
@@ -382,8 +433,11 @@ export class YouTubeAPIIntegrationService {
     }
 
     // Equipment relevance
-    const equipmentMatches = context.equipment.filter(eq =>
-      eq !== 'none' && (titleLower.includes(eq.toLowerCase()) || descriptionLower.includes(eq.toLowerCase()))
+    const equipmentMatches = context.equipment.filter(
+      eq =>
+        eq !== 'none' &&
+        (titleLower.includes(eq.toLowerCase()) ||
+          descriptionLower.includes(eq.toLowerCase()))
     ).length;
     score += equipmentMatches * 5;
 
@@ -394,7 +448,10 @@ export class YouTubeAPIIntegrationService {
     }
 
     // Age appropriateness
-    if (context.userAge < 18 && video.contentRating.ytRating === 'ytUnspecified') {
+    if (
+      context.userAge < 18 &&
+      video.contentRating.ytRating === 'ytUnspecified'
+    ) {
       score += 5;
       reasons.push('Age-appropriate content');
     }
@@ -419,11 +476,19 @@ export class YouTubeAPIIntegrationService {
 
     // Channel credibility bonus
     const credibleChannels = [
-      'Athlean-X', 'Fitness Blender', 'Pamela Reif', 'Chloe Ting',
-      'Jeremy Ethier', 'Jeff Nippard', 'Squat University', 'Alan Thrall'
+      'Athlean-X',
+      'Fitness Blender',
+      'Pamela Reif',
+      'Chloe Ting',
+      'Jeremy Ethier',
+      'Jeff Nippard',
+      'Squat University',
+      'Alan Thrall',
     ];
-    
-    if (credibleChannels.some(channel => video.channelTitle.includes(channel))) {
+
+    if (
+      credibleChannels.some(channel => video.channelTitle.includes(channel))
+    ) {
       score += 20;
       reasons.push('From credible fitness channel');
     }
@@ -431,7 +496,9 @@ export class YouTubeAPIIntegrationService {
     // Generate metadata
     const metadata = {
       isFormDemonstration: formMatches > 0,
-      isProgression: titleLower.includes('progression') || descriptionLower.includes('progression'),
+      isProgression:
+        titleLower.includes('progression') ||
+        descriptionLower.includes('progression'),
       difficultyLevel: this.assessDifficultyLevel(video, context),
       equipmentRequired: this.extractEquipment(video),
       muscleGroups: this.extractMuscleGroups(video),
@@ -460,7 +527,10 @@ export class YouTubeAPIIntegrationService {
   }
 
   // Score duration based on session duration preference
-  private scoreDuration(videoDuration: number, sessionDuration: string): number {
+  private scoreDuration(
+    videoDuration: number,
+    sessionDuration: string
+  ): number {
     const durationRanges = {
       short: [5, 15],
       medium: [15, 30],
@@ -468,7 +538,7 @@ export class YouTubeAPIIntegrationService {
     };
 
     const [min, max] = durationRanges[sessionDuration] || [0, 60];
-    
+
     if (videoDuration >= min && videoDuration <= max) {
       return 20;
     } else if (videoDuration >= min * 0.8 && videoDuration <= max * 1.2) {
@@ -479,19 +549,39 @@ export class YouTubeAPIIntegrationService {
   }
 
   // Assess difficulty level
-  private assessDifficultyLevel(video: YouTubeVideo, context: VideoRecommendationContext): 'beginner' | 'intermediate' | 'advanced' {
+  private assessDifficultyLevel(
+    video: YouTubeVideo,
+    context: VideoRecommendationContext
+  ): 'beginner' | 'intermediate' | 'advanced' {
     const titleLower = video.title.toLowerCase();
     const descriptionLower = video.description.toLowerCase();
 
-    const beginnerKeywords = ['beginner', 'basic', 'introduction', 'tutorial', 'start', 'easy'];
-    const advancedKeywords = ['advanced', 'expert', 'professional', 'elite', 'master', 'hard', 'challenging'];
+    const beginnerKeywords = [
+      'beginner',
+      'basic',
+      'introduction',
+      'tutorial',
+      'start',
+      'easy',
+    ];
+    const advancedKeywords = [
+      'advanced',
+      'expert',
+      'professional',
+      'elite',
+      'master',
+      'hard',
+      'challenging',
+    ];
 
-    const beginnerMatches = beginnerKeywords.filter(keyword =>
-      titleLower.includes(keyword) || descriptionLower.includes(keyword)
+    const beginnerMatches = beginnerKeywords.filter(
+      keyword =>
+        titleLower.includes(keyword) || descriptionLower.includes(keyword)
     ).length;
 
-    const advancedMatches = advancedKeywords.filter(keyword =>
-      titleLower.includes(keyword) || descriptionLower.includes(keyword)
+    const advancedMatches = advancedKeywords.filter(
+      keyword =>
+        titleLower.includes(keyword) || descriptionLower.includes(keyword)
     ).length;
 
     if (beginnerMatches > advancedMatches) return 'beginner';
@@ -502,31 +592,54 @@ export class YouTubeAPIIntegrationService {
   // Extract equipment from video
   private extractEquipment(video: YouTubeVideo): string[] {
     const equipmentKeywords = [
-      'dumbbell', 'barbell', 'kettlebell', 'resistance band', 'yoga mat',
-      'pull-up bar', 'bench', 'squat rack', 'cable', 'machine'
+      'dumbbell',
+      'barbell',
+      'kettlebell',
+      'resistance band',
+      'yoga mat',
+      'pull-up bar',
+      'bench',
+      'squat rack',
+      'cable',
+      'machine',
     ];
 
     const titleLower = video.title.toLowerCase();
     const descriptionLower = video.description.toLowerCase();
 
-    return equipmentKeywords.filter(equipment =>
-      titleLower.includes(equipment) || descriptionLower.includes(equipment)
+    return equipmentKeywords.filter(
+      equipment =>
+        titleLower.includes(equipment) || descriptionLower.includes(equipment)
     );
   }
 
   // Extract muscle groups from video
   private extractMuscleGroups(video: YouTubeVideo): string[] {
     const muscleGroups = [
-      'chest', 'back', 'shoulders', 'biceps', 'triceps', 'forearms',
-      'abs', 'core', 'obliques', 'quadriceps', 'hamstrings', 'glutes',
-      'calves', 'legs', 'arms', 'upper body', 'lower body'
+      'chest',
+      'back',
+      'shoulders',
+      'biceps',
+      'triceps',
+      'forearms',
+      'abs',
+      'core',
+      'obliques',
+      'quadriceps',
+      'hamstrings',
+      'glutes',
+      'calves',
+      'legs',
+      'arms',
+      'upper body',
+      'lower body',
     ];
 
     const titleLower = video.title.toLowerCase();
     const descriptionLower = video.description.toLowerCase();
 
-    return muscleGroups.filter(muscle =>
-      titleLower.includes(muscle) || descriptionLower.includes(muscle)
+    return muscleGroups.filter(
+      muscle => titleLower.includes(muscle) || descriptionLower.includes(muscle)
     );
   }
 
@@ -556,11 +669,18 @@ export class YouTubeAPIIntegrationService {
   }
 
   // Get cache statistics
-  getCacheStats(): { videoCount: number; searchCount: number; memoryUsage: number } {
+  getCacheStats(): {
+    videoCount: number;
+    searchCount: number;
+    memoryUsage: number;
+  } {
     return {
       videoCount: this.videoCache.size,
       searchCount: this.searchCache.size,
-      memoryUsage: JSON.stringify([...this.videoCache.values(), ...this.searchCache.values()]).length,
+      memoryUsage: JSON.stringify([
+        ...this.videoCache.values(),
+        ...this.searchCache.values(),
+      ]).length,
     };
   }
 

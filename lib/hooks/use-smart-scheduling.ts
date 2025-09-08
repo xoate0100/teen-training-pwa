@@ -19,11 +19,16 @@ export function useSmartScheduling() {
   const { currentUser } = useUser();
   const { sessions, checkIns } = useDatabase();
   const { weekCalculation, getCurrentWeekInfo } = useWeekCalculation();
-  
+
   const [nextSession, setNextSession] = useState<SessionSchedule | null>(null);
-  const [optimalTiming, setOptimalTiming] = useState<OptimalTiming | null>(null);
-  const [recoveryRecommendation, setRecoveryRecommendation] = useState<RecoveryRecommendation | null>(null);
-  const [phaseAnalysis, setPhaseAnalysis] = useState<PhaseAnalysis | null>(null);
+  const [optimalTiming, setOptimalTiming] = useState<OptimalTiming | null>(
+    null
+  );
+  const [recoveryRecommendation, setRecoveryRecommendation] =
+    useState<RecoveryRecommendation | null>(null);
+  const [phaseAnalysis, setPhaseAnalysis] = useState<PhaseAnalysis | null>(
+    null
+  );
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -59,7 +64,6 @@ export function useSmartScheduling() {
         sessions
       );
       setRecoveryRecommendation(recovery);
-
     } catch (err) {
       console.error('Error calculating next session:', err);
       setError('Failed to calculate next session');
@@ -95,14 +99,18 @@ export function useSmartScheduling() {
     const weekEnd = new Date(weekCalculation.weekEndDate);
 
     // Generate recommendations for each day of the week
-    for (let d = new Date(weekStart); d <= weekEnd; d.setDate(d.getDate() + 1)) {
+    for (
+      let d = new Date(weekStart);
+      d <= weekEnd;
+      d.setDate(d.getDate() + 1)
+    ) {
       const dateStr = d.toISOString().split('T')[0];
       const sessionRec = SessionSchedulingService.predictNextSession(
         dateStr,
         sessions,
         checkIns
       );
-      
+
       if (sessionRec) {
         recommendations.push(sessionRec);
       }
@@ -114,11 +122,13 @@ export function useSmartScheduling() {
   // Check if today is optimal for training
   const isOptimalTrainingDay = useCallback((): boolean => {
     if (!nextSession || !recoveryRecommendation) return false;
-    
+
     const today = new Date().toISOString().split('T')[0];
-    return nextSession.date === today && 
-           !recoveryRecommendation.shouldRest &&
-           nextSession.conflicts.length === 0;
+    return (
+      nextSession.date === today &&
+      !recoveryRecommendation.shouldRest &&
+      nextSession.conflicts.length === 0
+    );
   }, [nextSession, recoveryRecommendation]);
 
   // Get training readiness score
@@ -134,9 +144,13 @@ export function useSmartScheduling() {
 
     // Reduce score based on conflicts
     if (nextSession.conflicts.length > 0) {
-      const highSeverityConflicts = nextSession.conflicts.filter(c => c.severity === 'high').length;
-      const mediumSeverityConflicts = nextSession.conflicts.filter(c => c.severity === 'medium').length;
-      
+      const highSeverityConflicts = nextSession.conflicts.filter(
+        c => c.severity === 'high'
+      ).length;
+      const mediumSeverityConflicts = nextSession.conflicts.filter(
+        c => c.severity === 'medium'
+      ).length;
+
       score -= highSeverityConflicts * 30;
       score -= mediumSeverityConflicts * 15;
     }
@@ -176,10 +190,7 @@ export function useSmartScheduling() {
       rest: ['recovery', 'mobility'],
     };
 
-    return [
-      ...phaseFocus,
-      ...(sessionTypeFocus[nextSession.type] || [])
-    ];
+    return [...phaseFocus, ...(sessionTypeFocus[nextSession.type] || [])];
   }, [phaseAnalysis, nextSession]);
 
   // Get warnings and alerts
@@ -205,10 +216,7 @@ export function useSmartScheduling() {
 
   // Refresh all calculations
   const refreshAll = useCallback(async () => {
-    await Promise.all([
-      calculateNextSession(),
-      analyzePhase(),
-    ]);
+    await Promise.all([calculateNextSession(), analyzePhase()]);
   }, [calculateNextSession, analyzePhase]);
 
   // Load initial data

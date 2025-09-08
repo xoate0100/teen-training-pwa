@@ -53,13 +53,7 @@ export function useResponsiveNavigation() {
       case 'smart':
         // Keep on same page but change tab
         break;
-      case 'themes':
-        // Keep on same page but change tab
-        break;
       case 'interactive':
-        // Keep on same page but change tab
-        break;
-      case 'profile':
         // Keep on same page but change tab
         break;
       default:

@@ -94,7 +94,12 @@ export interface UserBehaviorPattern {
 
 export interface PreferenceEvolution {
   userId: string;
-  preferenceType: 'exercise' | 'timing' | 'intensity' | 'duration' | 'environment';
+  preferenceType:
+    | 'exercise'
+    | 'timing'
+    | 'intensity'
+    | 'duration'
+    | 'environment';
   currentValue: any;
   previousValue: any;
   evolutionRate: number; // Rate of change per month
@@ -138,7 +143,12 @@ export interface GoalAdaptation {
 export interface PerformanceOptimizationLoop {
   loopId: string;
   userId: string;
-  optimizationType: 'training_load' | 'recovery' | 'nutrition' | 'sleep' | 'motivation';
+  optimizationType:
+    | 'training_load'
+    | 'recovery'
+    | 'nutrition'
+    | 'sleep'
+    | 'motivation';
   currentState: any;
   targetState: any;
   optimizationStrategy: string;
@@ -192,7 +202,11 @@ export interface AutomationRule {
     value: any;
   }[];
   actions: {
-    type: 'adjust_session' | 'send_notification' | 'modify_recommendation' | 'trigger_alert';
+    type:
+      | 'adjust_session'
+      | 'send_notification'
+      | 'modify_recommendation'
+      | 'trigger_alert';
     parameters: any;
   }[];
   enabled: boolean;
@@ -213,12 +227,13 @@ export class AutonomousSystemManagementService {
   private performanceHistory: any[] = [];
   private learningInterval: number | null = null;
   private healthCheckInterval: number | null = null;
-  
+
   // Adaptive Learning System Properties
   private behaviorPatterns: Map<string, UserBehaviorPattern[]> = new Map();
   private preferenceEvolutions: Map<string, PreferenceEvolution[]> = new Map();
   private goalAdaptations: Map<string, GoalAdaptation[]> = new Map();
-  private optimizationLoops: Map<string, PerformanceOptimizationLoop[]> = new Map();
+  private optimizationLoops: Map<string, PerformanceOptimizationLoop[]> =
+    new Map();
   private adaptiveLearningInterval: number | null = null;
 
   constructor() {
@@ -233,23 +248,31 @@ export class AutonomousSystemManagementService {
   }
 
   // Model Performance Monitoring
-  async monitorModelPerformance(modelId: string, modelName: string): Promise<ModelPerformanceMetrics> {
+  async monitorModelPerformance(
+    modelId: string,
+    modelName: string
+  ): Promise<ModelPerformanceMetrics> {
     try {
       // Get recent data for evaluation
       const sessions = await this.databaseService.getSessions('current-user');
       const checkIns = await this.databaseService.getCheckIns('current-user');
-      
+
       // Calculate performance metrics
-      const metrics = await this.calculateModelMetrics(modelId, modelName, sessions, checkIns);
-      
+      const metrics = await this.calculateModelMetrics(
+        modelId,
+        modelName,
+        sessions,
+        checkIns
+      );
+
       // Store metrics
       this.modelMetrics.set(modelId, metrics);
-      
+
       // Check if tuning is needed
       if (this.shouldTuneParameters(metrics)) {
         await this.tuneParameters(modelId);
       }
-      
+
       return metrics;
     } catch (error) {
       console.error('Error monitoring model performance:', error);
@@ -258,20 +281,20 @@ export class AutonomousSystemManagementService {
   }
 
   private async calculateModelMetrics(
-    modelId: string, 
-    modelName: string, 
-    sessions: SessionData[], 
+    modelId: string,
+    modelName: string,
+    sessions: SessionData[],
     checkIns: CheckInData[]
   ): Promise<ModelPerformanceMetrics> {
     // Simulate model evaluation
     const accuracy = 0.75 + Math.random() * 0.2; // 75-95%
-    const precision = 0.70 + Math.random() * 0.25; // 70-95%
+    const precision = 0.7 + Math.random() * 0.25; // 70-95%
     const recall = 0.65 + Math.random() * 0.3; // 65-95%
-    const f1Score = 2 * (precision * recall) / (precision + recall);
-    
+    const f1Score = (2 * (precision * recall)) / (precision + recall);
+
     const performanceTrend = this.calculatePerformanceTrend();
     const confidence = Math.min(0.95, accuracy * 0.8 + f1Score * 0.2);
-    
+
     return {
       modelId,
       modelName,
@@ -289,10 +312,10 @@ export class AutonomousSystemManagementService {
 
   private calculatePerformanceTrend(): 'improving' | 'stable' | 'declining' {
     if (this.performanceHistory.length < 3) return 'stable';
-    
+
     const recent = this.performanceHistory.slice(-3);
     const trend = recent[2] - recent[0];
-    
+
     if (trend > 0.05) return 'improving';
     if (trend < -0.05) return 'declining';
     return 'stable';
@@ -302,7 +325,7 @@ export class AutonomousSystemManagementService {
   async tuneParameters(modelId: string): Promise<ParameterTuningResult[]> {
     const results: ParameterTuningResult[] = [];
     const currentMetrics = this.modelMetrics.get(modelId);
-    
+
     if (!currentMetrics) return results;
 
     // Simulate parameter tuning for different parameters
@@ -314,7 +337,11 @@ export class AutonomousSystemManagementService {
     ];
 
     for (const param of parameters) {
-      const tuningResult = await this.tuneSingleParameter(modelId, param, currentMetrics);
+      const tuningResult = await this.tuneSingleParameter(
+        modelId,
+        param,
+        currentMetrics
+      );
       if (tuningResult) {
         results.push(tuningResult);
         this.parameterHistory.push(tuningResult);
@@ -325,18 +352,18 @@ export class AutonomousSystemManagementService {
   }
 
   private async tuneSingleParameter(
-    modelId: string, 
-    parameter: any, 
+    modelId: string,
+    parameter: any,
     currentMetrics: ModelPerformanceMetrics
   ): Promise<ParameterTuningResult | null> {
     // Simulate parameter optimization
     const improvement = Math.random() * 0.1 - 0.05; // -5% to +5%
-    
+
     if (Math.abs(improvement) < 0.01) return null; // No significant improvement
-    
+
     const newValue = this.generateNewParameterValue(parameter);
     const confidence = Math.random() * 0.3 + 0.7; // 70-100%
-    
+
     return {
       parameterName: parameter.name,
       oldValue: parameter.current,
@@ -357,15 +384,22 @@ export class AutonomousSystemManagementService {
   }
 
   private shouldTuneParameters(metrics: ModelPerformanceMetrics): boolean {
-    return metrics.performanceTrend === 'declining' || 
-           metrics.confidence < 0.8 || 
-           metrics.accuracy < 0.8;
+    return (
+      metrics.performanceTrend === 'declining' ||
+      metrics.confidence < 0.8 ||
+      metrics.accuracy < 0.8
+    );
   }
 
   // A/B Testing Framework
-  async createABTest(config: Omit<ABTestConfig, 'testId' | 'startDate' | 'status' | 'currentSampleSize'>): Promise<string> {
+  async createABTest(
+    config: Omit<
+      ABTestConfig,
+      'testId' | 'startDate' | 'status' | 'currentSampleSize'
+    >
+  ): Promise<string> {
     const testId = `test_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-    
+
     const abTest: ABTestConfig = {
       ...config,
       testId,
@@ -373,7 +407,7 @@ export class AutonomousSystemManagementService {
       status: 'active',
       currentSampleSize: 0,
     };
-    
+
     this.abTests.set(testId, abTest);
     return testId;
   }
@@ -386,29 +420,31 @@ export class AutonomousSystemManagementService {
 
     // Select variant based on weights
     const variant = this.selectVariant(test.variants);
-    
+
     // Increment sample size
     test.currentSampleSize++;
-    
+
     // Check if test should be completed
     if (test.currentSampleSize >= test.minimumSampleSize) {
       await this.completeABTest(testId);
     }
-    
+
     return variant.config;
   }
 
-  private selectVariant(variants: ABTestConfig['variants']): ABTestConfig['variants'][0] {
+  private selectVariant(
+    variants: ABTestConfig['variants']
+  ): ABTestConfig['variants'][0] {
     const random = Math.random();
     let cumulative = 0;
-    
+
     for (const variant of variants) {
       cumulative += variant.weight;
       if (random <= cumulative) {
         return variant;
       }
     }
-    
+
     return variants[variants.length - 1];
   }
 
@@ -417,7 +453,8 @@ export class AutonomousSystemManagementService {
     if (!test) throw new Error('AB test not found');
 
     // Simulate test results
-    const winningVariant = test.variants[Math.floor(Math.random() * test.variants.length)];
+    const winningVariant =
+      test.variants[Math.floor(Math.random() * test.variants.length)];
     const confidence = 0.8 + Math.random() * 0.2; // 80-100%
     const improvement = Math.random() * 0.3; // 0-30%
     const statisticalSignificance = 0.85 + Math.random() * 0.15; // 85-100%
@@ -434,7 +471,7 @@ export class AutonomousSystemManagementService {
 
     this.abTestResults.push(result);
     test.status = 'completed';
-    
+
     return result;
   }
 
@@ -449,19 +486,18 @@ export class AutonomousSystemManagementService {
     try {
       // Learn user patterns
       await this.learnUserPatterns();
-      
+
       // Update model parameters
       await this.updateModelParameters();
-      
+
       // Analyze system performance
       await this.analyzeSystemPerformance();
-      
+
       // Detect problems proactively
       await this.detectProblems();
-      
+
       // Perform self-healing
       await this.performSelfHealing();
-      
     } catch (error) {
       console.error('Error in continuous learning:', error);
     }
@@ -470,61 +506,95 @@ export class AutonomousSystemManagementService {
   private async learnUserPatterns(): Promise<void> {
     const sessions = await this.databaseService.getSessions('current-user');
     const checkIns = await this.databaseService.getCheckIns('current-user');
-    
+
     // Learn preference patterns
-    const preferencePatterns = this.extractPreferencePatterns(sessions, checkIns);
-    this.updateLearningPatterns('current-user', 'preference', preferencePatterns);
-    
+    const preferencePatterns = this.extractPreferencePatterns(
+      sessions,
+      checkIns
+    );
+    this.updateLearningPatterns(
+      'current-user',
+      'preference',
+      preferencePatterns
+    );
+
     // Learn behavior patterns
     const behaviorPatterns = this.extractBehaviorPatterns(sessions, checkIns);
     this.updateLearningPatterns('current-user', 'behavior', behaviorPatterns);
-    
+
     // Learn performance patterns
-    const performancePatterns = this.extractPerformancePatterns(sessions, checkIns);
-    this.updateLearningPatterns('current-user', 'performance', performancePatterns);
+    const performancePatterns = this.extractPerformancePatterns(
+      sessions,
+      checkIns
+    );
+    this.updateLearningPatterns(
+      'current-user',
+      'performance',
+      performancePatterns
+    );
   }
 
-  private extractPreferencePatterns(sessions: SessionData[], checkIns: CheckInData[]): any[] {
+  private extractPreferencePatterns(
+    sessions: SessionData[],
+    checkIns: CheckInData[]
+  ): any[] {
     // Analyze exercise preferences, timing preferences, etc.
     const exerciseFrequency = new Map<string, number>();
     const timePreferences = new Map<string, number>();
-    
+
     sessions.forEach(session => {
       // Exercise preferences
       session.exercises.forEach(exercise => {
-        exerciseFrequency.set(exercise.name, (exerciseFrequency.get(exercise.name) || 0) + 1);
+        exerciseFrequency.set(
+          exercise.name,
+          (exerciseFrequency.get(exercise.name) || 0) + 1
+        );
       });
-      
+
       // Time preferences
       const hour = new Date(session.date).getHours();
-      const timeSlot = hour < 12 ? 'morning' : hour < 17 ? 'afternoon' : 'evening';
+      const timeSlot =
+        hour < 12 ? 'morning' : hour < 17 ? 'afternoon' : 'evening';
       timePreferences.set(timeSlot, (timePreferences.get(timeSlot) || 0) + 1);
     });
-    
+
     return [
-      { type: 'exercise_preferences', data: Object.fromEntries(exerciseFrequency) },
+      {
+        type: 'exercise_preferences',
+        data: Object.fromEntries(exerciseFrequency),
+      },
       { type: 'time_preferences', data: Object.fromEntries(timePreferences) },
     ];
   }
 
-  private extractBehaviorPatterns(sessions: SessionData[], checkIns: CheckInData[]): any[] {
+  private extractBehaviorPatterns(
+    sessions: SessionData[],
+    checkIns: CheckInData[]
+  ): any[] {
     // Analyze training consistency, session duration, etc.
     const sessionDurations = sessions.map(s => s.duration || 60);
-    const avgDuration = sessionDurations.reduce((sum, d) => sum + d, 0) / sessionDurations.length;
-    
+    const avgDuration =
+      sessionDurations.reduce((sum, d) => sum + d, 0) / sessionDurations.length;
+
     const consistency = this.calculateConsistency(sessions);
-    
+
     return [
-      { type: 'session_duration', data: { average: avgDuration, trend: 'stable' } },
+      {
+        type: 'session_duration',
+        data: { average: avgDuration, trend: 'stable' },
+      },
       { type: 'consistency', data: { score: consistency, trend: 'improving' } },
     ];
   }
 
-  private extractPerformancePatterns(sessions: SessionData[], checkIns: CheckInData[]): any[] {
+  private extractPerformancePatterns(
+    sessions: SessionData[],
+    checkIns: CheckInData[]
+  ): any[] {
     // Analyze performance trends, improvement rates, etc.
     const performanceTrend = this.calculatePerformanceTrend();
     const improvementRate = this.calculateImprovementRate(sessions);
-    
+
     return [
       { type: 'performance_trend', data: { trend: performanceTrend } },
       { type: 'improvement_rate', data: { rate: improvementRate } },
@@ -533,54 +603,72 @@ export class AutonomousSystemManagementService {
 
   private calculateConsistency(sessions: SessionData[]): number {
     if (sessions.length < 3) return 0.5;
-    
+
     const intervals = [];
     for (let i = 1; i < sessions.length; i++) {
-      const interval = sessions[i].date.getTime() - sessions[i-1].date.getTime();
+      const interval =
+        sessions[i].date.getTime() - sessions[i - 1].date.getTime();
       intervals.push(interval);
     }
-    
-    const avgInterval = intervals.reduce((sum, interval) => sum + interval, 0) / intervals.length;
-    const variance = intervals.reduce((sum, interval) => sum + Math.pow(interval - avgInterval, 2), 0) / intervals.length;
+
+    const avgInterval =
+      intervals.reduce((sum, interval) => sum + interval, 0) / intervals.length;
+    const variance =
+      intervals.reduce(
+        (sum, interval) => sum + Math.pow(interval - avgInterval, 2),
+        0
+      ) / intervals.length;
     const coefficient = Math.sqrt(variance) / avgInterval;
-    
+
     return Math.max(0, 1 - coefficient);
   }
 
   private calculateImprovementRate(sessions: SessionData[]): number {
     if (sessions.length < 7) return 0;
-    
+
     const firstHalf = sessions.slice(0, Math.floor(sessions.length / 2));
     const secondHalf = sessions.slice(Math.floor(sessions.length / 2));
-    
+
     const firstAvg = this.calculateAverageIntensity(firstHalf);
     const secondAvg = this.calculateAverageIntensity(secondHalf);
-    
+
     return (secondAvg - firstAvg) / firstAvg;
   }
 
   private calculateAverageIntensity(sessions: SessionData[]): number {
     if (sessions.length === 0) return 0;
-    
-    const allIntensities = sessions.flatMap(session => 
-      session.exercises.flatMap(exercise => 
+
+    const allIntensities = sessions.flatMap(session =>
+      session.exercises.flatMap(exercise =>
         exercise.sets.map(set => set.rpe || 5)
       )
     );
-    
-    return allIntensities.reduce((sum, intensity) => sum + intensity, 0) / allIntensities.length;
+
+    return (
+      allIntensities.reduce((sum, intensity) => sum + intensity, 0) /
+      allIntensities.length
+    );
   }
 
-  private updateLearningPatterns(userId: string, patternType: string, patterns: any[]): void {
+  private updateLearningPatterns(
+    userId: string,
+    patternType: string,
+    patterns: any[]
+  ): void {
     const userPatterns = this.learningPatterns.get(userId) || [];
-    
+
     patterns.forEach(pattern => {
-      const existingPattern = userPatterns.find(p => p.patternType === patternType && p.pattern.type === pattern.type);
-      
+      const existingPattern = userPatterns.find(
+        p => p.patternType === patternType && p.pattern.type === pattern.type
+      );
+
       if (existingPattern) {
         existingPattern.pattern = pattern;
         existingPattern.lastObserved = new Date();
-        existingPattern.confidence = Math.min(1, existingPattern.confidence + 0.1);
+        existingPattern.confidence = Math.min(
+          1,
+          existingPattern.confidence + 0.1
+        );
       } else {
         userPatterns.push({
           userId,
@@ -593,7 +681,7 @@ export class AutonomousSystemManagementService {
         });
       }
     });
-    
+
     this.learningPatterns.set(userId, userPatterns);
   }
 
@@ -610,13 +698,17 @@ export class AutonomousSystemManagementService {
     // Analyze overall system performance and update metrics
     const performance = {
       timestamp: Date.now(),
-      accuracy: Array.from(this.modelMetrics.values()).reduce((sum, m) => sum + m.accuracy, 0) / this.modelMetrics.size,
+      accuracy:
+        Array.from(this.modelMetrics.values()).reduce(
+          (sum, m) => sum + m.accuracy,
+          0
+        ) / this.modelMetrics.size,
       responseTime: Math.random() * 100 + 50, // 50-150ms
       throughput: Math.random() * 1000 + 500, // 500-1500 requests/min
     };
-    
+
     this.performanceHistory.push(performance);
-    
+
     // Keep only last 100 performance records
     if (this.performanceHistory.length > 100) {
       this.performanceHistory = this.performanceHistory.slice(-100);
@@ -635,16 +727,15 @@ export class AutonomousSystemManagementService {
     try {
       // Check for performance degradation
       await this.detectPerformanceDegradation();
-      
+
       // Check for data inconsistencies
       await this.detectDataInconsistencies();
-      
+
       // Check for user behavior anomalies
       await this.detectUserBehaviorAnomalies();
-      
+
       // Check for system resource issues
       await this.detectResourceIssues();
-      
     } catch (error) {
       console.error('Error in proactive problem detection:', error);
     }
@@ -652,11 +743,13 @@ export class AutonomousSystemManagementService {
 
   private async detectPerformanceDegradation(): Promise<void> {
     if (this.performanceHistory.length < 5) return;
-    
+
     const recent = this.performanceHistory.slice(-5);
-    const avgAccuracy = recent.reduce((sum, p) => sum + p.accuracy, 0) / recent.length;
-    const avgResponseTime = recent.reduce((sum, p) => sum + p.responseTime, 0) / recent.length;
-    
+    const avgAccuracy =
+      recent.reduce((sum, p) => sum + p.accuracy, 0) / recent.length;
+    const avgResponseTime =
+      recent.reduce((sum, p) => sum + p.responseTime, 0) / recent.length;
+
     // Check for accuracy degradation
     if (avgAccuracy < 0.7) {
       await this.triggerAlert({
@@ -665,20 +758,18 @@ export class AutonomousSystemManagementService {
         message: `Model accuracy has dropped to ${(avgAccuracy * 100).toFixed(1)}%`,
         actions: [
           { type: 'reduce_intensity', parameters: { factor: 0.8 } },
-          { type: 'schedule_recovery', parameters: { duration: 24 } }
-        ]
+          { type: 'schedule_recovery', parameters: { duration: 24 } },
+        ],
       });
     }
-    
+
     // Check for response time issues
     if (avgResponseTime > 200) {
       await this.triggerAlert({
         type: 'Response Time Issue',
         severity: 'medium',
         message: `Average response time is ${avgResponseTime.toFixed(0)}ms`,
-        actions: [
-          { type: 'optimize_cache', parameters: { clearOld: true } }
-        ]
+        actions: [{ type: 'optimize_cache', parameters: { clearOld: true } }],
       });
     }
   }
@@ -687,45 +778,52 @@ export class AutonomousSystemManagementService {
     try {
       const sessions = await this.databaseService.getSessions('current-user');
       const checkIns = await this.databaseService.getCheckIns('current-user');
-      
+
       // Check for missing data
-      const recentSessions = sessions.filter(s => 
-        new Date(s.date) > new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)
+      const recentSessions = sessions.filter(
+        s => new Date(s.date) > new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)
       );
-      const recentCheckIns = checkIns.filter(c => 
-        new Date(c.date) > new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)
+      const recentCheckIns = checkIns.filter(
+        c => new Date(c.date) > new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)
       );
-      
+
       if (recentSessions.length === 0) {
         await this.triggerAlert({
           type: 'Data Inconsistency',
           severity: 'medium',
           message: 'No recent session data found',
           actions: [
-            { type: 'send_notification', parameters: { 
-              type: 'Data Sync', 
-              message: 'Please sync your training data' 
-            }}
-          ]
+            {
+              type: 'send_notification',
+              parameters: {
+                type: 'Data Sync',
+                message: 'Please sync your training data',
+              },
+            },
+          ],
         });
       }
-      
+
       // Check for inconsistent data patterns
-      const inconsistentSessions = sessions.filter(s => 
-        s.exercises.some(ex => ex.sets.some(set => set.weight < 0 || set.reps < 0))
+      const inconsistentSessions = sessions.filter(s =>
+        s.exercises.some(ex =>
+          ex.sets.some(set => set.weight < 0 || set.reps < 0)
+        )
       );
-      
+
       if (inconsistentSessions.length > 0) {
         await this.triggerAlert({
           type: 'Data Quality Issue',
           severity: 'low',
           message: `${inconsistentSessions.length} sessions have invalid data`,
           actions: [
-            { type: 'data_cleanup', parameters: { sessions: inconsistentSessions.map(s => s.id) } }
-          ]
+            {
+              type: 'data_cleanup',
+              parameters: { sessions: inconsistentSessions.map(s => s.id) },
+            },
+          ],
         });
       }
-      
     } catch (error) {
       console.error('Error detecting data inconsistencies:', error);
     }
@@ -735,50 +833,60 @@ export class AutonomousSystemManagementService {
     try {
       const sessions = await this.databaseService.getSessions('current-user');
       const checkIns = await this.databaseService.getCheckIns('current-user');
-      
+
       if (sessions.length < 10) return;
-      
+
       // Check for sudden changes in training patterns
       const recentSessions = sessions.slice(-5);
       const olderSessions = sessions.slice(-10, -5);
-      
+
       const recentAvgIntensity = this.calculateAverageIntensity(recentSessions);
       const olderAvgIntensity = this.calculateAverageIntensity(olderSessions);
-      
-      const intensityChange = Math.abs(recentAvgIntensity - olderAvgIntensity) / olderAvgIntensity;
-      
+
+      const intensityChange =
+        Math.abs(recentAvgIntensity - olderAvgIntensity) / olderAvgIntensity;
+
       if (intensityChange > 0.5) {
         await this.triggerAlert({
           type: 'Behavior Anomaly',
           severity: 'medium',
           message: `Significant change in training intensity detected (${(intensityChange * 100).toFixed(1)}%)`,
           actions: [
-            { type: 'send_notification', parameters: { 
-              type: 'Training Adjustment', 
-              message: 'Consider adjusting your training intensity' 
-            }}
-          ]
+            {
+              type: 'send_notification',
+              parameters: {
+                type: 'Training Adjustment',
+                message: 'Consider adjusting your training intensity',
+              },
+            },
+          ],
         });
       }
-      
+
       // Check for missed sessions
-      const expectedSessions = Math.floor((Date.now() - new Date(sessions[0].date).getTime()) / (7 * 24 * 60 * 60 * 1000)) * 3;
+      const expectedSessions =
+        Math.floor(
+          (Date.now() - new Date(sessions[0].date).getTime()) /
+            (7 * 24 * 60 * 60 * 1000)
+        ) * 3;
       const actualSessions = sessions.length;
-      
+
       if (actualSessions < expectedSessions * 0.7) {
         await this.triggerAlert({
           type: 'Consistency Issue',
           severity: 'low',
           message: 'Training consistency has decreased',
           actions: [
-            { type: 'send_notification', parameters: { 
-              type: 'Motivation', 
-              message: 'You\'re doing great! Keep up the consistent training' 
-            }}
-          ]
+            {
+              type: 'send_notification',
+              parameters: {
+                type: 'Motivation',
+                message: "You're doing great! Keep up the consistent training",
+              },
+            },
+          ],
         });
       }
-      
     } catch (error) {
       console.error('Error detecting user behavior anomalies:', error);
     }
@@ -787,33 +895,30 @@ export class AutonomousSystemManagementService {
   private async detectResourceIssues(): Promise<void> {
     // Check memory usage
     if (typeof performance !== 'undefined' && performance.memory) {
-      const memoryUsage = performance.memory.usedJSHeapSize / performance.memory.jsHeapSizeLimit;
-      
+      const memoryUsage =
+        performance.memory.usedJSHeapSize / performance.memory.jsHeapSizeLimit;
+
       if (memoryUsage > 0.8) {
         await this.triggerAlert({
           type: 'Resource Issue',
           severity: 'medium',
           message: `High memory usage detected (${(memoryUsage * 100).toFixed(1)}%)`,
-          actions: [
-            { type: 'clear_cache', parameters: { aggressive: true } }
-          ]
+          actions: [{ type: 'clear_cache', parameters: { aggressive: true } }],
         });
       }
     }
-    
+
     // Check for storage issues
     try {
       const storageUsed = JSON.stringify(localStorage).length;
       const storageLimit = 5 * 1024 * 1024; // 5MB
-      
+
       if (storageUsed > storageLimit * 0.8) {
         await this.triggerAlert({
           type: 'Storage Issue',
           severity: 'low',
           message: 'Local storage is getting full',
-          actions: [
-            { type: 'cleanup_old_data', parameters: { days: 30 } }
-          ]
+          actions: [{ type: 'cleanup_old_data', parameters: { days: 30 } }],
         });
       }
     } catch (error) {
@@ -828,7 +933,6 @@ export class AutonomousSystemManagementService {
       await this.autoFixDataInconsistencies();
       await this.autoOptimizePerformance();
       await this.autoCleanupResources();
-      
     } catch (error) {
       console.error('Error in self-healing:', error);
     }
@@ -838,10 +942,10 @@ export class AutonomousSystemManagementService {
     try {
       const sessions = await this.databaseService.getSessions('current-user');
       let fixedCount = 0;
-      
+
       for (const session of sessions) {
         let needsUpdate = false;
-        
+
         // Fix negative weights
         session.exercises.forEach(exercise => {
           exercise.sets.forEach(set => {
@@ -859,17 +963,16 @@ export class AutonomousSystemManagementService {
             }
           });
         });
-        
+
         if (needsUpdate) {
           await this.databaseService.updateSession(session.id, session);
           fixedCount++;
         }
       }
-      
+
       if (fixedCount > 0) {
         console.log(`Auto-fixed ${fixedCount} data inconsistencies`);
       }
-      
     } catch (error) {
       console.error('Error auto-fixing data inconsistencies:', error);
     }
@@ -881,23 +984,23 @@ export class AutonomousSystemManagementService {
       if (this.performanceHistory.length > 50) {
         this.performanceHistory = this.performanceHistory.slice(-25);
       }
-      
+
       // Clear old model metrics
       const now = Date.now();
       for (const [modelId, metrics] of this.modelMetrics) {
         const age = now - metrics.lastUpdated.getTime();
-        if (age > 24 * 60 * 60 * 1000) { // 24 hours
+        if (age > 24 * 60 * 60 * 1000) {
+          // 24 hours
           this.modelMetrics.delete(modelId);
         }
       }
-      
+
       // Clear old parameter history
       if (this.parameterHistory.length > 100) {
         this.parameterHistory = this.parameterHistory.slice(-50);
       }
-      
+
       console.log('Performance optimization completed');
-      
     } catch (error) {
       console.error('Error auto-optimizing performance:', error);
     }
@@ -906,29 +1009,37 @@ export class AutonomousSystemManagementService {
   private async autoCleanupResources(): Promise<void> {
     try {
       // Clean up old notifications
-      const notifications = JSON.parse(localStorage.getItem('notifications') || '[]');
-      const recentNotifications = notifications.filter((n: any) => 
-        new Date(n.timestamp) > new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)
+      const notifications = JSON.parse(
+        localStorage.getItem('notifications') || '[]'
       );
-      localStorage.setItem('notifications', JSON.stringify(recentNotifications));
-      
+      const recentNotifications = notifications.filter(
+        (n: any) =>
+          new Date(n.timestamp) > new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)
+      );
+      localStorage.setItem(
+        'notifications',
+        JSON.stringify(recentNotifications)
+      );
+
       // Clean up old alerts
       const alerts = JSON.parse(localStorage.getItem('alerts') || '[]');
-      const recentAlerts = alerts.filter((a: any) => 
-        new Date(a.timestamp) > new Date(Date.now() - 3 * 24 * 60 * 60 * 1000)
+      const recentAlerts = alerts.filter(
+        (a: any) =>
+          new Date(a.timestamp) > new Date(Date.now() - 3 * 24 * 60 * 60 * 1000)
       );
       localStorage.setItem('alerts', JSON.stringify(recentAlerts));
-      
+
       // Clean up old learning patterns
       for (const [userId, patterns] of this.learningPatterns) {
-        const recentPatterns = patterns.filter(p => 
-          new Date(p.lastObserved) > new Date(Date.now() - 30 * 24 * 60 * 60 * 1000)
+        const recentPatterns = patterns.filter(
+          p =>
+            new Date(p.lastObserved) >
+            new Date(Date.now() - 30 * 24 * 60 * 60 * 1000)
         );
         this.learningPatterns.set(userId, recentPatterns);
       }
-      
+
       console.log('Resource cleanup completed');
-      
     } catch (error) {
       console.error('Error auto-cleaning resources:', error);
     }
@@ -955,8 +1066,11 @@ export class AutonomousSystemManagementService {
     };
 
     // Calculate overall health
-    const componentHealth = Object.values(health.components).reduce((sum, h) => sum + h, 0) / Object.keys(health.components).length;
-    const performanceHealth = health.performance.uptime * (1 - health.performance.errorRate / 100);
+    const componentHealth =
+      Object.values(health.components).reduce((sum, h) => sum + h, 0) /
+      Object.keys(health.components).length;
+    const performanceHealth =
+      health.performance.uptime * (1 - health.performance.errorRate / 100);
     health.overallHealth = (componentHealth + performanceHealth) / 2;
 
     // Detect issues
@@ -982,16 +1096,18 @@ export class AutonomousSystemManagementService {
   }
 
   // Automation Rules
-  async createAutomationRule(rule: Omit<AutomationRule, 'id' | 'lastTriggered' | 'successRate'>): Promise<string> {
+  async createAutomationRule(
+    rule: Omit<AutomationRule, 'id' | 'lastTriggered' | 'successRate'>
+  ): Promise<string> {
     const ruleId = `rule_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-    
+
     const automationRule: AutomationRule = {
       ...rule,
       id: ruleId,
       lastTriggered: null,
       successRate: 0,
     };
-    
+
     this.automationRules.set(ruleId, automationRule);
     return ruleId;
   }
@@ -999,7 +1115,7 @@ export class AutonomousSystemManagementService {
   async evaluateAutomationRules(): Promise<void> {
     for (const [ruleId, rule] of this.automationRules) {
       if (!rule.enabled) continue;
-      
+
       const shouldTrigger = await this.evaluateRuleConditions(rule);
       if (shouldTrigger) {
         await this.executeRuleActions(rule);
@@ -1012,13 +1128,17 @@ export class AutonomousSystemManagementService {
     // Evaluate all conditions - all must be true for rule to trigger
     for (const condition of rule.conditions) {
       const currentValue = await this.getMetricValue(condition.metric);
-      const conditionMet = this.evaluateCondition(currentValue, condition.operator, condition.value);
-      
+      const conditionMet = this.evaluateCondition(
+        currentValue,
+        condition.operator,
+        condition.value
+      );
+
       if (!conditionMet) {
         return false;
       }
     }
-    
+
     return true;
   }
 
@@ -1028,7 +1148,9 @@ export class AutonomousSystemManagementService {
       case 'recovery_score':
         return this.systemHealth?.components.analytics || 0;
       case 'performance_trend':
-        return this.performanceHistory.length > 0 ? this.performanceHistory[this.performanceHistory.length - 1].accuracy : 0;
+        return this.performanceHistory.length > 0
+          ? this.performanceHistory[this.performanceHistory.length - 1].accuracy
+          : 0;
       case 'error_rate':
         return this.systemHealth?.performance.errorRate || 0;
       default:
@@ -1036,15 +1158,26 @@ export class AutonomousSystemManagementService {
     }
   }
 
-  private evaluateCondition(value: any, operator: string, targetValue: any): boolean {
+  private evaluateCondition(
+    value: any,
+    operator: string,
+    targetValue: any
+  ): boolean {
     switch (operator) {
-      case '>': return value > targetValue;
-      case '<': return value < targetValue;
-      case '>=': return value >= targetValue;
-      case '<=': return value <= targetValue;
-      case '==': return value === targetValue;
-      case '!=': return value !== targetValue;
-      default: return false;
+      case '>':
+        return value > targetValue;
+      case '<':
+        return value < targetValue;
+      case '>=':
+        return value >= targetValue;
+      case '<=':
+        return value <= targetValue;
+      case '==':
+        return value === targetValue;
+      case '!=':
+        return value !== targetValue;
+      default:
+        return false;
     }
   }
 
@@ -1070,11 +1203,11 @@ export class AutonomousSystemManagementService {
   private async adjustSession(parameters: any): Promise<void> {
     try {
       const { sessionId, adjustments } = parameters;
-      
+
       // Get current session data
       const sessions = await this.databaseService.getSessions('current-user');
       const session = sessions.find(s => s.id === sessionId);
-      
+
       if (!session) {
         throw new Error('Session not found');
       }
@@ -1083,18 +1216,18 @@ export class AutonomousSystemManagementService {
       if (adjustments.intensity) {
         await this.adjustSessionIntensity(session, adjustments.intensity);
       }
-      
+
       if (adjustments.duration) {
         await this.adjustSessionDuration(session, adjustments.duration);
       }
-      
+
       if (adjustments.exercises) {
         await this.adjustSessionExercises(session, adjustments.exercises);
       }
-      
+
       // Update session in database
       await this.databaseService.updateSession(sessionId, session);
-      
+
       console.log('Session adjusted successfully:', sessionId);
     } catch (error) {
       console.error('Error adjusting session:', error);
@@ -1102,7 +1235,10 @@ export class AutonomousSystemManagementService {
     }
   }
 
-  private async adjustSessionIntensity(session: SessionData, intensityAdjustment: number): Promise<void> {
+  private async adjustSessionIntensity(
+    session: SessionData,
+    intensityAdjustment: number
+  ): Promise<void> {
     // Adjust RPE and weights based on intensity adjustment
     session.exercises.forEach(exercise => {
       exercise.sets.forEach(set => {
@@ -1110,26 +1246,42 @@ export class AutonomousSystemManagementService {
           set.rpe = Math.max(1, Math.min(10, set.rpe + intensityAdjustment));
         }
         if (set.weight) {
-          set.weight = Math.max(0, set.weight * (1 + intensityAdjustment * 0.1));
+          set.weight = Math.max(
+            0,
+            set.weight * (1 + intensityAdjustment * 0.1)
+          );
         }
       });
     });
   }
 
-  private async adjustSessionDuration(session: SessionData, durationAdjustment: number): Promise<void> {
+  private async adjustSessionDuration(
+    session: SessionData,
+    durationAdjustment: number
+  ): Promise<void> {
     // Adjust session duration
-    session.duration = Math.max(15, Math.min(120, (session.duration || 60) + durationAdjustment));
+    session.duration = Math.max(
+      15,
+      Math.min(120, (session.duration || 60) + durationAdjustment)
+    );
   }
 
-  private async adjustSessionExercises(session: SessionData, exerciseAdjustments: any[]): Promise<void> {
+  private async adjustSessionExercises(
+    session: SessionData,
+    exerciseAdjustments: any[]
+  ): Promise<void> {
     // Add, remove, or modify exercises based on adjustments
     exerciseAdjustments.forEach(adjustment => {
       if (adjustment.action === 'add') {
         session.exercises.push(adjustment.exercise);
       } else if (adjustment.action === 'remove') {
-        session.exercises = session.exercises.filter(ex => ex.id !== adjustment.exerciseId);
+        session.exercises = session.exercises.filter(
+          ex => ex.id !== adjustment.exerciseId
+        );
       } else if (adjustment.action === 'modify') {
-        const exercise = session.exercises.find(ex => ex.id === adjustment.exerciseId);
+        const exercise = session.exercises.find(
+          ex => ex.id === adjustment.exerciseId
+        );
         if (exercise) {
           Object.assign(exercise, adjustment.modifications);
         }
@@ -1140,7 +1292,7 @@ export class AutonomousSystemManagementService {
   private async sendNotification(parameters: any): Promise<void> {
     try {
       const { type, message, priority, userId, channels } = parameters;
-      
+
       // Create notification object
       const notification = {
         id: `notif_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
@@ -1152,25 +1304,27 @@ export class AutonomousSystemManagementService {
         timestamp: new Date(),
         read: false,
       };
-      
+
       // Store notification
-      const notifications = JSON.parse(localStorage.getItem('notifications') || '[]');
+      const notifications = JSON.parse(
+        localStorage.getItem('notifications') || '[]'
+      );
       notifications.push(notification);
       localStorage.setItem('notifications', JSON.stringify(notifications));
-      
+
       // Send to different channels
       if (channels?.includes('in_app')) {
         this.showInAppNotification(notification);
       }
-      
+
       if (channels?.includes('email')) {
         await this.sendEmailNotification(notification);
       }
-      
+
       if (channels?.includes('push')) {
         await this.sendPushNotification(notification);
       }
-      
+
       console.log('Notification sent successfully:', notification.id);
     } catch (error) {
       console.error('Error sending notification:', error);
@@ -1181,7 +1335,8 @@ export class AutonomousSystemManagementService {
   private showInAppNotification(notification: any): void {
     // Create in-app notification element
     const notificationElement = document.createElement('div');
-    notificationElement.className = 'fixed top-4 right-4 bg-white border rounded-lg shadow-lg p-4 z-50 max-w-sm';
+    notificationElement.className =
+      'fixed top-4 right-4 bg-white border rounded-lg shadow-lg p-4 z-50 max-w-sm';
     notificationElement.innerHTML = `
       <div class="flex items-start gap-3">
         <div class="flex-shrink-0">
@@ -1198,9 +1353,9 @@ export class AutonomousSystemManagementService {
         </button>
       </div>
     `;
-    
+
     document.body.appendChild(notificationElement);
-    
+
     // Auto-remove after 5 seconds
     setTimeout(() => {
       if (notificationElement.parentElement) {
@@ -1224,23 +1379,27 @@ export class AutonomousSystemManagementService {
   private async modifyRecommendation(parameters: any): Promise<void> {
     try {
       const { recommendationId, modifications, userId } = parameters;
-      
+
       // Get current recommendations
-      const recommendations = JSON.parse(localStorage.getItem('recommendations') || '[]');
-      const recommendation = recommendations.find((r: any) => r.id === recommendationId);
-      
+      const recommendations = JSON.parse(
+        localStorage.getItem('recommendations') || '[]'
+      );
+      const recommendation = recommendations.find(
+        (r: any) => r.id === recommendationId
+      );
+
       if (!recommendation) {
         throw new Error('Recommendation not found');
       }
-      
+
       // Apply modifications
       Object.assign(recommendation, modifications);
       recommendation.lastModified = new Date();
       recommendation.modifiedBy = 'autonomous_system';
-      
+
       // Update recommendations
       localStorage.setItem('recommendations', JSON.stringify(recommendations));
-      
+
       console.log('Recommendation modified successfully:', recommendationId);
     } catch (error) {
       console.error('Error modifying recommendation:', error);
@@ -1251,7 +1410,7 @@ export class AutonomousSystemManagementService {
   private async triggerAlert(parameters: any): Promise<void> {
     try {
       const { type, severity, message, userId, actions } = parameters;
-      
+
       // Create alert object
       const alert = {
         id: `alert_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
@@ -1263,22 +1422,22 @@ export class AutonomousSystemManagementService {
         acknowledged: false,
         actions: actions || [],
       };
-      
+
       // Store alert
       const alerts = JSON.parse(localStorage.getItem('alerts') || '[]');
       alerts.push(alert);
       localStorage.setItem('alerts', JSON.stringify(alerts));
-      
+
       // Show alert in UI
       this.showAlert(alert);
-      
+
       // Execute any immediate actions
       if (actions) {
         for (const action of actions) {
           await this.executeAction(action);
         }
       }
-      
+
       console.log('Alert triggered successfully:', alert.id);
     } catch (error) {
       console.error('Error triggering alert:', error);
@@ -1290,15 +1449,21 @@ export class AutonomousSystemManagementService {
     // Create alert element
     const alertElement = document.createElement('div');
     alertElement.className = `fixed top-4 left-1/2 transform -translate-x-1/2 bg-white border-l-4 ${
-      alert.severity === 'high' ? 'border-red-500' : 
-      alert.severity === 'medium' ? 'border-yellow-500' : 'border-blue-500'
+      alert.severity === 'high'
+        ? 'border-red-500'
+        : alert.severity === 'medium'
+          ? 'border-yellow-500'
+          : 'border-blue-500'
     } rounded-lg shadow-lg p-4 z-50 max-w-md`;
     alertElement.innerHTML = `
       <div class="flex items-start gap-3">
         <div class="flex-shrink-0">
           <div class="w-2 h-2 ${
-            alert.severity === 'high' ? 'bg-red-500' : 
-            alert.severity === 'medium' ? 'bg-yellow-500' : 'bg-blue-500'
+            alert.severity === 'high'
+              ? 'bg-red-500'
+              : alert.severity === 'medium'
+                ? 'bg-yellow-500'
+                : 'bg-blue-500'
           } rounded-full"></div>
         </div>
         <div class="flex-1">
@@ -1315,10 +1480,10 @@ export class AutonomousSystemManagementService {
         </div>
       </div>
     `;
-    
+
     alertElement.classList.add('alert-container');
     document.body.appendChild(alertElement);
-    
+
     // Auto-remove after 10 seconds
     setTimeout(() => {
       if (alertElement.parentElement) {
@@ -1377,16 +1542,15 @@ export class AutonomousSystemManagementService {
     try {
       // Learn user behavior patterns
       await this.learnUserBehaviorPatterns();
-      
+
       // Track preference evolution
       await this.trackPreferenceEvolution();
-      
+
       // Adapt goals based on performance
       await this.adaptGoals();
-      
+
       // Run performance optimization loops
       await this.runPerformanceOptimizationLoops();
-      
     } catch (error) {
       console.error('Error in adaptive learning:', error);
     }
@@ -1397,55 +1561,69 @@ export class AutonomousSystemManagementService {
     try {
       const sessions = await this.databaseService.getSessions('current-user');
       const checkIns = await this.databaseService.getCheckIns('current-user');
-      
+
       if (sessions.length < 5) return;
-      
+
       // Analyze training patterns
       const trainingPatterns = this.analyzeTrainingPatterns(sessions);
       this.updateBehaviorPatterns('current-user', 'training', trainingPatterns);
-      
+
       // Analyze recovery patterns
       const recoveryPatterns = this.analyzeRecoveryPatterns(sessions, checkIns);
       this.updateBehaviorPatterns('current-user', 'recovery', recoveryPatterns);
-      
+
       // Analyze motivation patterns
-      const motivationPatterns = this.analyzeMotivationPatterns(sessions, checkIns);
-      this.updateBehaviorPatterns('current-user', 'motivation', motivationPatterns);
-      
+      const motivationPatterns = this.analyzeMotivationPatterns(
+        sessions,
+        checkIns
+      );
+      this.updateBehaviorPatterns(
+        'current-user',
+        'motivation',
+        motivationPatterns
+      );
+
       // Analyze performance patterns
       const performancePatterns = this.analyzePerformancePatterns(sessions);
-      this.updateBehaviorPatterns('current-user', 'performance', performancePatterns);
-      
+      this.updateBehaviorPatterns(
+        'current-user',
+        'performance',
+        performancePatterns
+      );
     } catch (error) {
       console.error('Error learning user behavior patterns:', error);
     }
   }
 
-  private analyzeTrainingPatterns(sessions: SessionData[]): UserBehaviorPattern[] {
+  private analyzeTrainingPatterns(
+    sessions: SessionData[]
+  ): UserBehaviorPattern[] {
     const patterns: UserBehaviorPattern[] = [];
-    
+
     // Analyze session timing patterns
     const timePatterns = this.analyzeTimePatterns(sessions);
     if (timePatterns) {
       patterns.push(timePatterns);
     }
-    
+
     // Analyze exercise selection patterns
     const exercisePatterns = this.analyzeExercisePatterns(sessions);
     if (exercisePatterns) {
       patterns.push(exercisePatterns);
     }
-    
+
     // Analyze intensity patterns
     const intensityPatterns = this.analyzeIntensityPatterns(sessions);
     if (intensityPatterns) {
       patterns.push(intensityPatterns);
     }
-    
+
     return patterns;
   }
 
-  private analyzeTimePatterns(sessions: SessionData[]): UserBehaviorPattern | null {
+  private analyzeTimePatterns(
+    sessions: SessionData[]
+  ): UserBehaviorPattern | null {
     const timeSlots = sessions.map(s => {
       const hour = new Date(s.date).getHours();
       if (hour < 6) return 'early_morning';
@@ -1454,18 +1632,21 @@ export class AutonomousSystemManagementService {
       if (hour < 21) return 'evening';
       return 'night';
     });
-    
-    const timeCounts = timeSlots.reduce((acc, time) => {
-      acc[time] = (acc[time] || 0) + 1;
-      return acc;
-    }, {} as Record<string, number>);
-    
-    const mostCommonTime = Object.entries(timeCounts).reduce((a, b) => 
+
+    const timeCounts = timeSlots.reduce(
+      (acc, time) => {
+        acc[time] = (acc[time] || 0) + 1;
+        return acc;
+      },
+      {} as Record<string, number>
+    );
+
+    const mostCommonTime = Object.entries(timeCounts).reduce((a, b) =>
       timeCounts[a[0]] > timeCounts[b[0]] ? a : b
     );
-    
+
     if (mostCommonTime[1] < sessions.length * 0.3) return null; // Not significant enough
-    
+
     return {
       userId: 'current-user',
       patternId: `time_pattern_${Date.now()}`,
@@ -1494,30 +1675,40 @@ export class AutonomousSystemManagementService {
     };
   }
 
-  private analyzeExercisePatterns(sessions: SessionData[]): UserBehaviorPattern | null {
+  private analyzeExercisePatterns(
+    sessions: SessionData[]
+  ): UserBehaviorPattern | null {
     const exerciseFrequency = new Map<string, number>();
     sessions.forEach(session => {
       session.exercises.forEach(exercise => {
-        exerciseFrequency.set(exercise.name, (exerciseFrequency.get(exercise.name) || 0) + 1);
+        exerciseFrequency.set(
+          exercise.name,
+          (exerciseFrequency.get(exercise.name) || 0) + 1
+        );
       });
     });
-    
+
     const sortedExercises = Array.from(exerciseFrequency.entries())
       .sort((a, b) => b[1] - a[1])
       .slice(0, 5);
-    
+
     if (sortedExercises.length === 0) return null;
-    
-    const totalExercises = Array.from(exerciseFrequency.values()).reduce((sum, count) => sum + count, 0);
+
+    const totalExercises = Array.from(exerciseFrequency.values()).reduce(
+      (sum, count) => sum + count,
+      0
+    );
     const topExercise = sortedExercises[0];
-    
+
     return {
       userId: 'current-user',
       patternId: `exercise_pattern_${Date.now()}`,
       patternName: 'Exercise Preferences',
       description: `User frequently performs ${topExercise[0]}`,
       frequency: topExercise[1] / totalExercises,
-      consistency: this.calculateConsistency(Array.from(exerciseFrequency.keys())),
+      consistency: this.calculateConsistency(
+        Array.from(exerciseFrequency.keys())
+      ),
       strength: topExercise[1] / totalExercises,
       lastObserved: new Date(),
       firstObserved: new Date(sessions[0].date),
@@ -1539,26 +1730,35 @@ export class AutonomousSystemManagementService {
     };
   }
 
-  private analyzeIntensityPatterns(sessions: SessionData[]): UserBehaviorPattern | null {
+  private analyzeIntensityPatterns(
+    sessions: SessionData[]
+  ): UserBehaviorPattern | null {
     const intensities = sessions.map(session => {
-      const allRPEs = session.exercises.flatMap(ex => ex.sets.map(set => set.rpe || 5));
+      const allRPEs = session.exercises.flatMap(ex =>
+        ex.sets.map(set => set.rpe || 5)
+      );
       return allRPEs.reduce((sum, rpe) => sum + rpe, 0) / allRPEs.length;
     });
-    
-    const avgIntensity = intensities.reduce((sum, intensity) => sum + intensity, 0) / intensities.length;
-    const intensityVariance = intensities.reduce((sum, intensity) => 
-      sum + Math.pow(intensity - avgIntensity, 2), 0
-    ) / intensities.length;
-    
-    const intensityLevel = avgIntensity < 6 ? 'low' : avgIntensity < 8 ? 'medium' : 'high';
-    
+
+    const avgIntensity =
+      intensities.reduce((sum, intensity) => sum + intensity, 0) /
+      intensities.length;
+    const intensityVariance =
+      intensities.reduce(
+        (sum, intensity) => sum + Math.pow(intensity - avgIntensity, 2),
+        0
+      ) / intensities.length;
+
+    const intensityLevel =
+      avgIntensity < 6 ? 'low' : avgIntensity < 8 ? 'medium' : 'high';
+
     return {
       userId: 'current-user',
       patternId: `intensity_pattern_${Date.now()}`,
       patternName: 'Training Intensity Preference',
       description: `User prefers ${intensityLevel} intensity training`,
-      frequency: 1 - (intensityVariance / 10), // Lower variance = higher frequency
-      consistency: 1 - (intensityVariance / 10),
+      frequency: 1 - intensityVariance / 10, // Lower variance = higher frequency
+      consistency: 1 - intensityVariance / 10,
       strength: avgIntensity / 10,
       lastObserved: new Date(),
       firstObserved: new Date(sessions[0].date),
@@ -1580,9 +1780,12 @@ export class AutonomousSystemManagementService {
     };
   }
 
-  private analyzeRecoveryPatterns(sessions: SessionData[], checkIns: CheckInData[]): UserBehaviorPattern[] {
+  private analyzeRecoveryPatterns(
+    sessions: SessionData[],
+    checkIns: CheckInData[]
+  ): UserBehaviorPattern[] {
     const patterns: UserBehaviorPattern[] = [];
-    
+
     // Analyze recovery time patterns
     const recoveryTimes = this.calculateRecoveryTimes(sessions);
     if (recoveryTimes.length > 0) {
@@ -1592,7 +1795,9 @@ export class AutonomousSystemManagementService {
         patternName: 'Recovery Time Pattern',
         description: `Average recovery time: ${recoveryTimes.reduce((sum, time) => sum + time, 0) / recoveryTimes.length} hours`,
         frequency: 1,
-        consistency: this.calculateConsistency(recoveryTimes.map(t => t.toString())),
+        consistency: this.calculateConsistency(
+          recoveryTimes.map(t => t.toString())
+        ),
         strength: 0.8,
         lastObserved: new Date(),
         firstObserved: new Date(sessions[0].date),
@@ -1605,32 +1810,43 @@ export class AutonomousSystemManagementService {
         actions: [
           {
             type: 'recovery_optimization',
-            parameters: { averageRecoveryTime: recoveryTimes.reduce((sum, time) => sum + time, 0) / recoveryTimes.length },
+            parameters: {
+              averageRecoveryTime:
+                recoveryTimes.reduce((sum, time) => sum + time, 0) /
+                recoveryTimes.length,
+            },
             effectiveness: 0.8,
           },
         ],
       });
     }
-    
+
     return patterns;
   }
 
-  private analyzeMotivationPatterns(sessions: SessionData[], checkIns: CheckInData[]): UserBehaviorPattern[] {
+  private analyzeMotivationPatterns(
+    sessions: SessionData[],
+    checkIns: CheckInData[]
+  ): UserBehaviorPattern[] {
     const patterns: UserBehaviorPattern[] = [];
-    
+
     // Analyze motivation trends from check-ins
     const motivationScores = checkIns.map(c => c.motivation || 5);
     if (motivationScores.length > 0) {
-      const avgMotivation = motivationScores.reduce((sum, score) => sum + score, 0) / motivationScores.length;
+      const avgMotivation =
+        motivationScores.reduce((sum, score) => sum + score, 0) /
+        motivationScores.length;
       const motivationTrend = this.calculateTrend(motivationScores);
-      
+
       patterns.push({
         userId: 'current-user',
         patternId: `motivation_pattern_${Date.now()}`,
         patternName: 'Motivation Pattern',
         description: `Average motivation: ${avgMotivation.toFixed(1)}/10`,
         frequency: 1,
-        consistency: this.calculateConsistency(motivationScores.map(s => s.toString())),
+        consistency: this.calculateConsistency(
+          motivationScores.map(s => s.toString())
+        ),
         strength: avgMotivation / 10,
         lastObserved: new Date(),
         firstObserved: new Date(checkIns[0].date),
@@ -1651,17 +1867,19 @@ export class AutonomousSystemManagementService {
         ],
       });
     }
-    
+
     return patterns;
   }
 
-  private analyzePerformancePatterns(sessions: SessionData[]): UserBehaviorPattern[] {
+  private analyzePerformancePatterns(
+    sessions: SessionData[]
+  ): UserBehaviorPattern[] {
     const patterns: UserBehaviorPattern[] = [];
-    
+
     // Analyze performance progression
     const performanceTrend = this.calculatePerformanceTrend();
     const improvementRate = this.calculateImprovementRate(sessions);
-    
+
     patterns.push({
       userId: 'current-user',
       patternId: `performance_pattern_${Date.now()}`,
@@ -1673,7 +1891,12 @@ export class AutonomousSystemManagementService {
       lastObserved: new Date(),
       firstObserved: new Date(sessions[0].date),
       evolution: {
-        trend: performanceTrend === 'improving' ? 'increasing' : performanceTrend === 'declining' ? 'decreasing' : 'stable',
+        trend:
+          performanceTrend === 'improving'
+            ? 'increasing'
+            : performanceTrend === 'declining'
+              ? 'decreasing'
+              : 'stable',
         rate: improvementRate,
         confidence: 0.7,
       },
@@ -1688,29 +1911,39 @@ export class AutonomousSystemManagementService {
         },
       ],
     });
-    
+
     return patterns;
   }
 
-  private updateBehaviorPatterns(userId: string, category: string, patterns: UserBehaviorPattern[]): void {
+  private updateBehaviorPatterns(
+    userId: string,
+    category: string,
+    patterns: UserBehaviorPattern[]
+  ): void {
     const userPatterns = this.behaviorPatterns.get(userId) || [];
-    
+
     patterns.forEach(pattern => {
-      const existingPattern = userPatterns.find(p => p.patternName === pattern.patternName);
-      
+      const existingPattern = userPatterns.find(
+        p => p.patternName === pattern.patternName
+      );
+
       if (existingPattern) {
         // Update existing pattern
-        existingPattern.frequency = (existingPattern.frequency + pattern.frequency) / 2;
-        existingPattern.consistency = (existingPattern.consistency + pattern.consistency) / 2;
-        existingPattern.strength = (existingPattern.strength + pattern.strength) / 2;
+        existingPattern.frequency =
+          (existingPattern.frequency + pattern.frequency) / 2;
+        existingPattern.consistency =
+          (existingPattern.consistency + pattern.consistency) / 2;
+        existingPattern.strength =
+          (existingPattern.strength + pattern.strength) / 2;
         existingPattern.lastObserved = new Date();
-        existingPattern.evolution.rate = (existingPattern.evolution.rate + pattern.evolution.rate) / 2;
+        existingPattern.evolution.rate =
+          (existingPattern.evolution.rate + pattern.evolution.rate) / 2;
       } else {
         // Add new pattern
         userPatterns.push(pattern);
       }
     });
-    
+
     this.behaviorPatterns.set(userId, userPatterns);
   }
 
@@ -1719,29 +1952,33 @@ export class AutonomousSystemManagementService {
     try {
       const sessions = await this.databaseService.getSessions('current-user');
       const checkIns = await this.databaseService.getCheckIns('current-user');
-      
+
       if (sessions.length < 10) return;
-      
+
       // Track exercise preferences
       await this.trackExercisePreferenceEvolution(sessions);
-      
+
       // Track timing preferences
       await this.trackTimingPreferenceEvolution(sessions);
-      
+
       // Track intensity preferences
       await this.trackIntensityPreferenceEvolution(sessions);
-      
+
       // Track duration preferences
       await this.trackDurationPreferenceEvolution(sessions);
-      
     } catch (error) {
       console.error('Error tracking preference evolution:', error);
     }
   }
 
-  private async trackExercisePreferenceEvolution(sessions: SessionData[]): Promise<void> {
-    const exerciseCounts = new Map<string, { count: number; sessions: SessionData[] }>();
-    
+  private async trackExercisePreferenceEvolution(
+    sessions: SessionData[]
+  ): Promise<void> {
+    const exerciseCounts = new Map<
+      string,
+      { count: number; sessions: SessionData[] }
+    >();
+
     sessions.forEach(session => {
       session.exercises.forEach(exercise => {
         if (!exerciseCounts.has(exercise.name)) {
@@ -1751,28 +1988,29 @@ export class AutonomousSystemManagementService {
         exerciseCounts.get(exercise.name)!.sessions.push(session);
       });
     });
-    
-    const sortedExercises = Array.from(exerciseCounts.entries())
-      .sort((a, b) => b[1].count - a[1].count);
-    
+
+    const sortedExercises = Array.from(exerciseCounts.entries()).sort(
+      (a, b) => b[1].count - a[1].count
+    );
+
     if (sortedExercises.length < 2) return;
-    
+
     const topExercise = sortedExercises[0];
     const secondExercise = sortedExercises[1];
-    
+
     // Calculate evolution over time
     const recentSessions = sessions.slice(-Math.floor(sessions.length / 2));
     const olderSessions = sessions.slice(0, Math.floor(sessions.length / 2));
-    
-    const recentCount = recentSessions.filter(s => 
+
+    const recentCount = recentSessions.filter(s =>
       s.exercises.some(e => e.name === topExercise[0])
     ).length;
-    const olderCount = olderSessions.filter(s => 
+    const olderCount = olderSessions.filter(s =>
       s.exercises.some(e => e.name === topExercise[0])
     ).length;
-    
+
     const evolutionRate = (recentCount - olderCount) / Math.max(olderCount, 1);
-    
+
     const preferenceEvolution: PreferenceEvolution = {
       userId: 'current-user',
       preferenceType: 'exercise',
@@ -1792,11 +2030,13 @@ export class AutonomousSystemManagementService {
         timeframe: 30, // 30 days
       },
     };
-    
+
     this.updatePreferenceEvolution('current-user', preferenceEvolution);
   }
 
-  private async trackTimingPreferenceEvolution(sessions: SessionData[]): Promise<void> {
+  private async trackTimingPreferenceEvolution(
+    sessions: SessionData[]
+  ): Promise<void> {
     const timeSlots = sessions.map(s => {
       const hour = new Date(s.date).getHours();
       if (hour < 6) return 'early_morning';
@@ -1805,18 +2045,21 @@ export class AutonomousSystemManagementService {
       if (hour < 21) return 'evening';
       return 'night';
     });
-    
-    const timeCounts = timeSlots.reduce((acc, time) => {
-      acc[time] = (acc[time] || 0) + 1;
-      return acc;
-    }, {} as Record<string, number>);
-    
+
+    const timeCounts = timeSlots.reduce(
+      (acc, time) => {
+        acc[time] = (acc[time] || 0) + 1;
+        return acc;
+      },
+      {} as Record<string, number>
+    );
+
     const sortedTimes = Object.entries(timeCounts).sort((a, b) => b[1] - a[1]);
     if (sortedTimes.length < 2) return;
-    
+
     const currentTime = sortedTimes[0][0];
     const previousTime = sortedTimes[1][0];
-    
+
     const preferenceEvolution: PreferenceEvolution = {
       userId: 'current-user',
       preferenceType: 'timing',
@@ -1836,23 +2079,34 @@ export class AutonomousSystemManagementService {
         timeframe: 14, // 14 days
       },
     };
-    
+
     this.updatePreferenceEvolution('current-user', preferenceEvolution);
   }
 
-  private async trackIntensityPreferenceEvolution(sessions: SessionData[]): Promise<void> {
+  private async trackIntensityPreferenceEvolution(
+    sessions: SessionData[]
+  ): Promise<void> {
     const intensities = sessions.map(session => {
-      const allRPEs = session.exercises.flatMap(ex => ex.sets.map(set => set.rpe || 5));
+      const allRPEs = session.exercises.flatMap(ex =>
+        ex.sets.map(set => set.rpe || 5)
+      );
       return allRPEs.reduce((sum, rpe) => sum + rpe, 0) / allRPEs.length;
     });
-    
-    const recentIntensity = intensities.slice(-Math.floor(intensities.length / 2))
-      .reduce((sum, intensity) => sum + intensity, 0) / Math.floor(intensities.length / 2);
-    const olderIntensity = intensities.slice(0, Math.floor(intensities.length / 2))
-      .reduce((sum, intensity) => sum + intensity, 0) / Math.floor(intensities.length / 2);
-    
-    const evolutionRate = (recentIntensity - olderIntensity) / Math.max(olderIntensity, 1);
-    
+
+    const recentIntensity =
+      intensities
+        .slice(-Math.floor(intensities.length / 2))
+        .reduce((sum, intensity) => sum + intensity, 0) /
+      Math.floor(intensities.length / 2);
+    const olderIntensity =
+      intensities
+        .slice(0, Math.floor(intensities.length / 2))
+        .reduce((sum, intensity) => sum + intensity, 0) /
+      Math.floor(intensities.length / 2);
+
+    const evolutionRate =
+      (recentIntensity - olderIntensity) / Math.max(olderIntensity, 1);
+
     const preferenceEvolution: PreferenceEvolution = {
       userId: 'current-user',
       preferenceType: 'intensity',
@@ -1872,20 +2126,29 @@ export class AutonomousSystemManagementService {
         timeframe: 21, // 21 days
       },
     };
-    
+
     this.updatePreferenceEvolution('current-user', preferenceEvolution);
   }
 
-  private async trackDurationPreferenceEvolution(sessions: SessionData[]): Promise<void> {
+  private async trackDurationPreferenceEvolution(
+    sessions: SessionData[]
+  ): Promise<void> {
     const durations = sessions.map(s => s.duration || 60);
-    
-    const recentDuration = durations.slice(-Math.floor(durations.length / 2))
-      .reduce((sum, duration) => sum + duration, 0) / Math.floor(durations.length / 2);
-    const olderDuration = durations.slice(0, Math.floor(durations.length / 2))
-      .reduce((sum, duration) => sum + duration, 0) / Math.floor(durations.length / 2);
-    
-    const evolutionRate = (recentDuration - olderDuration) / Math.max(olderDuration, 1);
-    
+
+    const recentDuration =
+      durations
+        .slice(-Math.floor(durations.length / 2))
+        .reduce((sum, duration) => sum + duration, 0) /
+      Math.floor(durations.length / 2);
+    const olderDuration =
+      durations
+        .slice(0, Math.floor(durations.length / 2))
+        .reduce((sum, duration) => sum + duration, 0) /
+      Math.floor(durations.length / 2);
+
+    const evolutionRate =
+      (recentDuration - olderDuration) / Math.max(olderDuration, 1);
+
     const preferenceEvolution: PreferenceEvolution = {
       userId: 'current-user',
       preferenceType: 'duration',
@@ -1905,15 +2168,20 @@ export class AutonomousSystemManagementService {
         timeframe: 28, // 28 days
       },
     };
-    
+
     this.updatePreferenceEvolution('current-user', preferenceEvolution);
   }
 
-  private updatePreferenceEvolution(userId: string, evolution: PreferenceEvolution): void {
+  private updatePreferenceEvolution(
+    userId: string,
+    evolution: PreferenceEvolution
+  ): void {
     const userEvolutions = this.preferenceEvolutions.get(userId) || [];
-    
-    const existingEvolution = userEvolutions.find(e => e.preferenceType === evolution.preferenceType);
-    
+
+    const existingEvolution = userEvolutions.find(
+      e => e.preferenceType === evolution.preferenceType
+    );
+
     if (existingEvolution) {
       // Update existing evolution
       existingEvolution.currentValue = evolution.currentValue;
@@ -1927,7 +2195,7 @@ export class AutonomousSystemManagementService {
       // Add new evolution
       userEvolutions.push(evolution);
     }
-    
+
     this.preferenceEvolutions.set(userId, userEvolutions);
   }
 
@@ -1936,19 +2204,22 @@ export class AutonomousSystemManagementService {
     try {
       const sessions = await this.databaseService.getSessions('current-user');
       const checkIns = await this.databaseService.getCheckIns('current-user');
-      
+
       if (sessions.length < 10) return;
-      
+
       // Get current goals (simulated)
       const currentGoals = this.getCurrentGoals();
-      
+
       for (const goal of currentGoals) {
-        const adaptation = await this.analyzeGoalAdaptation(goal, sessions, checkIns);
+        const adaptation = await this.analyzeGoalAdaptation(
+          goal,
+          sessions,
+          checkIns
+        );
         if (adaptation) {
           this.updateGoalAdaptation('current-user', adaptation);
         }
       }
-      
     } catch (error) {
       console.error('Error adapting goals:', error);
     }
@@ -1974,14 +2245,20 @@ export class AutonomousSystemManagementService {
     ];
   }
 
-  private async analyzeGoalAdaptation(goal: any, sessions: SessionData[], checkIns: CheckInData[]): Promise<GoalAdaptation | null> {
+  private async analyzeGoalAdaptation(
+    goal: any,
+    sessions: SessionData[],
+    checkIns: CheckInData[]
+  ): Promise<GoalAdaptation | null> {
     // Analyze progress towards goal
     const progress = this.calculateGoalProgress(goal, sessions);
-    const timeRemaining = (goal.deadline.getTime() - Date.now()) / (24 * 60 * 60 * 1000);
+    const timeRemaining =
+      (goal.deadline.getTime() - Date.now()) / (24 * 60 * 60 * 1000);
     const requiredProgressRate = (100 - progress) / timeRemaining;
-    
+
     // Check if goal needs adaptation
-    if (requiredProgressRate > 2) { // More than 2% per day needed
+    if (requiredProgressRate > 2) {
+      // More than 2% per day needed
       const adaptation = {
         userId: 'current-user',
         goalId: goal.id,
@@ -1997,7 +2274,12 @@ export class AutonomousSystemManagementService {
         adaptations: [
           {
             type: 'modify' as const,
-            value: { target: this.adjustGoalTarget(goal, 0.8), deadline: new Date(goal.deadline.getTime() + 7 * 24 * 60 * 60 * 1000) },
+            value: {
+              target: this.adjustGoalTarget(goal, 0.8),
+              deadline: new Date(
+                goal.deadline.getTime() + 7 * 24 * 60 * 60 * 1000
+              ),
+            },
             reason: 'Timeline adjustment needed',
             date: new Date(),
             effectiveness: 0.8,
@@ -2010,10 +2292,10 @@ export class AutonomousSystemManagementService {
           timeframe: 14, // 14 days
         },
       };
-      
+
       return adaptation;
     }
-    
+
     return null;
   }
 
@@ -2026,14 +2308,21 @@ export class AutonomousSystemManagementService {
 
   private adjustGoalTarget(goal: any, factor: number): string {
     // Simulate goal target adjustment
-    return goal.target.replace(/\d+/, (match: string) => Math.round(parseInt(match) * factor).toString());
+    return goal.target.replace(/\d+/, (match: string) =>
+      Math.round(parseInt(match) * factor).toString()
+    );
   }
 
-  private updateGoalAdaptation(userId: string, adaptation: GoalAdaptation): void {
+  private updateGoalAdaptation(
+    userId: string,
+    adaptation: GoalAdaptation
+  ): void {
     const userAdaptations = this.goalAdaptations.get(userId) || [];
-    
-    const existingAdaptation = userAdaptations.find(a => a.goalId === adaptation.goalId);
-    
+
+    const existingAdaptation = userAdaptations.find(
+      a => a.goalId === adaptation.goalId
+    );
+
     if (existingAdaptation) {
       // Update existing adaptation
       existingAdaptation.currentGoal = adaptation.currentGoal;
@@ -2045,7 +2334,7 @@ export class AutonomousSystemManagementService {
       // Add new adaptation
       userAdaptations.push(adaptation);
     }
-    
+
     this.goalAdaptations.set(userId, userAdaptations);
   }
 
@@ -2054,30 +2343,34 @@ export class AutonomousSystemManagementService {
     try {
       const sessions = await this.databaseService.getSessions('current-user');
       const checkIns = await this.databaseService.getCheckIns('current-user');
-      
+
       if (sessions.length < 5) return;
-      
+
       // Run training load optimization
       await this.runTrainingLoadOptimizationLoop(sessions, checkIns);
-      
+
       // Run recovery optimization
       await this.runRecoveryOptimizationLoop(sessions, checkIns);
-      
+
       // Run motivation optimization
       await this.runMotivationOptimizationLoop(sessions, checkIns);
-      
     } catch (error) {
       console.error('Error running performance optimization loops:', error);
     }
   }
 
-  private async runTrainingLoadOptimizationLoop(sessions: SessionData[], checkIns: CheckInData[]): Promise<void> {
+  private async runTrainingLoadOptimizationLoop(
+    sessions: SessionData[],
+    checkIns: CheckInData[]
+  ): Promise<void> {
     const loopId = 'training_load_optimization';
     const userId = 'current-user';
-    
+
     // Get or create optimization loop
-    let loop = this.optimizationLoops.get(userId)?.find(l => l.loopId === loopId);
-    
+    let loop = this.optimizationLoops
+      .get(userId)
+      ?.find(l => l.loopId === loopId);
+
     if (!loop) {
       loop = {
         loopId,
@@ -2096,72 +2389,93 @@ export class AutonomousSystemManagementService {
         },
       };
     }
-    
+
     // Calculate current state
     const currentLoad = this.calculateWeeklyLoad(sessions.slice(-7));
     const currentIntensity = this.calculateAverageIntensity(sessions.slice(-7));
-    
+
     // Calculate performance
-    const performance = this.calculatePerformanceScore(sessions.slice(-7), checkIns.slice(-7));
-    
+    const performance = this.calculatePerformanceScore(
+      sessions.slice(-7),
+      checkIns.slice(-7)
+    );
+
     // Add iteration
     const iteration = {
       iteration: loop.iterations.length + 1,
       state: { weeklyLoad: currentLoad, intensity: currentIntensity },
       performance,
       timestamp: new Date(),
-      changes: this.calculateTrainingLoadChanges(loop, currentLoad, currentIntensity, performance),
+      changes: this.calculateTrainingLoadChanges(
+        loop,
+        currentLoad,
+        currentIntensity,
+        performance
+      ),
     };
-    
+
     loop.iterations.push(iteration);
-    
+
     // Update loop state
-    loop.currentState = { weeklyLoad: currentLoad, intensity: currentIntensity };
+    loop.currentState = {
+      weeklyLoad: currentLoad,
+      intensity: currentIntensity,
+    };
     loop.convergenceRate = this.calculateConvergenceRate(loop.iterations);
     loop.stability = this.calculateStability(loop.iterations);
     loop.nextIteration = this.predictNextIteration(loop);
-    
+
     // Update optimization loops
     const userLoops = this.optimizationLoops.get(userId) || [];
     const existingLoopIndex = userLoops.findIndex(l => l.loopId === loopId);
-    
+
     if (existingLoopIndex >= 0) {
       userLoops[existingLoopIndex] = loop;
     } else {
       userLoops.push(loop);
     }
-    
+
     this.optimizationLoops.set(userId, userLoops);
   }
 
-  private async runRecoveryOptimizationLoop(sessions: SessionData[], checkIns: CheckInData[]): Promise<void> {
+  private async runRecoveryOptimizationLoop(
+    sessions: SessionData[],
+    checkIns: CheckInData[]
+  ): Promise<void> {
     const loopId = 'recovery_optimization';
     const userId = 'current-user';
-    
+
     // Similar implementation for recovery optimization
     // ... (implementation details would be similar to training load)
   }
 
-  private async runMotivationOptimizationLoop(sessions: SessionData[], checkIns: CheckInData[]): Promise<void> {
+  private async runMotivationOptimizationLoop(
+    sessions: SessionData[],
+    checkIns: CheckInData[]
+  ): Promise<void> {
     const loopId = 'motivation_optimization';
     const userId = 'current-user';
-    
+
     // Similar implementation for motivation optimization
     // ... (implementation details would be similar to training load)
   }
 
   // Helper methods for adaptive learning
-  private calculateTrend(values: number[]): 'increasing' | 'stable' | 'decreasing' {
+  private calculateTrend(
+    values: number[]
+  ): 'increasing' | 'stable' | 'decreasing' {
     if (values.length < 3) return 'stable';
-    
+
     const firstHalf = values.slice(0, Math.floor(values.length / 2));
     const secondHalf = values.slice(Math.floor(values.length / 2));
-    
-    const firstAvg = firstHalf.reduce((sum, val) => sum + val, 0) / firstHalf.length;
-    const secondAvg = secondHalf.reduce((sum, val) => sum + val, 0) / secondHalf.length;
-    
+
+    const firstAvg =
+      firstHalf.reduce((sum, val) => sum + val, 0) / firstHalf.length;
+    const secondAvg =
+      secondHalf.reduce((sum, val) => sum + val, 0) / secondHalf.length;
+
     const change = (secondAvg - firstAvg) / firstAvg;
-    
+
     if (change > 0.1) return 'increasing';
     if (change < -0.1) return 'decreasing';
     return 'stable';
@@ -2169,68 +2483,90 @@ export class AutonomousSystemManagementService {
 
   private calculateTrendRate(values: number[]): number {
     if (values.length < 2) return 0;
-    
+
     const first = values[0];
     const last = values[values.length - 1];
     const timeSpan = values.length; // Assuming weekly data
-    
+
     return (last - first) / first / timeSpan;
   }
 
   private calculateRecoveryTimes(sessions: SessionData[]): number[] {
     const recoveryTimes: number[] = [];
-    
+
     for (let i = 1; i < sessions.length; i++) {
-      const timeDiff = sessions[i].date.getTime() - sessions[i - 1].date.getTime();
+      const timeDiff =
+        sessions[i].date.getTime() - sessions[i - 1].date.getTime();
       const hours = timeDiff / (1000 * 60 * 60);
       recoveryTimes.push(hours);
     }
-    
+
     return recoveryTimes;
   }
 
-  private calculateTrainingLoadChanges(loop: PerformanceOptimizationLoop, currentLoad: number, currentIntensity: number, performance: number): any {
+  private calculateTrainingLoadChanges(
+    loop: PerformanceOptimizationLoop,
+    currentLoad: number,
+    currentIntensity: number,
+    performance: number
+  ): any {
     // Calculate what changes should be made based on current state and performance
     const targetLoad = loop.targetState.weeklyLoad;
     const targetIntensity = loop.targetState.intensity;
-    
+
     const loadChange = (targetLoad - currentLoad) / 10; // Gradual change
     const intensityChange = (targetIntensity - currentIntensity) / 10;
-    
+
     return {
       loadAdjustment: loadChange,
       intensityAdjustment: intensityChange,
-      reason: performance > 0.8 ? 'increase_load' : performance < 0.6 ? 'decrease_load' : 'maintain_load',
+      reason:
+        performance > 0.8
+          ? 'increase_load'
+          : performance < 0.6
+            ? 'decrease_load'
+            : 'maintain_load',
     };
   }
 
-  private calculateConvergenceRate(iterations: PerformanceOptimizationLoop['iterations']): number {
+  private calculateConvergenceRate(
+    iterations: PerformanceOptimizationLoop['iterations']
+  ): number {
     if (iterations.length < 3) return 0;
-    
+
     const recent = iterations.slice(-3);
-    const performanceVariance = recent.reduce((sum, iter) => 
-      sum + Math.pow(iter.performance - 0.8, 2), 0
-    ) / recent.length;
-    
+    const performanceVariance =
+      recent.reduce(
+        (sum, iter) => sum + Math.pow(iter.performance - 0.8, 2),
+        0
+      ) / recent.length;
+
     return Math.max(0, 1 - performanceVariance);
   }
 
-  private calculateStability(iterations: PerformanceOptimizationLoop['iterations']): number {
+  private calculateStability(
+    iterations: PerformanceOptimizationLoop['iterations']
+  ): number {
     if (iterations.length < 3) return 0;
-    
+
     const recent = iterations.slice(-3);
     const performanceValues = recent.map(iter => iter.performance);
     const variance = this.calculateVariance(performanceValues);
-    
+
     return Math.max(0, 1 - variance);
   }
 
   private calculateVariance(values: number[]): number {
     const mean = values.reduce((sum, val) => sum + val, 0) / values.length;
-    return values.reduce((sum, val) => sum + Math.pow(val - mean, 2), 0) / values.length;
+    return (
+      values.reduce((sum, val) => sum + Math.pow(val - mean, 2), 0) /
+      values.length
+    );
   }
 
-  private predictNextIteration(loop: PerformanceOptimizationLoop): PerformanceOptimizationLoop['nextIteration'] {
+  private predictNextIteration(
+    loop: PerformanceOptimizationLoop
+  ): PerformanceOptimizationLoop['nextIteration'] {
     const recent = loop.iterations.slice(-3);
     if (recent.length < 2) {
       return {
@@ -2239,26 +2575,45 @@ export class AutonomousSystemManagementService {
         timeframe: 24,
       };
     }
-    
+
     const lastPerformance = recent[recent.length - 1].performance;
-    const performanceTrend = this.calculateTrend(recent.map(iter => iter.performance));
-    
+    const performanceTrend = this.calculateTrend(
+      recent.map(iter => iter.performance)
+    );
+
     return {
       predictedChanges: {
-        loadAdjustment: performanceTrend === 'increasing' ? 0.1 : performanceTrend === 'decreasing' ? -0.1 : 0,
-        intensityAdjustment: performanceTrend === 'increasing' ? 0.05 : performanceTrend === 'decreasing' ? -0.05 : 0,
+        loadAdjustment:
+          performanceTrend === 'increasing'
+            ? 0.1
+            : performanceTrend === 'decreasing'
+              ? -0.1
+              : 0,
+        intensityAdjustment:
+          performanceTrend === 'increasing'
+            ? 0.05
+            : performanceTrend === 'decreasing'
+              ? -0.05
+              : 0,
       },
       confidence: Math.min(0.9, lastPerformance),
       timeframe: 24,
     };
   }
 
-  private calculatePerformanceScore(sessions: SessionData[], checkIns: CheckInData[]): number {
+  private calculatePerformanceScore(
+    sessions: SessionData[],
+    checkIns: CheckInData[]
+  ): number {
     // Calculate overall performance score based on sessions and check-ins
     const sessionScore = sessions.length > 0 ? 0.8 : 0.2;
-    const checkInScore = checkIns.length > 0 ? 
-      checkIns.reduce((sum, c) => sum + (c.motivation || 5), 0) / checkIns.length / 10 : 0.5;
-    
+    const checkInScore =
+      checkIns.length > 0
+        ? checkIns.reduce((sum, c) => sum + (c.motivation || 5), 0) /
+          checkIns.length /
+          10
+        : 0.5;
+
     return (sessionScore + checkInScore) / 2;
   }
 
@@ -2269,11 +2624,16 @@ export class AutonomousSystemManagementService {
       if (storedMetrics) {
         const metrics = JSON.parse(storedMetrics);
         Object.entries(metrics).forEach(([key, value]) => {
-          this.modelMetrics.set(key, { ...value, lastUpdated: new Date(value.lastUpdated) });
+          this.modelMetrics.set(key, {
+            ...value,
+            lastUpdated: new Date(value.lastUpdated),
+          });
         });
       }
 
-      const storedParameters = localStorage.getItem('autonomous_parameter_history');
+      const storedParameters = localStorage.getItem(
+        'autonomous_parameter_history'
+      );
       if (storedParameters) {
         this.parameterHistory = JSON.parse(storedParameters).map((p: any) => ({
           ...p,
@@ -2285,7 +2645,10 @@ export class AutonomousSystemManagementService {
       if (storedABTests) {
         const tests = JSON.parse(storedABTests);
         Object.entries(tests).forEach(([key, value]) => {
-          this.abTests.set(key, { ...value, startDate: new Date(value.startDate) });
+          this.abTests.set(key, {
+            ...value,
+            startDate: new Date(value.startDate),
+          });
         });
       }
     } catch (error) {
@@ -2295,9 +2658,18 @@ export class AutonomousSystemManagementService {
 
   private saveData(): void {
     try {
-      localStorage.setItem('autonomous_model_metrics', JSON.stringify(Object.fromEntries(this.modelMetrics)));
-      localStorage.setItem('autonomous_parameter_history', JSON.stringify(this.parameterHistory));
-      localStorage.setItem('autonomous_ab_tests', JSON.stringify(Object.fromEntries(this.abTests)));
+      localStorage.setItem(
+        'autonomous_model_metrics',
+        JSON.stringify(Object.fromEntries(this.modelMetrics))
+      );
+      localStorage.setItem(
+        'autonomous_parameter_history',
+        JSON.stringify(this.parameterHistory)
+      );
+      localStorage.setItem(
+        'autonomous_ab_tests',
+        JSON.stringify(Object.fromEntries(this.abTests))
+      );
     } catch (error) {
       console.error('Error saving data:', error);
     }
@@ -2365,4 +2737,5 @@ export class AutonomousSystemManagementService {
 }
 
 // Export singleton instance
-export const autonomousSystemManagement = new AutonomousSystemManagementService();
+export const autonomousSystemManagement =
+  new AutonomousSystemManagementService();

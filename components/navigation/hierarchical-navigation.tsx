@@ -118,23 +118,9 @@ export function HierarchicalNavigation({
       isSecondary: true,
     },
     {
-      id: 'themes',
-      label: 'Themes',
-      icon: Palette,
-      isPrimary: false,
-      isSecondary: true,
-    },
-    {
       id: 'interactive',
       label: 'Interactive',
       icon: Touch,
-      isPrimary: false,
-      isSecondary: true,
-    },
-    {
-      id: 'profile',
-      label: 'Profile',
-      icon: User,
       isPrimary: false,
       isSecondary: true,
     },

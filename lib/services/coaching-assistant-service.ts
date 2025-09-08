@@ -1,18 +1,26 @@
 'use client';
 
-// eslint-disable-next-line no-unused-vars
 import { SessionData, CheckInData } from '@/lib/services/database-service';
-// eslint-disable-next-line no-unused-vars
+
 import { BehaviorInsights } from './behavior-analysis-service';
-// eslint-disable-next-line no-unused-vars
+
 import { PerformanceForecast } from './performance-prediction-service';
-import { OpenAIService, ConversationContext, MotivationalMessage } from './openai-service';
+import {
+  OpenAIService,
+  ConversationContext,
+  MotivationalMessage,
+} from './openai-service';
 
 export interface CoachingSession {
   id: string;
   userId: string;
   sessionId?: string;
-  type: 'form_feedback' | 'motivational' | 'technique_guidance' | 'progress_celebration' | 'general';
+  type:
+    | 'form_feedback'
+    | 'motivational'
+    | 'technique_guidance'
+    | 'progress_celebration'
+    | 'general';
   startTime: string;
   endTime?: string;
   messages: CoachingMessage[];
@@ -183,14 +191,16 @@ export class CoachingAssistantService {
       }
 
       const messageType = this.determineMessageType(trigger);
-      const motivationalMessage = await OpenAIService.generateMotivationalMessage(
-        context,
-        messageType,
-        intensity
-      );
+      const motivationalMessage =
+        await OpenAIService.generateMotivationalMessage(
+          context,
+          messageType,
+          intensity
+        );
 
       // Update last sent time
-      this.motivationalSystem.lastSent[`${context.userId}_${trigger}`] = new Date().toISOString();
+      this.motivationalSystem.lastSent[`${context.userId}_${trigger}`] =
+        new Date().toISOString();
 
       return motivationalMessage;
     } catch (error) {
@@ -245,7 +255,11 @@ export class CoachingAssistantService {
   ): Promise<GoalOrientedGuidance> {
     try {
       const progress = await this.calculateGoalProgress(currentGoals, context);
-      const guidance = await this.generateGoalGuidance(currentGoals, progress, context);
+      const guidance = await this.generateGoalGuidance(
+        currentGoals,
+        progress,
+        context
+      );
 
       return {
         userId,
@@ -345,15 +359,18 @@ export class CoachingAssistantService {
     return `msg_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
   }
 
-  private static shouldSendMotivationalMessage(userId: string, trigger: string): boolean {
+  private static shouldSendMotivationalMessage(
+    userId: string,
+    trigger: string
+  ): boolean {
     const key = `${userId}_${trigger}`;
     const lastSent = this.motivationalSystem.lastSent[key];
-    
+
     if (!lastSent) return true;
-    
+
     const timeSinceLastSent = Date.now() - new Date(lastSent).getTime();
     const minInterval = 30 * 60 * 1000; // 30 minutes
-    
+
     return timeSinceLastSent > minInterval;
   }
 
@@ -363,19 +380,27 @@ export class CoachingAssistantService {
       .filter(key => key.startsWith(userId))
       .map(key => this.motivationalSystem.lastSent[key])
       .filter(timestamp => new Date(timestamp).toDateString() === today);
-    
+
     return userMessages.length < this.motivationalSystem.frequency.daily;
   }
 
-  private static determineMessageType(trigger: string): 'achievement' | 'encouragement' | 'reminder' | 'celebration' {
-    if (this.motivationalSystem.triggers.achievement.includes(trigger)) return 'achievement';
-    if (this.motivationalSystem.triggers.encouragement.includes(trigger)) return 'encouragement';
-    if (this.motivationalSystem.triggers.reminder.includes(trigger)) return 'reminder';
-    if (this.motivationalSystem.triggers.celebration.includes(trigger)) return 'celebration';
+  private static determineMessageType(
+    trigger: string
+  ): 'achievement' | 'encouragement' | 'reminder' | 'celebration' {
+    if (this.motivationalSystem.triggers.achievement.includes(trigger))
+      return 'achievement';
+    if (this.motivationalSystem.triggers.encouragement.includes(trigger))
+      return 'encouragement';
+    if (this.motivationalSystem.triggers.reminder.includes(trigger))
+      return 'reminder';
+    if (this.motivationalSystem.triggers.celebration.includes(trigger))
+      return 'celebration';
     return 'encouragement';
   }
 
-  private static determinePromptTemplate(sessionType: CoachingSession['type']): string {
+  private static determinePromptTemplate(
+    sessionType: CoachingSession['type']
+  ): string {
     const templateMap = {
       form_feedback: 'formFeedback',
       motivational: 'motivationalMessage',
@@ -383,11 +408,13 @@ export class CoachingAssistantService {
       progress_celebration: 'progressCelebration',
       general: 'formFeedback',
     };
-    
+
     return templateMap[sessionType] || 'formFeedback';
   }
 
-  private static determineCoachingMessageType(sessionType: CoachingSession['type']): CoachingMessage['type'] {
+  private static determineCoachingMessageType(
+    sessionType: CoachingSession['type']
+  ): CoachingMessage['type'] {
     const typeMap = {
       form_feedback: 'form_feedback',
       motivational: 'motivational',
@@ -395,30 +422,34 @@ export class CoachingAssistantService {
       progress_celebration: 'celebration',
       general: 'text',
     };
-    
+
     return typeMap[sessionType] || 'text';
   }
 
   private static generateEncouragement(feedback: string): string {
     // Extract encouraging phrases from feedback
     const encouragingPhrases = [
-      "Great job!",
+      'Great job!',
       "You're doing well!",
-      "Keep it up!",
-      "Nice work!",
-      "Excellent effort!",
+      'Keep it up!',
+      'Nice work!',
+      'Excellent effort!',
     ];
-    
-    return encouragingPhrases[Math.floor(Math.random() * encouragingPhrases.length)];
+
+    return encouragingPhrases[
+      Math.floor(Math.random() * encouragingPhrases.length)
+    ];
   }
 
   private static calculateFormConfidence(formData: any): number {
     // Simple confidence calculation based on form data
     if (!formData || !formData.scores) return 0.5;
-    
+
     const scores = formData.scores;
-    const avgScore = scores.reduce((sum: number, score: number) => sum + score, 0) / scores.length;
-    
+    const avgScore =
+      scores.reduce((sum: number, score: number) => sum + score, 0) /
+      scores.length;
+
     return Math.min(1, Math.max(0, avgScore / 10));
   }
 
@@ -426,7 +457,10 @@ export class CoachingAssistantService {
     // Simple extraction - in a real implementation, this would use NLP
     const lines = guidance.split('\n');
     for (const line of lines) {
-      if (line.toLowerCase().includes('target') || line.toLowerCase().includes('goal')) {
+      if (
+        line.toLowerCase().includes('target') ||
+        line.toLowerCase().includes('goal')
+      ) {
         return line.trim();
       }
     }
@@ -436,25 +470,31 @@ export class CoachingAssistantService {
   private static extractImprovementSteps(guidance: string): string[] {
     const steps: string[] = [];
     const lines = guidance.split('\n');
-    
+
     for (const line of lines) {
       if (line.match(/^\d+\./) || line.toLowerCase().includes('step')) {
         steps.push(line.trim());
       }
     }
-    
-    return steps.length > 0 ? steps : ['Practice regularly', 'Focus on form', 'Seek feedback'];
+
+    return steps.length > 0
+      ? steps
+      : ['Practice regularly', 'Focus on form', 'Seek feedback'];
   }
 
-  private static estimateImprovementTimeline(currentTechnique: string, context: ConversationContext): string {
+  private static estimateImprovementTimeline(
+    currentTechnique: string,
+    context: ConversationContext
+  ): string {
     // Simple estimation based on user level and technique complexity
     const userLevel = this.assessUserLevel(context);
     const complexity = this.assessTechniqueComplexity(currentTechnique);
-    
+
     if (userLevel === 'beginner' && complexity === 'high') return '4-6 weeks';
-    if (userLevel === 'intermediate' && complexity === 'medium') return '2-3 weeks';
+    if (userLevel === 'intermediate' && complexity === 'medium')
+      return '2-3 weeks';
     if (userLevel === 'advanced' && complexity === 'low') return '1-2 weeks';
-    
+
     return '2-4 weeks';
   }
 
@@ -479,23 +519,27 @@ export class CoachingAssistantService {
 
   private static assessUserLevel(context: ConversationContext): string {
     if (!context.behaviorInsights) return 'beginner';
-    
-    const consistency = context.behaviorInsights.patterns.consistency.weeklyFrequency;
+
+    const consistency =
+      context.behaviorInsights.patterns.consistency.weeklyFrequency;
     const experience = context.behaviorInsights.habits.workoutHabit.strength;
-    
+
     if (consistency >= 4 && experience >= 0.8) return 'advanced';
     if (consistency >= 3 && experience >= 0.6) return 'intermediate';
     return 'beginner';
   }
 
-  private static assessTechniqueComplexity(technique: string): 'low' | 'medium' | 'high' {
+  private static assessTechniqueComplexity(
+    technique: string
+  ): 'low' | 'medium' | 'high' {
     const complexExercises = ['squat', 'deadlift', 'clean', 'snatch'];
     const mediumExercises = ['bench press', 'overhead press', 'row'];
-    
+
     const lowerTechnique = technique.toLowerCase();
-    
+
     if (complexExercises.some(ex => lowerTechnique.includes(ex))) return 'high';
-    if (mediumExercises.some(ex => lowerTechnique.includes(ex))) return 'medium';
+    if (mediumExercises.some(ex => lowerTechnique.includes(ex)))
+      return 'medium';
     return 'low';
   }
 

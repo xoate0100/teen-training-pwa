@@ -2,46 +2,50 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { wearableDeviceIntegration } from '@/lib/services/wearable-device-integration';
-import { 
-  WearableDevice, 
-  HeartRateData, 
-  SleepData, 
-  ActivityData, 
+import {
+  WearableDevice,
+  HeartRateData,
+  SleepData,
+  ActivityData,
   RecoveryMetrics,
-  DeviceIntegrationConfig 
+  DeviceIntegrationConfig,
 } from '@/lib/services/wearable-device-integration';
 
 export interface UseWearableDeviceIntegrationReturn {
   // Device management
   devices: WearableDevice[];
   connectedDevices: WearableDevice[];
-  connectDevice: (device: Omit<WearableDevice, 'id' | 'connected' | 'lastSync'>) => Promise<string>;
+  connectDevice: (
+    device: Omit<WearableDevice, 'id' | 'connected' | 'lastSync'>
+  ) => Promise<string>;
   disconnectDevice: (deviceId: string) => void;
   syncDevice: (deviceId: string) => Promise<void>;
   syncAllDevices: () => Promise<void>;
-  
+
   // Data access
   getHeartRateData: (startDate?: Date, endDate?: Date) => HeartRateData[];
   getSleepData: (startDate?: Date, endDate?: Date) => SleepData[];
   getActivityData: (startDate?: Date, endDate?: Date) => ActivityData[];
   getRecoveryMetrics: (startDate?: Date, endDate?: Date) => RecoveryMetrics[];
   getLatestRecoveryMetrics: () => RecoveryMetrics | null;
-  
+
   // Configuration
   config: DeviceIntegrationConfig;
   updateConfig: (config: Partial<DeviceIntegrationConfig>) => void;
-  
+
   // Data management
   clearAllData: () => void;
-  
+
   // Event handlers
   onDeviceConnected: (callback: (device: WearableDevice) => void) => void;
   onDeviceDisconnected: (callback: (device: WearableDevice) => void) => void;
   onSyncStart: (callback: (data: { deviceId: string }) => void) => void;
   onSyncComplete: (callback: (data: { deviceId: string }) => void) => void;
-  onSyncError: (callback: (data: { deviceId: string; error: any }) => void) => void;
+  onSyncError: (
+    callback: (data: { deviceId: string; error: any }) => void
+  ) => void;
   onDataCleared: (callback: () => void) => void;
-  
+
   // Loading states
   isSyncing: boolean;
   error: string | null;
@@ -49,8 +53,12 @@ export interface UseWearableDeviceIntegrationReturn {
 
 export function useWearableDeviceIntegration(): UseWearableDeviceIntegrationReturn {
   const [devices, setDevices] = useState<WearableDevice[]>([]);
-  const [connectedDevices, setConnectedDevices] = useState<WearableDevice[]>([]);
-  const [config, setConfig] = useState<DeviceIntegrationConfig>(wearableDeviceIntegration.getConfig());
+  const [connectedDevices, setConnectedDevices] = useState<WearableDevice[]>(
+    []
+  );
+  const [config, setConfig] = useState<DeviceIntegrationConfig>(
+    wearableDeviceIntegration.getConfig()
+  );
   const [isSyncing, setIsSyncing] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -62,27 +70,31 @@ export function useWearableDeviceIntegration(): UseWearableDeviceIntegrationRetu
     };
 
     updateDevices();
-    
+
     // Update devices every 5 seconds
     const interval = setInterval(updateDevices, 5000);
-    
+
     return () => clearInterval(interval);
   }, []);
 
   // Connect device
-  const connectDevice = useCallback(async (device: Omit<WearableDevice, 'id' | 'connected' | 'lastSync'>) => {
-    try {
-      setError(null);
-      const deviceId = await wearableDeviceIntegration.connectDevice(device);
-      setDevices(wearableDeviceIntegration.getDevices());
-      setConnectedDevices(wearableDeviceIntegration.getConnectedDevices());
-      return deviceId;
-    } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Failed to connect device';
-      setError(errorMessage);
-      throw new Error(errorMessage);
-    }
-  }, []);
+  const connectDevice = useCallback(
+    async (device: Omit<WearableDevice, 'id' | 'connected' | 'lastSync'>) => {
+      try {
+        setError(null);
+        const deviceId = await wearableDeviceIntegration.connectDevice(device);
+        setDevices(wearableDeviceIntegration.getDevices());
+        setConnectedDevices(wearableDeviceIntegration.getConnectedDevices());
+        return deviceId;
+      } catch (err) {
+        const errorMessage =
+          err instanceof Error ? err.message : 'Failed to connect device';
+        setError(errorMessage);
+        throw new Error(errorMessage);
+      }
+    },
+    []
+  );
 
   // Disconnect device
   const disconnectDevice = useCallback((deviceId: string) => {
@@ -98,7 +110,8 @@ export function useWearableDeviceIntegration(): UseWearableDeviceIntegrationRetu
       setError(null);
       await wearableDeviceIntegration.syncDevice(deviceId);
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Failed to sync device';
+      const errorMessage =
+        err instanceof Error ? err.message : 'Failed to sync device';
       setError(errorMessage);
       throw new Error(errorMessage);
     } finally {
@@ -113,7 +126,8 @@ export function useWearableDeviceIntegration(): UseWearableDeviceIntegrationRetu
       setError(null);
       await wearableDeviceIntegration.syncAllDevices();
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Failed to sync devices';
+      const errorMessage =
+        err instanceof Error ? err.message : 'Failed to sync devices';
       setError(errorMessage);
       throw new Error(errorMessage);
     } finally {
@@ -147,10 +161,13 @@ export function useWearableDeviceIntegration(): UseWearableDeviceIntegrationRetu
   }, []);
 
   // Update configuration
-  const updateConfig = useCallback((newConfig: Partial<DeviceIntegrationConfig>) => {
-    wearableDeviceIntegration.updateConfig(newConfig);
-    setConfig(wearableDeviceIntegration.getConfig());
-  }, []);
+  const updateConfig = useCallback(
+    (newConfig: Partial<DeviceIntegrationConfig>) => {
+      wearableDeviceIntegration.updateConfig(newConfig);
+      setConfig(wearableDeviceIntegration.getConfig());
+    },
+    []
+  );
 
   // Clear all data
   const clearAllData = useCallback(() => {
@@ -158,25 +175,40 @@ export function useWearableDeviceIntegration(): UseWearableDeviceIntegrationRetu
   }, []);
 
   // Event handlers
-  const onDeviceConnected = useCallback((callback: (device: WearableDevice) => void) => {
-    wearableDeviceIntegration.on('deviceConnected', callback);
-  }, []);
+  const onDeviceConnected = useCallback(
+    (callback: (device: WearableDevice) => void) => {
+      wearableDeviceIntegration.on('deviceConnected', callback);
+    },
+    []
+  );
 
-  const onDeviceDisconnected = useCallback((callback: (device: WearableDevice) => void) => {
-    wearableDeviceIntegration.on('deviceDisconnected', callback);
-  }, []);
+  const onDeviceDisconnected = useCallback(
+    (callback: (device: WearableDevice) => void) => {
+      wearableDeviceIntegration.on('deviceDisconnected', callback);
+    },
+    []
+  );
 
-  const onSyncStart = useCallback((callback: (data: { deviceId: string }) => void) => {
-    wearableDeviceIntegration.on('syncStart', callback);
-  }, []);
+  const onSyncStart = useCallback(
+    (callback: (data: { deviceId: string }) => void) => {
+      wearableDeviceIntegration.on('syncStart', callback);
+    },
+    []
+  );
 
-  const onSyncComplete = useCallback((callback: (data: { deviceId: string }) => void) => {
-    wearableDeviceIntegration.on('syncComplete', callback);
-  }, []);
+  const onSyncComplete = useCallback(
+    (callback: (data: { deviceId: string }) => void) => {
+      wearableDeviceIntegration.on('syncComplete', callback);
+    },
+    []
+  );
 
-  const onSyncError = useCallback((callback: (data: { deviceId: string; error: any }) => void) => {
-    wearableDeviceIntegration.on('syncError', callback);
-  }, []);
+  const onSyncError = useCallback(
+    (callback: (data: { deviceId: string; error: any }) => void) => {
+      wearableDeviceIntegration.on('syncError', callback);
+    },
+    []
+  );
 
   const onDataCleared = useCallback((callback: () => void) => {
     wearableDeviceIntegration.on('dataCleared', callback);

@@ -13,9 +13,9 @@ import { cn } from '@/lib/utils';
 
 interface SessionThemeSelectorProps {
   currentTheme?: SessionTheme['type'];
-  /* eslint-disable-next-line no-unused-vars */
+
   onThemeSelect?: (theme: SessionTheme) => void;
-  /* eslint-disable-next-line no-unused-vars */
+
   onThemePreview?: (theme: SessionTheme) => void;
   className?: string;
   showPreview?: boolean;
@@ -157,7 +157,7 @@ function getThemeDescription(type: SessionTheme['type']): string {
 
 interface ThemeCustomizerProps {
   baseTheme: SessionTheme;
-  /* eslint-disable-next-line no-unused-vars */
+
   onThemeUpdate?: (theme: SessionTheme) => void;
   className?: string;
 }

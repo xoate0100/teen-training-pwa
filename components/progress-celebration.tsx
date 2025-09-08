@@ -17,7 +17,7 @@ export function ProgressCelebration({
   type,
   message,
   icon,
-  /* eslint-disable-next-line no-unused-vars */
+
   color = '#3b82f6',
   duration = 3000,
   onComplete,

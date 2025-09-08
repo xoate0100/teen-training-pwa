@@ -2,46 +2,59 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { performanceOptimization } from '@/lib/services/performance-optimization';
-import { 
-  PaginationOptions, 
-  PaginatedResult, 
-  CacheStrategy, 
-  QueryOptimization, 
-  MemoryManagement, 
-  PerformanceMetrics 
+import {
+  PaginationOptions,
+  PaginatedResult,
+  CacheStrategy,
+  QueryOptimization,
+  MemoryManagement,
+  PerformanceMetrics,
 } from '@/lib/services/performance-optimization';
 import { SessionData, CheckInData } from '@/lib/services/database-service';
 
 export interface UsePerformanceOptimizationReturn {
   // Performance metrics
   metrics: PerformanceMetrics;
-  
+
   // Pagination
-  paginateSessions: (options: PaginationOptions) => Promise<PaginatedResult<SessionData>>; // eslint-disable-next-line no-unused-vars
-  paginateCheckIns: (options: PaginationOptions) => Promise<PaginatedResult<CheckInData>>; // eslint-disable-next-line no-unused-vars
-  
+  paginateSessions: (
+    options: PaginationOptions
+  ) => Promise<PaginatedResult<SessionData>>;
+  paginateCheckIns: (
+    options: PaginationOptions
+  ) => Promise<PaginatedResult<CheckInData>>;
+
   // Cache management
   clearCache: () => void;
   getCacheSize: () => number;
   getCacheHitRate: () => number;
-  
+
   // Memory management
   getMemoryUsage: () => number;
-  
+
   // Configuration
-  setCacheStrategy: (strategy: Partial<CacheStrategy>) => void; // eslint-disable-next-line no-unused-vars
-  setQueryOptimization: (optimization: Partial<QueryOptimization>) => void; // eslint-disable-next-line no-unused-vars
-  setMemoryManagement: (management: Partial<MemoryManagement>) => void; // eslint-disable-next-line no-unused-vars
-  
+  setCacheStrategy: (strategy: Partial<CacheStrategy>) => void;
+  setQueryOptimization: (optimization: Partial<QueryOptimization>) => void;
+  setMemoryManagement: (management: Partial<MemoryManagement>) => void;
+
   // Debounced queries
-  debouncedQuery: <T>(queryFn: () => Promise<T>, key: string, delay?: number) => Promise<T>; // eslint-disable-next-line no-unused-vars
-  
+  debouncedQuery: <T>(
+    queryFn: () => Promise<T>,
+    key: string,
+    delay?: number
+  ) => Promise<T>;
+
   // Batch operations
-  batchOperations: <T>(operations: Array<() => Promise<T>>, batchSize?: number) => Promise<T[]>; // eslint-disable-next-line no-unused-vars
+  batchOperations: <T>(
+    operations: Array<() => Promise<T>>,
+    batchSize?: number
+  ) => Promise<T[]>;
 }
 
 export function usePerformanceOptimization(): UsePerformanceOptimizationReturn {
-  const [metrics, setMetrics] = useState<PerformanceMetrics>(performanceOptimization.getPerformanceMetrics());
+  const [metrics, setMetrics] = useState<PerformanceMetrics>(
+    performanceOptimization.getPerformanceMetrics()
+  );
 
   // Update metrics periodically
   useEffect(() => {
@@ -91,24 +104,36 @@ export function usePerformanceOptimization(): UsePerformanceOptimizationReturn {
   }, []);
 
   // Set query optimization
-  const setQueryOptimization = useCallback((optimization: Partial<QueryOptimization>) => {
-    performanceOptimization.setQueryOptimization(optimization);
-  }, []);
+  const setQueryOptimization = useCallback(
+    (optimization: Partial<QueryOptimization>) => {
+      performanceOptimization.setQueryOptimization(optimization);
+    },
+    []
+  );
 
   // Set memory management
-  const setMemoryManagement = useCallback((management: Partial<MemoryManagement>) => {
-    performanceOptimization.setMemoryManagement(management);
-  }, []);
+  const setMemoryManagement = useCallback(
+    (management: Partial<MemoryManagement>) => {
+      performanceOptimization.setMemoryManagement(management);
+    },
+    []
+  );
 
   // Debounced query
-  const debouncedQuery = useCallback(<T>(queryFn: () => Promise<T>, key: string, delay?: number) => {
-    return performanceOptimization.debouncedQuery(queryFn, key, delay);
-  }, []);
+  const debouncedQuery = useCallback(
+    <T>(queryFn: () => Promise<T>, key: string, delay?: number) => {
+      return performanceOptimization.debouncedQuery(queryFn, key, delay);
+    },
+    []
+  );
 
   // Batch operations
-  const batchOperations = useCallback(<T>(operations: Array<() => Promise<T>>, batchSize?: number) => {
-    return performanceOptimization.batchOperations(operations, batchSize);
-  }, []);
+  const batchOperations = useCallback(
+    <T>(operations: Array<() => Promise<T>>, batchSize?: number) => {
+      return performanceOptimization.batchOperations(operations, batchSize);
+    },
+    []
+  );
 
   return {
     metrics,

@@ -9,7 +9,7 @@ import { toast } from 'sonner';
 interface Props {
   children: ReactNode;
   fallback?: ReactNode;
-  // eslint-disable-next-line no-unused-vars
+
   onError?: (error: Error, errorInfo: ErrorInfo) => void;
   showDetails?: boolean;
 }

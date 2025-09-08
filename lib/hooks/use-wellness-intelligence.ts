@@ -1,6 +1,5 @@
 'use client';
 
-/* eslint-disable no-unused-vars */
 import { useState, useEffect, useCallback } from 'react';
 import {
   WellnessAnalysisService,

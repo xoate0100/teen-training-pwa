@@ -107,7 +107,12 @@ export interface FeatureUsageAnalysis {
 export interface SuccessRateMonitoring {
   metricId: string;
   metricName: string;
-  category: 'user_engagement' | 'performance' | 'retention' | 'satisfaction' | 'technical';
+  category:
+    | 'user_engagement'
+    | 'performance'
+    | 'retention'
+    | 'satisfaction'
+    | 'technical';
   currentValue: number;
   targetValue: number;
   successRate: number; // percentage
@@ -213,7 +218,8 @@ export interface ContinuousImprovementLoop {
 export class AnalyticsService {
   private databaseService = new DatabaseService();
   private engagementMetrics: Map<string, UserEngagementMetrics> = new Map();
-  private performanceTracking: Map<string, PerformanceImprovementTracking> = new Map();
+  private performanceTracking: Map<string, PerformanceImprovementTracking> =
+    new Map();
   private featureUsage: Map<string, FeatureUsageAnalysis> = new Map();
   private successRates: Map<string, SuccessRateMonitoring> = new Map();
   private researchData: Map<string, ResearchDataCollection> = new Map();
@@ -230,18 +236,24 @@ export class AnalyticsService {
   }
 
   // User Engagement Metrics
-  async generateUserEngagementMetrics(userId: string): Promise<UserEngagementMetrics> {
+  async generateUserEngagementMetrics(
+    userId: string
+  ): Promise<UserEngagementMetrics> {
     try {
       const sessions = await this.databaseService.getSessions(userId);
       const checkIns = await this.databaseService.getCheckIns(userId);
-      
+
       if (sessions.length < 3) {
         return this.getDefaultEngagementMetrics(userId);
       }
 
-      const metrics = await this.calculateUserEngagementMetrics(userId, sessions, checkIns);
+      const metrics = await this.calculateUserEngagementMetrics(
+        userId,
+        sessions,
+        checkIns
+      );
       this.engagementMetrics.set(userId, metrics);
-      
+
       return metrics;
     } catch (error) {
       console.error('Error generating user engagement metrics:', error);
@@ -256,16 +268,16 @@ export class AnalyticsService {
   ): Promise<UserEngagementMetrics> {
     // Calculate session frequency
     const sessionFrequency = this.calculateSessionFrequency(sessions);
-    
+
     // Calculate session duration metrics
     const sessionDuration = this.calculateSessionDurationMetrics(sessions);
-    
+
     // Calculate feature usage
     const featureUsage = this.calculateFeatureUsage(sessions, checkIns);
-    
+
     // Calculate app interaction
     const appInteraction = this.calculateAppInteraction(sessions, checkIns);
-    
+
     // Calculate retention metrics
     const retention = this.calculateRetentionMetrics(sessions, checkIns);
 
@@ -280,7 +292,9 @@ export class AnalyticsService {
     };
   }
 
-  private calculateSessionFrequency(sessions: SessionData[]): UserEngagementMetrics['sessionFrequency'] {
+  private calculateSessionFrequency(
+    sessions: SessionData[]
+  ): UserEngagementMetrics['sessionFrequency'] {
     const now = new Date();
     const oneDayAgo = new Date(now.getTime() - 24 * 60 * 60 * 1000);
     const oneWeekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
@@ -291,7 +305,9 @@ export class AnalyticsService {
     const monthlySessions = sessions.filter(s => s.date >= oneMonthAgo).length;
 
     // Calculate current streak
-    const sortedSessions = sessions.sort((a, b) => b.date.getTime() - a.date.getTime());
+    const sortedSessions = sessions.sort(
+      (a, b) => b.date.getTime() - a.date.getTime()
+    );
     let currentStreak = 0;
     let longestStreak = 0;
     let tempStreak = 0;
@@ -300,13 +316,15 @@ export class AnalyticsService {
     for (const session of sortedSessions) {
       const sessionDate = new Date(session.date);
       sessionDate.setHours(0, 0, 0, 0);
-      
+
       if (lastDate === null) {
         lastDate = sessionDate;
         tempStreak = 1;
         currentStreak = 1;
       } else {
-        const daysDiff = Math.floor((lastDate.getTime() - sessionDate.getTime()) / (24 * 60 * 60 * 1000));
+        const daysDiff = Math.floor(
+          (lastDate.getTime() - sessionDate.getTime()) / (24 * 60 * 60 * 1000)
+        );
         if (daysDiff === 1) {
           tempStreak++;
           if (tempStreak > longestStreak) {
@@ -331,20 +349,27 @@ export class AnalyticsService {
     };
   }
 
-  private calculateSessionDurationMetrics(sessions: SessionData[]): UserEngagementMetrics['sessionDuration'] {
+  private calculateSessionDurationMetrics(
+    sessions: SessionData[]
+  ): UserEngagementMetrics['sessionDuration'] {
     const durations = sessions.map(s => s.duration || 60);
     const total = durations.reduce((sum, d) => sum + d, 0);
     const average = total / durations.length;
     const median = this.calculateMedian(durations);
-    
+
     // Calculate trend
     const recentSessions = sessions.slice(-10);
     const olderSessions = sessions.slice(-20, -10);
-    
-    const recentAvg = recentSessions.reduce((sum, s) => sum + (s.duration || 60), 0) / recentSessions.length;
-    const olderAvg = olderSessions.length > 0 ? 
-      olderSessions.reduce((sum, s) => sum + (s.duration || 60), 0) / olderSessions.length : recentAvg;
-    
+
+    const recentAvg =
+      recentSessions.reduce((sum, s) => sum + (s.duration || 60), 0) /
+      recentSessions.length;
+    const olderAvg =
+      olderSessions.length > 0
+        ? olderSessions.reduce((sum, s) => sum + (s.duration || 60), 0) /
+          olderSessions.length
+        : recentAvg;
+
     let trend: 'increasing' | 'stable' | 'decreasing' = 'stable';
     if (recentAvg > olderAvg * 1.1) trend = 'increasing';
     else if (recentAvg < olderAvg * 0.9) trend = 'decreasing';
@@ -357,12 +382,39 @@ export class AnalyticsService {
     };
   }
 
-  private calculateFeatureUsage(sessions: SessionData[], checkIns: CheckInData[]): UserEngagementMetrics['featureUsage'] {
+  private calculateFeatureUsage(
+    sessions: SessionData[],
+    checkIns: CheckInData[]
+  ): UserEngagementMetrics['featureUsage'] {
     const features = [
-      { name: 'Session Tracking', usageCount: sessions.length, lastUsed: sessions[0]?.date, frequency: sessions.length / 4, satisfaction: 8 },
-      { name: 'Check-ins', usageCount: checkIns.length, lastUsed: checkIns[0]?.date, frequency: checkIns.length / 4, satisfaction: 7 },
-      { name: 'Progress Tracking', usageCount: sessions.filter(s => s.exercises.length > 0).length, lastUsed: sessions[0]?.date, frequency: sessions.length / 4, satisfaction: 8 },
-      { name: 'Goal Setting', usageCount: checkIns.filter(c => c.notes?.includes('goal')).length, lastUsed: checkIns[0]?.date, frequency: checkIns.length / 8, satisfaction: 6 },
+      {
+        name: 'Session Tracking',
+        usageCount: sessions.length,
+        lastUsed: sessions[0]?.date,
+        frequency: sessions.length / 4,
+        satisfaction: 8,
+      },
+      {
+        name: 'Check-ins',
+        usageCount: checkIns.length,
+        lastUsed: checkIns[0]?.date,
+        frequency: checkIns.length / 4,
+        satisfaction: 7,
+      },
+      {
+        name: 'Progress Tracking',
+        usageCount: sessions.filter(s => s.exercises.length > 0).length,
+        lastUsed: sessions[0]?.date,
+        frequency: sessions.length / 4,
+        satisfaction: 8,
+      },
+      {
+        name: 'Goal Setting',
+        usageCount: checkIns.filter(c => c.notes?.includes('goal')).length,
+        lastUsed: checkIns[0]?.date,
+        frequency: checkIns.length / 8,
+        satisfaction: 6,
+      },
     ];
 
     return features.map(feature => ({
@@ -374,7 +426,10 @@ export class AnalyticsService {
     }));
   }
 
-  private calculateAppInteraction(sessions: SessionData[], checkIns: CheckInData[]): UserEngagementMetrics['appInteraction'] {
+  private calculateAppInteraction(
+    sessions: SessionData[],
+    checkIns: CheckInData[]
+  ): UserEngagementMetrics['appInteraction'] {
     const now = new Date();
     const oneDayAgo = new Date(now.getTime() - 24 * 60 * 60 * 1000);
     const oneWeekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
@@ -384,13 +439,23 @@ export class AnalyticsService {
     const weeklySessions = sessions.filter(s => s.date >= oneWeekAgo);
     const monthlySessions = sessions.filter(s => s.date >= oneMonthAgo);
 
-    const dailyActiveMinutes = dailySessions.reduce((sum, s) => sum + (s.duration || 60), 0);
-    const weeklyActiveMinutes = weeklySessions.reduce((sum, s) => sum + (s.duration || 60), 0);
-    const monthlyActiveMinutes = monthlySessions.reduce((sum, s) => sum + (s.duration || 60), 0);
+    const dailyActiveMinutes = dailySessions.reduce(
+      (sum, s) => sum + (s.duration || 60),
+      0
+    );
+    const weeklyActiveMinutes = weeklySessions.reduce(
+      (sum, s) => sum + (s.duration || 60),
+      0
+    );
+    const monthlyActiveMinutes = monthlySessions.reduce(
+      (sum, s) => sum + (s.duration || 60),
+      0
+    );
 
     // Calculate bounce rate (sessions less than 5 minutes)
     const shortSessions = sessions.filter(s => (s.duration || 60) < 5).length;
-    const bounceRate = sessions.length > 0 ? shortSessions / sessions.length : 0;
+    const bounceRate =
+      sessions.length > 0 ? shortSessions / sessions.length : 0;
 
     return {
       dailyActiveMinutes,
@@ -401,10 +466,13 @@ export class AnalyticsService {
     };
   }
 
-  private calculateRetentionMetrics(sessions: SessionData[], checkIns: CheckInData[]): UserEngagementMetrics['retention'] {
+  private calculateRetentionMetrics(
+    sessions: SessionData[],
+    checkIns: CheckInData[]
+  ): UserEngagementMetrics['retention'] {
     const now = new Date();
     const firstSession = sessions[0]?.date;
-    
+
     if (!firstSession) {
       return {
         day1: 0,
@@ -415,9 +483,15 @@ export class AnalyticsService {
       };
     }
 
-    const daysSinceFirst = Math.floor((now.getTime() - firstSession.getTime()) / (24 * 60 * 60 * 1000));
+    const daysSinceFirst = Math.floor(
+      (now.getTime() - firstSession.getTime()) / (24 * 60 * 60 * 1000)
+    );
     const lastSession = sessions[sessions.length - 1]?.date;
-    const daysSinceLast = lastSession ? Math.floor((now.getTime() - lastSession.getTime()) / (24 * 60 * 60 * 1000)) : 0;
+    const daysSinceLast = lastSession
+      ? Math.floor(
+          (now.getTime() - lastSession.getTime()) / (24 * 60 * 60 * 1000)
+        )
+      : 0;
 
     // Calculate retention rates (simplified)
     const day1 = daysSinceFirst >= 1 ? 1 : 0;
@@ -444,7 +518,9 @@ export class AnalyticsService {
   private calculateMedian(numbers: number[]): number {
     const sorted = [...numbers].sort((a, b) => a - b);
     const mid = Math.floor(sorted.length / 2);
-    return sorted.length % 2 === 0 ? (sorted[mid - 1] + sorted[mid]) / 2 : sorted[mid];
+    return sorted.length % 2 === 0
+      ? (sorted[mid - 1] + sorted[mid]) / 2
+      : sorted[mid];
   }
 
   private getDefaultEngagementMetrics(userId: string): UserEngagementMetrics {
@@ -483,21 +559,30 @@ export class AnalyticsService {
   }
 
   // Performance Improvement Tracking
-  async generatePerformanceImprovementTracking(userId: string): Promise<PerformanceImprovementTracking> {
+  async generatePerformanceImprovementTracking(
+    userId: string
+  ): Promise<PerformanceImprovementTracking> {
     try {
       const sessions = await this.databaseService.getSessions(userId);
       const checkIns = await this.databaseService.getCheckIns(userId);
-      
+
       if (sessions.length < 5) {
         return this.getDefaultPerformanceTracking(userId);
       }
 
-      const tracking = await this.calculatePerformanceImprovementTracking(userId, sessions, checkIns);
+      const tracking = await this.calculatePerformanceImprovementTracking(
+        userId,
+        sessions,
+        checkIns
+      );
       this.performanceTracking.set(userId, tracking);
-      
+
       return tracking;
     } catch (error) {
-      console.error('Error generating performance improvement tracking:', error);
+      console.error(
+        'Error generating performance improvement tracking:',
+        error
+      );
       throw error;
     }
   }
@@ -509,13 +594,13 @@ export class AnalyticsService {
   ): Promise<PerformanceImprovementTracking> {
     // Calculate strength progress
     const strengthProgress = this.calculateStrengthProgress(sessions);
-    
+
     // Calculate skill development
     const skillDevelopment = this.calculateSkillDevelopment(sessions, checkIns);
-    
+
     // Calculate endurance progress
     const enduranceProgress = this.calculateEnduranceProgress(sessions);
-    
+
     // Calculate overall progress
     const overallProgress = this.calculateOverallProgress(sessions, checkIns);
 
@@ -529,36 +614,60 @@ export class AnalyticsService {
     };
   }
 
-  private calculateStrengthProgress(sessions: SessionData[]): PerformanceImprovementTracking['strengthProgress'] {
-    const strengthExercises = ['Squats', 'Push-ups', 'Plunges', 'Planks', 'Burpees'];
+  private calculateStrengthProgress(
+    sessions: SessionData[]
+  ): PerformanceImprovementTracking['strengthProgress'] {
+    const strengthExercises = [
+      'Squats',
+      'Push-ups',
+      'Plunges',
+      'Planks',
+      'Burpees',
+    ];
     const progress: PerformanceImprovementTracking['strengthProgress'] = [];
 
     for (const exercise of strengthExercises) {
-      const exerciseSessions = sessions.filter(s => 
-        s.exercises.some(e => e.name.toLowerCase().includes(exercise.toLowerCase()))
+      const exerciseSessions = sessions.filter(s =>
+        s.exercises.some(e =>
+          e.name.toLowerCase().includes(exercise.toLowerCase())
+        )
       );
 
       if (exerciseSessions.length < 2) continue;
 
-      const weights = exerciseSessions.map(session => {
-        const exercise = session.exercises.find(e => e.name.toLowerCase().includes(exercise.toLowerCase()));
-        return exercise ? exercise.sets.reduce((sum, set) => sum + (set.weight || 0), 0) / exercise.sets.length : 0;
-      }).filter(w => w > 0);
+      const weights = exerciseSessions
+        .map(session => {
+          const exercise = session.exercises.find(e =>
+            e.name.toLowerCase().includes(exercise.toLowerCase())
+          );
+          return exercise
+            ? exercise.sets.reduce((sum, set) => sum + (set.weight || 0), 0) /
+                exercise.sets.length
+            : 0;
+        })
+        .filter(w => w > 0);
 
       if (weights.length < 2) continue;
 
       const initialWeight = weights[0];
       const currentWeight = weights[weights.length - 1];
-      const improvement = ((currentWeight - initialWeight) / initialWeight) * 100;
-      
+      const improvement =
+        ((currentWeight - initialWeight) / initialWeight) * 100;
+
       // Calculate progression rate
-      const timeSpan = (exerciseSessions[exerciseSessions.length - 1].date.getTime() - exerciseSessions[0].date.getTime()) / (7 * 24 * 60 * 60 * 1000);
-      const progressionRate = timeSpan > 0 ? (currentWeight - initialWeight) / timeSpan : 0;
+      const timeSpan =
+        (exerciseSessions[exerciseSessions.length - 1].date.getTime() -
+          exerciseSessions[0].date.getTime()) /
+        (7 * 24 * 60 * 60 * 1000);
+      const progressionRate =
+        timeSpan > 0 ? (currentWeight - initialWeight) / timeSpan : 0;
 
       // Detect plateau (no improvement in last 2 weeks)
       const recentWeights = weights.slice(-4);
-      const plateauDetected = recentWeights.length >= 2 && 
-        Math.abs(recentWeights[recentWeights.length - 1] - recentWeights[0]) < (recentWeights[0] * 0.05);
+      const plateauDetected =
+        recentWeights.length >= 2 &&
+        Math.abs(recentWeights[recentWeights.length - 1] - recentWeights[0]) <
+          recentWeights[0] * 0.05;
 
       progress.push({
         exercise,
@@ -574,14 +683,26 @@ export class AnalyticsService {
     return progress;
   }
 
-  private calculateSkillDevelopment(sessions: SessionData[], checkIns: CheckInData[]): PerformanceImprovementTracking['skillDevelopment'] {
-    const skills = ['Volleyball', 'Plyometric', 'Coordination', 'Balance', 'Flexibility'];
+  private calculateSkillDevelopment(
+    sessions: SessionData[],
+    checkIns: CheckInData[]
+  ): PerformanceImprovementTracking['skillDevelopment'] {
+    const skills = [
+      'Volleyball',
+      'Plyometric',
+      'Coordination',
+      'Balance',
+      'Flexibility',
+    ];
     const development: PerformanceImprovementTracking['skillDevelopment'] = [];
 
     for (const skill of skills) {
-      const skillSessions = sessions.filter(s => 
-        s.type?.toLowerCase().includes(skill.toLowerCase()) || 
-        s.exercises.some(e => e.name.toLowerCase().includes(skill.toLowerCase()))
+      const skillSessions = sessions.filter(
+        s =>
+          s.type?.toLowerCase().includes(skill.toLowerCase()) ||
+          s.exercises.some(e =>
+            e.name.toLowerCase().includes(skill.toLowerCase())
+          )
       );
 
       if (skillSessions.length < 2) continue;
@@ -589,19 +710,31 @@ export class AnalyticsService {
       // Calculate skill level based on session complexity and duration
       const skillLevels = skillSessions.map(session => {
         const duration = session.duration || 60;
-        const intensity = session.exercises.reduce((sum, exercise) => {
-          return sum + exercise.sets.reduce((setSum, set) => setSum + (set.rpe || 5), 0) / exercise.sets.length;
-        }, 0) / session.exercises.length;
+        const intensity =
+          session.exercises.reduce((sum, exercise) => {
+            return (
+              sum +
+              exercise.sets.reduce(
+                (setSum, set) => setSum + (set.rpe || 5),
+                0
+              ) /
+                exercise.sets.length
+            );
+          }, 0) / session.exercises.length;
         return (duration / 60) * (intensity / 10) * 10; // Scale to 1-10
       });
 
       const initialLevel = skillLevels[0];
       const currentLevel = skillLevels[skillLevels.length - 1];
       const improvement = ((currentLevel - initialLevel) / initialLevel) * 100;
-      
+
       // Calculate learning rate
-      const timeSpan = (skillSessions[skillSessions.length - 1].date.getTime() - skillSessions[0].date.getTime()) / (7 * 24 * 60 * 60 * 1000);
-      const learningRate = timeSpan > 0 ? (currentLevel - initialLevel) / timeSpan : 0;
+      const timeSpan =
+        (skillSessions[skillSessions.length - 1].date.getTime() -
+          skillSessions[0].date.getTime()) /
+        (7 * 24 * 60 * 60 * 1000);
+      const learningRate =
+        timeSpan > 0 ? (currentLevel - initialLevel) / timeSpan : 0;
 
       // Calculate mastery progress
       const masteryProgress = Math.min(currentLevel / 10, 1);
@@ -619,13 +752,23 @@ export class AnalyticsService {
     return development;
   }
 
-  private calculateEnduranceProgress(sessions: SessionData[]): PerformanceImprovementTracking['enduranceProgress'] {
-    const enduranceExercises = ['Running', 'Cycling', 'Swimming', 'Rowing', 'Cardio'];
+  private calculateEnduranceProgress(
+    sessions: SessionData[]
+  ): PerformanceImprovementTracking['enduranceProgress'] {
+    const enduranceExercises = [
+      'Running',
+      'Cycling',
+      'Swimming',
+      'Rowing',
+      'Cardio',
+    ];
     const progress: PerformanceImprovementTracking['enduranceProgress'] = [];
 
     for (const exercise of enduranceExercises) {
-      const exerciseSessions = sessions.filter(s => 
-        s.exercises.some(e => e.name.toLowerCase().includes(exercise.toLowerCase()))
+      const exerciseSessions = sessions.filter(s =>
+        s.exercises.some(e =>
+          e.name.toLowerCase().includes(exercise.toLowerCase())
+        )
       );
 
       if (exerciseSessions.length < 2) continue;
@@ -633,11 +776,16 @@ export class AnalyticsService {
       const durations = exerciseSessions.map(session => session.duration || 60);
       const initialDuration = durations[0];
       const currentDuration = durations[durations.length - 1];
-      const improvement = ((currentDuration - initialDuration) / initialDuration) * 100;
-      
+      const improvement =
+        ((currentDuration - initialDuration) / initialDuration) * 100;
+
       // Calculate endurance gain
-      const timeSpan = (exerciseSessions[exerciseSessions.length - 1].date.getTime() - exerciseSessions[0].date.getTime()) / (7 * 24 * 60 * 60 * 1000);
-      const enduranceGain = timeSpan > 0 ? (currentDuration - initialDuration) / timeSpan : 0;
+      const timeSpan =
+        (exerciseSessions[exerciseSessions.length - 1].date.getTime() -
+          exerciseSessions[0].date.getTime()) /
+        (7 * 24 * 60 * 60 * 1000);
+      const enduranceGain =
+        timeSpan > 0 ? (currentDuration - initialDuration) / timeSpan : 0;
 
       progress.push({
         exercise,
@@ -651,7 +799,10 @@ export class AnalyticsService {
     return progress;
   }
 
-  private calculateOverallProgress(sessions: SessionData[], checkIns: CheckInData[]): PerformanceImprovementTracking['overallProgress'] {
+  private calculateOverallProgress(
+    sessions: SessionData[],
+    checkIns: CheckInData[]
+  ): PerformanceImprovementTracking['overallProgress'] {
     // Calculate total improvement (weighted average of all metrics)
     const strengthProgress = this.calculateStrengthProgress(sessions);
     const skillDevelopment = this.calculateSkillDevelopment(sessions, checkIns);
@@ -663,8 +814,11 @@ export class AnalyticsService {
       ...enduranceProgress.map(s => s.improvement),
     ];
 
-    const totalImprovement = allImprovements.length > 0 ? 
-      allImprovements.reduce((sum, imp) => sum + imp, 0) / allImprovements.length : 0;
+    const totalImprovement =
+      allImprovements.length > 0
+        ? allImprovements.reduce((sum, imp) => sum + imp, 0) /
+          allImprovements.length
+        : 0;
 
     // Calculate consistency (based on session frequency and regularity)
     const sessionDates = sessions.map(s => s.date).sort();
@@ -672,13 +826,17 @@ export class AnalyticsService {
 
     // Calculate average motivation
     const motivations = checkIns.map(c => c.motivation || 5);
-    const motivation = motivations.length > 0 ? 
-      motivations.reduce((sum, m) => sum + m, 0) / motivations.length : 5;
+    const motivation =
+      motivations.length > 0
+        ? motivations.reduce((sum, m) => sum + m, 0) / motivations.length
+        : 5;
 
     // Calculate average satisfaction (based on check-in ratings)
     const satisfactions = checkIns.map(c => c.rating || 5);
-    const satisfaction = satisfactions.length > 0 ? 
-      satisfactions.reduce((sum, s) => sum + s, 0) / satisfactions.length : 5;
+    const satisfaction =
+      satisfactions.length > 0
+        ? satisfactions.reduce((sum, s) => sum + s, 0) / satisfactions.length
+        : 5;
 
     return {
       totalImprovement,
@@ -693,19 +851,28 @@ export class AnalyticsService {
 
     const intervals: number[] = [];
     for (let i = 1; i < sessionDates.length; i++) {
-      const interval = (sessionDates[i].getTime() - sessionDates[i - 1].getTime()) / (24 * 60 * 60 * 1000);
+      const interval =
+        (sessionDates[i].getTime() - sessionDates[i - 1].getTime()) /
+        (24 * 60 * 60 * 1000);
       intervals.push(interval);
     }
 
-    const averageInterval = intervals.reduce((sum, interval) => sum + interval, 0) / intervals.length;
-    const variance = intervals.reduce((sum, interval) => sum + Math.pow(interval - averageInterval, 2), 0) / intervals.length;
+    const averageInterval =
+      intervals.reduce((sum, interval) => sum + interval, 0) / intervals.length;
+    const variance =
+      intervals.reduce(
+        (sum, interval) => sum + Math.pow(interval - averageInterval, 2),
+        0
+      ) / intervals.length;
     const standardDeviation = Math.sqrt(variance);
 
     // Consistency is higher when standard deviation is lower
-    return Math.max(0, 1 - (standardDeviation / averageInterval));
+    return Math.max(0, 1 - standardDeviation / averageInterval);
   }
 
-  private getDefaultPerformanceTracking(userId: string): PerformanceImprovementTracking {
+  private getDefaultPerformanceTracking(
+    userId: string
+  ): PerformanceImprovementTracking {
     return {
       userId,
       strengthProgress: [],
@@ -728,7 +895,10 @@ export class AnalyticsService {
       if (storedEngagement) {
         const metrics = JSON.parse(storedEngagement);
         Object.entries(metrics).forEach(([key, value]) => {
-          this.engagementMetrics.set(key, { ...value, lastUpdated: new Date(value.lastUpdated) });
+          this.engagementMetrics.set(key, {
+            ...value,
+            lastUpdated: new Date(value.lastUpdated),
+          });
         });
       }
 
@@ -736,7 +906,10 @@ export class AnalyticsService {
       if (storedPerformance) {
         const tracking = JSON.parse(storedPerformance);
         Object.entries(tracking).forEach(([key, value]) => {
-          this.performanceTracking.set(key, { ...value, lastUpdated: new Date(value.lastUpdated) });
+          this.performanceTracking.set(key, {
+            ...value,
+            lastUpdated: new Date(value.lastUpdated),
+          });
         });
       }
     } catch (error) {
@@ -746,8 +919,14 @@ export class AnalyticsService {
 
   private saveData(): void {
     try {
-      localStorage.setItem('engagement_metrics', JSON.stringify(Object.fromEntries(this.engagementMetrics)));
-      localStorage.setItem('performance_tracking', JSON.stringify(Object.fromEntries(this.performanceTracking)));
+      localStorage.setItem(
+        'engagement_metrics',
+        JSON.stringify(Object.fromEntries(this.engagementMetrics))
+      );
+      localStorage.setItem(
+        'performance_tracking',
+        JSON.stringify(Object.fromEntries(this.performanceTracking))
+      );
     } catch (error) {
       console.error('Error saving data:', error);
     }
@@ -758,7 +937,9 @@ export class AnalyticsService {
     return this.engagementMetrics.get(userId) || null;
   }
 
-  getPerformanceImprovementTracking(userId: string): PerformanceImprovementTracking | null {
+  getPerformanceImprovementTracking(
+    userId: string
+  ): PerformanceImprovementTracking | null {
     return this.performanceTracking.get(userId) || null;
   }
 
@@ -772,26 +953,31 @@ export class AnalyticsService {
   private async performAnalyticsCollection(): Promise<void> {
     try {
       const userIds = ['current-user']; // In a real app, this would be dynamic
-      
+
       for (const userId of userIds) {
         await this.generateUserEngagementMetrics(userId);
         await this.generatePerformanceImprovementTracking(userId);
       }
-      
     } catch (error) {
       console.error('Error in analytics collection:', error);
     }
   }
 
   // Feature Usage Analysis
-  async generateFeatureUsageAnalysis(featureId: string): Promise<FeatureUsageAnalysis> {
+  async generateFeatureUsageAnalysis(
+    featureId: string
+  ): Promise<FeatureUsageAnalysis> {
     try {
       const sessions = await this.databaseService.getSessions('current-user');
       const checkIns = await this.databaseService.getCheckIns('current-user');
-      
-      const analysis = await this.calculateFeatureUsageAnalysis(featureId, sessions, checkIns);
+
+      const analysis = await this.calculateFeatureUsageAnalysis(
+        featureId,
+        sessions,
+        checkIns
+      );
       this.featureUsage.set(featureId, analysis);
-      
+
       return analysis;
     } catch (error) {
       console.error('Error generating feature usage analysis:', error);
@@ -806,11 +992,30 @@ export class AnalyticsService {
   ): Promise<FeatureUsageAnalysis> {
     const featureName = this.getFeatureName(featureId);
     const totalUsers = 1; // In a real app, this would be the total user count
-    const activeUsers = this.calculateActiveUsers(featureId, sessions, checkIns);
-    const usageFrequency = this.calculateUsageFrequency(featureId, sessions, checkIns);
-    const userSatisfaction = this.calculateUserSatisfaction(featureId, checkIns);
-    const completionRate = this.calculateCompletionRate(featureId, sessions, checkIns);
-    const dropoffPoints = this.calculateDropoffPoints(featureId, sessions, checkIns);
+    const activeUsers = this.calculateActiveUsers(
+      featureId,
+      sessions,
+      checkIns
+    );
+    const usageFrequency = this.calculateUsageFrequency(
+      featureId,
+      sessions,
+      checkIns
+    );
+    const userSatisfaction = this.calculateUserSatisfaction(
+      featureId,
+      checkIns
+    );
+    const completionRate = this.calculateCompletionRate(
+      featureId,
+      sessions,
+      checkIns
+    );
+    const dropoffPoints = this.calculateDropoffPoints(
+      featureId,
+      sessions,
+      checkIns
+    );
     const performanceMetrics = this.calculatePerformanceMetrics(featureId);
     const trends = this.calculateTrends(featureId, sessions, checkIns);
 
@@ -831,19 +1036,23 @@ export class AnalyticsService {
 
   private getFeatureName(featureId: string): string {
     const featureNames: Record<string, string> = {
-      'session_tracking': 'Session Tracking',
-      'progress_monitoring': 'Progress Monitoring',
-      'goal_setting': 'Goal Setting',
-      'social_features': 'Social Features',
-      'ai_coaching': 'AI Coaching',
-      'predictive_insights': 'Predictive Insights',
-      'contextual_intelligence': 'Contextual Intelligence',
-      'deep_personalization': 'Deep Personalization',
+      session_tracking: 'Session Tracking',
+      progress_monitoring: 'Progress Monitoring',
+      goal_setting: 'Goal Setting',
+      social_features: 'Social Features',
+      ai_coaching: 'AI Coaching',
+      predictive_insights: 'Predictive Insights',
+      contextual_intelligence: 'Contextual Intelligence',
+      deep_personalization: 'Deep Personalization',
     };
     return featureNames[featureId] || featureId;
   }
 
-  private calculateActiveUsers(featureId: string, sessions: SessionData[], checkIns: CheckInData[]): number {
+  private calculateActiveUsers(
+    featureId: string,
+    sessions: SessionData[],
+    checkIns: CheckInData[]
+  ): number {
     // Simplified calculation - in a real app, this would track actual user usage
     switch (featureId) {
       case 'session_tracking':
@@ -851,62 +1060,99 @@ export class AnalyticsService {
       case 'progress_monitoring':
         return sessions.filter(s => s.exercises.length > 0).length > 0 ? 1 : 0;
       case 'goal_setting':
-        return checkIns.filter(c => c.notes?.includes('goal')).length > 0 ? 1 : 0;
+        return checkIns.filter(c => c.notes?.includes('goal')).length > 0
+          ? 1
+          : 0;
       case 'social_features':
-        return sessions.filter(s => s.type === 'group' || s.type === 'team').length > 0 ? 1 : 0;
+        return sessions.filter(s => s.type === 'group' || s.type === 'team')
+          .length > 0
+          ? 1
+          : 0;
       default:
         return 1;
     }
   }
 
-  private calculateUsageFrequency(featureId: string, sessions: SessionData[], checkIns: CheckInData[]): number {
+  private calculateUsageFrequency(
+    featureId: string,
+    sessions: SessionData[],
+    checkIns: CheckInData[]
+  ): number {
     const now = new Date();
     const oneWeekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
-    
+
     let usageCount = 0;
     switch (featureId) {
       case 'session_tracking':
         usageCount = sessions.filter(s => s.date >= oneWeekAgo).length;
         break;
       case 'progress_monitoring':
-        usageCount = sessions.filter(s => s.date >= oneWeekAgo && s.exercises.length > 0).length;
+        usageCount = sessions.filter(
+          s => s.date >= oneWeekAgo && s.exercises.length > 0
+        ).length;
         break;
       case 'goal_setting':
-        usageCount = checkIns.filter(c => c.date >= oneWeekAgo && c.notes?.includes('goal')).length;
+        usageCount = checkIns.filter(
+          c => c.date >= oneWeekAgo && c.notes?.includes('goal')
+        ).length;
         break;
       case 'social_features':
-        usageCount = sessions.filter(s => s.date >= oneWeekAgo && (s.type === 'group' || s.type === 'team')).length;
+        usageCount = sessions.filter(
+          s => s.date >= oneWeekAgo && (s.type === 'group' || s.type === 'team')
+        ).length;
         break;
       default:
         usageCount = 1;
     }
-    
+
     return usageCount;
   }
 
-  private calculateUserSatisfaction(featureId: string, checkIns: CheckInData[]): number {
+  private calculateUserSatisfaction(
+    featureId: string,
+    checkIns: CheckInData[]
+  ): number {
     // Simplified calculation based on check-in ratings
     const ratings = checkIns.map(c => c.rating || 5);
-    return ratings.length > 0 ? ratings.reduce((sum, r) => sum + r, 0) / ratings.length : 5;
+    return ratings.length > 0
+      ? ratings.reduce((sum, r) => sum + r, 0) / ratings.length
+      : 5;
   }
 
-  private calculateCompletionRate(featureId: string, sessions: SessionData[], checkIns: CheckInData[]): number {
+  private calculateCompletionRate(
+    featureId: string,
+    sessions: SessionData[],
+    checkIns: CheckInData[]
+  ): number {
     // Simplified calculation - in a real app, this would track actual completion rates
     switch (featureId) {
       case 'session_tracking':
         return sessions.length > 0 ? 0.9 : 0;
       case 'progress_monitoring':
-        return sessions.filter(s => s.exercises.length > 0).length / Math.max(sessions.length, 1);
+        return (
+          sessions.filter(s => s.exercises.length > 0).length /
+          Math.max(sessions.length, 1)
+        );
       case 'goal_setting':
-        return checkIns.filter(c => c.notes?.includes('goal')).length / Math.max(checkIns.length, 1);
+        return (
+          checkIns.filter(c => c.notes?.includes('goal')).length /
+          Math.max(checkIns.length, 1)
+        );
       case 'social_features':
-        return sessions.filter(s => s.type === 'group' || s.type === 'team').length / Math.max(sessions.length, 1);
+        return (
+          sessions.filter(s => s.type === 'group' || s.type === 'team').length /
+          Math.max(sessions.length, 1)
+        );
       default:
         return 0.8;
     }
   }
 
-  private calculateDropoffPoints(featureId: string, sessions: SessionData[], checkIns: CheckInData[]): FeatureUsageAnalysis['dropoffPoints'] {
+  private calculateDropoffPoints(
+    featureId: string,
+    sessions: SessionData[],
+    checkIns: CheckInData[]
+  ): FeatureUsageAnalysis['dropoffPoints'] {
     // Simplified dropoff analysis
     return [
       {
@@ -927,7 +1173,9 @@ export class AnalyticsService {
     ];
   }
 
-  private calculatePerformanceMetrics(featureId: string): FeatureUsageAnalysis['performanceMetrics'] {
+  private calculatePerformanceMetrics(
+    featureId: string
+  ): FeatureUsageAnalysis['performanceMetrics'] {
     // Simplified performance metrics
     return {
       loadTime: Math.random() * 1000 + 500, // 500-1500ms
@@ -937,7 +1185,11 @@ export class AnalyticsService {
     };
   }
 
-  private calculateTrends(featureId: string, sessions: SessionData[], checkIns: CheckInData[]): FeatureUsageAnalysis['trends'] {
+  private calculateTrends(
+    featureId: string,
+    sessions: SessionData[],
+    checkIns: CheckInData[]
+  ): FeatureUsageAnalysis['trends'] {
     // Simplified trend calculation
     const now = new Date();
     const dailyData = [];
@@ -978,14 +1230,20 @@ export class AnalyticsService {
   }
 
   // Success Rate Monitoring
-  async generateSuccessRateMonitoring(metricId: string): Promise<SuccessRateMonitoring> {
+  async generateSuccessRateMonitoring(
+    metricId: string
+  ): Promise<SuccessRateMonitoring> {
     try {
       const sessions = await this.databaseService.getSessions('current-user');
       const checkIns = await this.databaseService.getCheckIns('current-user');
-      
-      const monitoring = await this.calculateSuccessRateMonitoring(metricId, sessions, checkIns);
+
+      const monitoring = await this.calculateSuccessRateMonitoring(
+        metricId,
+        sessions,
+        checkIns
+      );
       this.successRates.set(metricId, monitoring);
-      
+
       return monitoring;
     } catch (error) {
       console.error('Error generating success rate monitoring:', error);
@@ -1000,13 +1258,22 @@ export class AnalyticsService {
   ): Promise<SuccessRateMonitoring> {
     const metricName = this.getMetricName(metricId);
     const category = this.getMetricCategory(metricId);
-    const currentValue = this.calculateCurrentValue(metricId, sessions, checkIns);
+    const currentValue = this.calculateCurrentValue(
+      metricId,
+      sessions,
+      checkIns
+    );
     const targetValue = this.getTargetValue(metricId);
     const successRate = (currentValue / targetValue) * 100;
     const trend = this.calculateTrend(metricId, sessions, checkIns);
     const confidence = this.calculateConfidence(metricId, sessions, checkIns);
     const factors = this.identifyFactors(metricId, sessions, checkIns);
-    const recommendations = this.generateRecommendations(metricId, currentValue, targetValue, successRate);
+    const recommendations = this.generateRecommendations(
+      metricId,
+      currentValue,
+      targetValue,
+      successRate
+    );
 
     return {
       metricId,
@@ -1025,33 +1292,39 @@ export class AnalyticsService {
 
   private getMetricName(metricId: string): string {
     const metricNames: Record<string, string> = {
-      'user_engagement': 'User Engagement',
-      'session_frequency': 'Session Frequency',
-      'performance_improvement': 'Performance Improvement',
-      'user_retention': 'User Retention',
-      'feature_adoption': 'Feature Adoption',
-      'user_satisfaction': 'User Satisfaction',
-      'app_performance': 'App Performance',
-      'data_quality': 'Data Quality',
+      user_engagement: 'User Engagement',
+      session_frequency: 'Session Frequency',
+      performance_improvement: 'Performance Improvement',
+      user_retention: 'User Retention',
+      feature_adoption: 'Feature Adoption',
+      user_satisfaction: 'User Satisfaction',
+      app_performance: 'App Performance',
+      data_quality: 'Data Quality',
     };
     return metricNames[metricId] || metricId;
   }
 
-  private getMetricCategory(metricId: string): SuccessRateMonitoring['category'] {
+  private getMetricCategory(
+    metricId: string
+  ): SuccessRateMonitoring['category'] {
     const categories: Record<string, SuccessRateMonitoring['category']> = {
-      'user_engagement': 'user_engagement',
-      'session_frequency': 'user_engagement',
-      'performance_improvement': 'performance',
-      'user_retention': 'retention',
-      'feature_adoption': 'user_engagement',
-      'user_satisfaction': 'satisfaction',
-      'app_performance': 'technical',
-      'data_quality': 'technical',
+      user_engagement: 'user_engagement',
+      session_frequency: 'user_engagement',
+      performance_improvement: 'performance',
+      user_retention: 'retention',
+      feature_adoption: 'user_engagement',
+      user_satisfaction: 'satisfaction',
+      app_performance: 'technical',
+      data_quality: 'technical',
     };
     return categories[metricId] || 'user_engagement';
   }
 
-  private calculateCurrentValue(metricId: string, sessions: SessionData[], checkIns: CheckInData[]): number {
+  private calculateCurrentValue(
+    metricId: string,
+    sessions: SessionData[],
+    checkIns: CheckInData[]
+  ): number {
     switch (metricId) {
       case 'user_engagement':
         return sessions.length > 0 ? 0.8 : 0.2;
@@ -1065,7 +1338,9 @@ export class AnalyticsService {
         return 0.7; // 70% adoption rate
       case 'user_satisfaction':
         const ratings = checkIns.map(c => c.rating || 5);
-        return ratings.length > 0 ? ratings.reduce((sum, r) => sum + r, 0) / ratings.length : 5;
+        return ratings.length > 0
+          ? ratings.reduce((sum, r) => sum + r, 0) / ratings.length
+          : 5;
       case 'app_performance':
         return 0.95; // 95% uptime
       case 'data_quality':
@@ -1077,62 +1352,83 @@ export class AnalyticsService {
 
   private getTargetValue(metricId: string): number {
     const targets: Record<string, number> = {
-      'user_engagement': 0.8,
-      'session_frequency': 3, // 3 sessions per week
-      'performance_improvement': 0.2, // 20% improvement
-      'user_retention': 0.7, // 70% retention
-      'feature_adoption': 0.8, // 80% adoption
-      'user_satisfaction': 4, // 4/5 rating
-      'app_performance': 0.99, // 99% uptime
-      'data_quality': 0.95, // 95% data quality
+      user_engagement: 0.8,
+      session_frequency: 3, // 3 sessions per week
+      performance_improvement: 0.2, // 20% improvement
+      user_retention: 0.7, // 70% retention
+      feature_adoption: 0.8, // 80% adoption
+      user_satisfaction: 4, // 4/5 rating
+      app_performance: 0.99, // 99% uptime
+      data_quality: 0.95, // 95% data quality
     };
     return targets[metricId] || 1;
   }
 
   private calculatePerformanceImprovement(sessions: SessionData[]): number {
     if (sessions.length < 2) return 0;
-    
+
     const recentSessions = sessions.slice(-5);
     const olderSessions = sessions.slice(-10, -5);
-    
+
     if (olderSessions.length === 0) return 0;
-    
-    const recentAvg = recentSessions.reduce((sum, s) => sum + (s.duration || 60), 0) / recentSessions.length;
-    const olderAvg = olderSessions.reduce((sum, s) => sum + (s.duration || 60), 0) / olderSessions.length;
-    
+
+    const recentAvg =
+      recentSessions.reduce((sum, s) => sum + (s.duration || 60), 0) /
+      recentSessions.length;
+    const olderAvg =
+      olderSessions.reduce((sum, s) => sum + (s.duration || 60), 0) /
+      olderSessions.length;
+
     return (recentAvg - olderAvg) / olderAvg;
   }
 
   private calculateUserRetention(sessions: SessionData[]): number {
     if (sessions.length === 0) return 0;
-    
+
     const now = new Date();
     const lastSession = sessions[sessions.length - 1].date;
-    const daysSinceLastSession = (now.getTime() - lastSession.getTime()) / (24 * 60 * 60 * 1000);
-    
+    const daysSinceLastSession =
+      (now.getTime() - lastSession.getTime()) / (24 * 60 * 60 * 1000);
+
     // Retention decreases with time since last session
-    return Math.max(0, 1 - (daysSinceLastSession / 30));
+    return Math.max(0, 1 - daysSinceLastSession / 30);
   }
 
-  private calculateTrend(metricId: string, sessions: SessionData[], checkIns: CheckInData[]): SuccessRateMonitoring['trend'] {
+  private calculateTrend(
+    metricId: string,
+    sessions: SessionData[],
+    checkIns: CheckInData[]
+  ): SuccessRateMonitoring['trend'] {
     // Simplified trend calculation
-    const currentValue = this.calculateCurrentValue(metricId, sessions, checkIns);
+    const currentValue = this.calculateCurrentValue(
+      metricId,
+      sessions,
+      checkIns
+    );
     const targetValue = this.getTargetValue(metricId);
-    
+
     if (currentValue >= targetValue * 1.1) return 'improving';
     if (currentValue <= targetValue * 0.9) return 'declining';
     return 'stable';
   }
 
-  private calculateConfidence(metricId: string, sessions: SessionData[], checkIns: CheckInData[]): number {
+  private calculateConfidence(
+    metricId: string,
+    sessions: SessionData[],
+    checkIns: CheckInData[]
+  ): number {
     // Confidence based on data availability and consistency
     const dataPoints = sessions.length + checkIns.length;
     const consistency = this.calculateConsistency(sessions.map(s => s.date));
-    
+
     return Math.min(1, (dataPoints / 20) * consistency);
   }
 
-  private identifyFactors(metricId: string, sessions: SessionData[], checkIns: CheckInData[]): SuccessRateMonitoring['factors'] {
+  private identifyFactors(
+    metricId: string,
+    sessions: SessionData[],
+    checkIns: CheckInData[]
+  ): SuccessRateMonitoring['factors'] {
     // Simplified factor identification
     return [
       {
@@ -1158,9 +1454,14 @@ export class AnalyticsService {
     ];
   }
 
-  private generateRecommendations(metricId: string, currentValue: number, targetValue: number, successRate: number): SuccessRateMonitoring['recommendations'] {
+  private generateRecommendations(
+    metricId: string,
+    currentValue: number,
+    targetValue: number,
+    successRate: number
+  ): SuccessRateMonitoring['recommendations'] {
     const recommendations: SuccessRateMonitoring['recommendations'] = [];
-    
+
     if (successRate < 80) {
       recommendations.push({
         action: 'Improve user onboarding',
@@ -1169,7 +1470,7 @@ export class AnalyticsService {
         effort: 'medium',
       });
     }
-    
+
     if (successRate < 60) {
       recommendations.push({
         action: 'Add user feedback system',
@@ -1178,7 +1479,7 @@ export class AnalyticsService {
         effort: 'low',
       });
     }
-    
+
     if (successRate < 40) {
       recommendations.push({
         action: 'Redesign core features',
@@ -1187,7 +1488,7 @@ export class AnalyticsService {
         effort: 'high',
       });
     }
-    
+
     return recommendations;
   }
 

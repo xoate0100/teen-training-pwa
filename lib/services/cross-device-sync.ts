@@ -4,7 +4,12 @@ import { DatabaseService, SessionData, CheckInData } from './database-service';
 
 export interface SyncEvent {
   id: string;
-  type: 'session_update' | 'checkin_update' | 'achievement_unlock' | 'progress_update' | 'user_preference_change';
+  type:
+    | 'session_update'
+    | 'checkin_update'
+    | 'achievement_unlock'
+    | 'progress_update'
+    | 'user_preference_change';
   userId: string;
   data: any;
   timestamp: Date;
@@ -76,7 +81,7 @@ export class CrossDeviceSyncService {
     this.startPeriodicSync();
 
     // Listen for visibility changes to sync when app becomes visible
-    // eslint-disable-next-line no-undef
+
     // eslint-disable-next-line no-undef
     document.addEventListener('visibilitychange', () => {
       // eslint-disable-next-line no-undef
@@ -114,17 +119,15 @@ export class CrossDeviceSyncService {
   private startPeriodicSync() {
     if (this.syncInterval) {
       // eslint-disable-next-line no-undef
-      // eslint-disable-next-line no-undef
-clearInterval(this.syncInterval);
+      clearInterval(this.syncInterval);
     }
 
-    // eslint-disable-next-line no-undef
     this.syncInterval = // eslint-disable-next-line no-undef
-setInterval(() => {
-      if (this.syncStatus.isOnline && !this.syncStatus.syncInProgress) {
-        this.syncNow();
-      }
-    }, 30000); // Sync every 30 seconds
+      setInterval(() => {
+        if (this.syncStatus.isOnline && !this.syncStatus.syncInProgress) {
+          this.syncNow();
+        }
+      }, 30000); // Sync every 30 seconds
   }
 
   // Sync now
@@ -148,7 +151,8 @@ setInterval(() => {
       this.syncStatus.pendingChanges = 0;
       this.emit('syncComplete', this.syncStatus);
     } catch (error) {
-      this.syncStatus.error = error instanceof Error ? error.message : 'Sync failed';
+      this.syncStatus.error =
+        error instanceof Error ? error.message : 'Sync failed';
       this.emit('syncError', error);
     } finally {
       this.syncStatus.syncInProgress = false;
@@ -159,7 +163,9 @@ setInterval(() => {
   // Process sync queue
   private async processSyncQueue(): Promise<void> {
     const highPriorityQueue = this.syncQueue.filter(q => q.priority === 'high');
-    const mediumPriorityQueue = this.syncQueue.filter(q => q.priority === 'medium');
+    const mediumPriorityQueue = this.syncQueue.filter(
+      q => q.priority === 'medium'
+    );
     const lowPriorityQueue = this.syncQueue.filter(q => q.priority === 'low');
 
     // Process queues in priority order
@@ -178,9 +184,14 @@ setInterval(() => {
         syncQueue.retryCount++;
         if (syncQueue.retryCount >= syncQueue.maxRetries) {
           this.removeFromSyncQueue(syncQueue);
-          this.emit('syncError', new Error(`Max retries exceeded for queue: ${error}`));
+          this.emit(
+            'syncError',
+            new Error(`Max retries exceeded for queue: ${error}`)
+          );
         } else {
-          syncQueue.nextRetry = new Date(Date.now() + Math.pow(2, syncQueue.retryCount) * 1000);
+          syncQueue.nextRetry = new Date(
+            Date.now() + Math.pow(2, syncQueue.retryCount) * 1000
+          );
         }
       }
     }
@@ -194,7 +205,7 @@ setInterval(() => {
   }
 
   // Process individual sync event
-  // eslint-disable-next-line no-unused-vars
+
   private async processSyncEvent(event: SyncEvent): Promise<void> {
     try {
       switch (event.type) {
@@ -225,12 +236,18 @@ setInterval(() => {
   // Sync session update
   private async syncSessionUpdate(event: SyncEvent): Promise<void> {
     const sessionData = event.data as SessionData;
-    
+
     // Check for conflicts
-    const existingSession = await this.databaseService.getSession(sessionData.id);
+    const existingSession = await this.databaseService.getSession(
+      sessionData.id
+    );
     if (existingSession && existingSession.version > event.version) {
       // Conflict detected - resolve it
-      const resolution = await this.resolveSessionConflict(existingSession, sessionData, event);
+      const resolution = await this.resolveSessionConflict(
+        existingSession,
+        sessionData,
+        event
+      );
       if (resolution) {
         await this.databaseService.saveSession(resolution.resolvedData);
         this.syncStatus.conflicts.push(resolution);
@@ -244,12 +261,18 @@ setInterval(() => {
   // Sync check-in update
   private async syncCheckInUpdate(event: SyncEvent): Promise<void> {
     const checkInData = event.data as CheckInData;
-    
+
     // Check for conflicts
-    const existingCheckIn = await this.databaseService.getCheckIn(checkInData.id);
+    const existingCheckIn = await this.databaseService.getCheckIn(
+      checkInData.id
+    );
     if (existingCheckIn && existingCheckIn.version > event.version) {
       // Conflict detected - resolve it
-      const resolution = await this.resolveCheckInConflict(existingCheckIn, checkInData, event);
+      const resolution = await this.resolveCheckInConflict(
+        existingCheckIn,
+        checkInData,
+        event
+      );
       if (resolution) {
         await this.databaseService.saveCheckIn(resolution.resolvedData);
         this.syncStatus.conflicts.push(resolution);
@@ -271,7 +294,7 @@ setInterval(() => {
   // Sync progress update
   private async syncProgressUpdate(event: SyncEvent): Promise<void> {
     const progressData = event.data;
-    
+
     // Progress updates are typically additive, so we can merge them
     await this.databaseService.updateProgress(event.userId, progressData);
     this.emit('progressUpdated', progressData);
@@ -280,9 +303,12 @@ setInterval(() => {
   // Sync user preference change
   private async syncUserPreferenceChange(event: SyncEvent): Promise<void> {
     const preferenceData = event.data;
-    
+
     // User preferences typically use last-write-wins
-    await this.databaseService.updateUserPreferences(event.userId, preferenceData);
+    await this.databaseService.updateUserPreferences(
+      event.userId,
+      preferenceData
+    );
     this.emit('preferencesUpdated', preferenceData);
   }
 
@@ -343,13 +369,13 @@ setInterval(() => {
 
     // Sync sessions
     await this.syncSessions(userId);
-    
+
     // Sync check-ins
     await this.syncCheckIns(userId);
-    
+
     // Sync achievements
     await this.syncAchievements(userId);
-    
+
     // Sync progress
     await this.syncProgress(userId);
   }
@@ -387,8 +413,10 @@ setInterval(() => {
   }
 
   // Queue sync event
-  // eslint-disable-next-line no-unused-vars
-  queueSyncEvent(event: Omit<SyncEvent, 'id' | 'timestamp' | 'deviceId' | 'version'>): void {
+
+  queueSyncEvent(
+    event: Omit<SyncEvent, 'id' | 'timestamp' | 'deviceId' | 'version'>
+  ): void {
     const syncEvent: SyncEvent = {
       ...event,
       id: `sync_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
@@ -437,7 +465,10 @@ setInterval(() => {
     const index = this.syncQueue.indexOf(syncQueue);
     if (index > -1) {
       this.syncQueue.splice(index, 1);
-      this.syncStatus.pendingChanges = Math.max(0, this.syncStatus.pendingChanges - 1);
+      this.syncStatus.pendingChanges = Math.max(
+        0,
+        this.syncStatus.pendingChanges - 1
+      );
       this.emit('statusChange', this.syncStatus);
     }
   }
@@ -539,8 +570,7 @@ setInterval(() => {
   destroy(): void {
     if (this.syncInterval) {
       // eslint-disable-next-line no-undef
-      // eslint-disable-next-line no-undef
-clearInterval(this.syncInterval);
+      clearInterval(this.syncInterval);
     }
     this.eventListeners.clear();
   }

@@ -8,36 +8,40 @@ export interface UseCrossDeviceSyncReturn {
   // Sync status
   syncStatus: SyncStatus;
   deviceInfo: DeviceInfo;
-  
+
   // Sync actions
   syncNow: () => Promise<void>;
   forceSync: () => Promise<void>;
   clearConflicts: () => void;
-  
+
   // Event handlers
-  // eslint-disable-next-line no-unused-vars
+
   onSyncStart: (callback: () => void) => void;
-  // eslint-disable-next-line no-unused-vars
+
   onSyncComplete: (callback: (status: SyncStatus) => void) => void;
-  // eslint-disable-next-line no-unused-vars
+
   onSyncError: (callback: (error: Error) => void) => void;
-  // eslint-disable-next-line no-unused-vars
+
   onAchievementUnlocked: (callback: (achievement: any) => void) => void;
-  // eslint-disable-next-line no-unused-vars
+
   onProgressUpdated: (callback: (progress: any) => void) => void;
-  // eslint-disable-next-line no-unused-vars
+
   onPreferencesUpdated: (callback: (preferences: any) => void) => void;
-  
+
   // Utility functions
   isOnline: () => boolean;
   isSyncInProgress: () => boolean;
   getPendingChangesCount: () => number;
-  setDeviceName: (name: string) => void; // eslint-disable-next-line no-unused-vars
+  setDeviceName: (name: string) => void;
 }
 
 export function useCrossDeviceSync(): UseCrossDeviceSyncReturn {
-  const [syncStatus, setSyncStatus] = useState<SyncStatus>(crossDeviceSync.getSyncStatus());
-  const [deviceInfo, setDeviceInfo] = useState<DeviceInfo>(crossDeviceSync.getDeviceInfo());
+  const [syncStatus, setSyncStatus] = useState<SyncStatus>(
+    crossDeviceSync.getSyncStatus()
+  );
+  const [deviceInfo, setDeviceInfo] = useState<DeviceInfo>(
+    crossDeviceSync.getDeviceInfo()
+  );
 
   // Update sync status when it changes
   useEffect(() => {
@@ -79,35 +83,39 @@ export function useCrossDeviceSync(): UseCrossDeviceSyncReturn {
   }, []);
 
   // Event handlers
-  // eslint-disable-next-line no-unused-vars
+
   const onSyncStart = useCallback((callback: () => void) => {
     crossDeviceSync.on('syncStart', callback);
   }, []);
 
-  // eslint-disable-next-line no-unused-vars
-  const onSyncComplete = useCallback((callback: (status: SyncStatus) => void) => { // eslint-disable-next-line no-unused-vars
-    crossDeviceSync.on('syncComplete', callback);
-  }, []);
+  const onSyncComplete = useCallback(
+    (callback: (status: SyncStatus) => void) => {
+      crossDeviceSync.on('syncComplete', callback);
+    },
+    []
+  );
 
-  // eslint-disable-next-line no-unused-vars
   const onSyncError = useCallback((callback: (error: Error) => void) => {
     crossDeviceSync.on('syncError', callback);
   }, []);
 
-  // eslint-disable-next-line no-unused-vars
-  const onAchievementUnlocked = useCallback((callback: (achievement: any) => void) => { // eslint-disable-next-line no-unused-vars
-    crossDeviceSync.on('achievementUnlocked', callback);
-  }, []);
+  const onAchievementUnlocked = useCallback(
+    (callback: (achievement: any) => void) => {
+      crossDeviceSync.on('achievementUnlocked', callback);
+    },
+    []
+  );
 
-  // eslint-disable-next-line no-unused-vars
-  const onProgressUpdated = useCallback((callback: (progress: any) => void) => { // eslint-disable-next-line no-unused-vars
+  const onProgressUpdated = useCallback((callback: (progress: any) => void) => {
     crossDeviceSync.on('progressUpdated', callback);
   }, []);
 
-  // eslint-disable-next-line no-unused-vars
-  const onPreferencesUpdated = useCallback((callback: (preferences: any) => void) => { // eslint-disable-next-line no-unused-vars
-    crossDeviceSync.on('preferencesUpdated', callback);
-  }, []);
+  const onPreferencesUpdated = useCallback(
+    (callback: (preferences: any) => void) => {
+      crossDeviceSync.on('preferencesUpdated', callback);
+    },
+    []
+  );
 
   // Utility functions
   const isOnline = useCallback(() => {
@@ -122,7 +130,6 @@ export function useCrossDeviceSync(): UseCrossDeviceSyncReturn {
     return crossDeviceSync.getPendingChangesCount();
   }, []);
 
-  // eslint-disable-next-line no-unused-vars
   const setDeviceName = useCallback((name: string) => {
     crossDeviceSync.setDeviceName(name);
     setDeviceInfo(crossDeviceSync.getDeviceInfo());

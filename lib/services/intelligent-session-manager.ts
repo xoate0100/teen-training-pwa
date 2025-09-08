@@ -1,12 +1,20 @@
 'use client';
 
 import { DatabaseService, SessionData } from './database-service';
-import { SessionSchedulingService, AutomaticSchedule, ConflictResolution, MissedSessionRecovery } from './session-scheduling-service';
-import { sessionProgramIntegration, SessionProgram } from './session-program-integration';
+import {
+  SessionSchedulingService,
+  AutomaticSchedule,
+  ConflictResolution,
+  MissedSessionRecovery,
+} from './session-scheduling-service';
+import {
+  sessionProgramIntegration,
+  SessionProgram,
+} from './session-program-integration';
 
 export interface IntelligentSessionManager {
   // Automatic session scheduling
-  // eslint-disable-next-line no-unused-vars
+
   generateWeeklySchedule(
     userId: string,
     weekStart: string,
@@ -14,44 +22,43 @@ export interface IntelligentSessionManager {
   ): Promise<AutomaticSchedule>;
 
   // Conflict resolution
-  // eslint-disable-next-line no-unused-vars
+
   resolveScheduleConflicts(
     schedule: AutomaticSchedule,
     userId: string
   ): Promise<ConflictResolution[]>;
 
   // Missed session recovery
-  // eslint-disable-next-line no-unused-vars
+
   handleMissedSessions(
     userId: string,
     missedSessionIds: string[]
   ): Promise<MissedSessionRecovery[]>;
 
   // Optimal timing recommendations
-  // eslint-disable-next-line no-unused-vars
-  getOptimalTimingRecommendations(
-    userId: string
-  ): Promise<any>;
+
+  getOptimalTimingRecommendations(userId: string): Promise<any>;
 
   // Session program integration
-  // eslint-disable-next-line no-unused-vars
+
   generateSessionProgramsForSchedule(
     schedule: AutomaticSchedule,
     userId: string
   ): Promise<SessionProgram[]>;
 }
 
-export class IntelligentSessionManagerService implements IntelligentSessionManager {
+export class IntelligentSessionManagerService
+  implements IntelligentSessionManager
+{
   private databaseService = new DatabaseService();
 
   // Generate automatic weekly schedule
-  // eslint-disable-next-line no-unused-vars
+
   async generateWeeklySchedule(
-    // eslint-disable-next-line no-unused-vars
     userId: string,
-    // eslint-disable-next-line no-unused-vars
+
     weekStart: string,
-    // eslint-disable-next-line no-unused-vars
+
     userPreferences: any = {}
   ): Promise<AutomaticSchedule> {
     try {
@@ -86,11 +93,10 @@ export class IntelligentSessionManagerService implements IntelligentSessionManag
   }
 
   // Resolve schedule conflicts
-  // eslint-disable-next-line no-unused-vars
+
   async resolveScheduleConflicts(
-    // eslint-disable-next-line no-unused-vars
     schedule: AutomaticSchedule,
-    // eslint-disable-next-line no-unused-vars
+
     userId: string
   ): Promise<ConflictResolution[]> {
     try {
@@ -115,11 +121,10 @@ export class IntelligentSessionManagerService implements IntelligentSessionManag
   }
 
   // Handle missed sessions
-  // eslint-disable-next-line no-unused-vars
+
   async handleMissedSessions(
-    // eslint-disable-next-line no-unused-vars
     userId: string,
-    // eslint-disable-next-line no-unused-vars
+
     missedSessionIds: string[]
   ): Promise<MissedSessionRecovery[]> {
     try {
@@ -157,11 +162,8 @@ export class IntelligentSessionManagerService implements IntelligentSessionManag
   }
 
   // Get optimal timing recommendations
-  // eslint-disable-next-line no-unused-vars
-  async getOptimalTimingRecommendations(
-    // eslint-disable-next-line no-unused-vars
-    userId: string
-  ): Promise<any> {
+
+  async getOptimalTimingRecommendations(userId: string): Promise<any> {
     try {
       // Fetch user data
       const [sessions, checkIns] = await Promise.all([
@@ -170,11 +172,12 @@ export class IntelligentSessionManagerService implements IntelligentSessionManag
       ]);
 
       // Generate recommendations
-      const recommendations = SessionSchedulingService.generateOptimalTimingRecommendations(
-        userId,
-        sessions,
-        checkIns
-      );
+      const recommendations =
+        SessionSchedulingService.generateOptimalTimingRecommendations(
+          userId,
+          sessions,
+          checkIns
+        );
 
       return recommendations;
     } catch (error) {
@@ -184,11 +187,10 @@ export class IntelligentSessionManagerService implements IntelligentSessionManag
   }
 
   // Generate session programs for schedule
-  // eslint-disable-next-line no-unused-vars
+
   async generateSessionProgramsForSchedule(
-    // eslint-disable-next-line no-unused-vars
     schedule: AutomaticSchedule,
-    // eslint-disable-next-line no-unused-vars
+
     userId: string
   ): Promise<SessionProgram[]> {
     try {
@@ -218,11 +220,8 @@ export class IntelligentSessionManagerService implements IntelligentSessionManag
   }
 
   // Get comprehensive session management dashboard data
-  // eslint-disable-next-line no-unused-vars
-  async getSessionManagementDashboard(
-    // eslint-disable-next-line no-unused-vars
-    userId: string
-  ): Promise<{
+
+  async getSessionManagementDashboard(userId: string): Promise<{
     currentWeekSchedule: AutomaticSchedule;
     nextWeekSchedule: AutomaticSchedule;
     missedSessions: MissedSessionRecovery[];
@@ -254,7 +253,8 @@ export class IntelligentSessionManagerService implements IntelligentSessionManag
       );
 
       // Get timing recommendations
-      const timingRecommendations = await this.getOptimalTimingRecommendations(userId);
+      const timingRecommendations =
+        await this.getOptimalTimingRecommendations(userId);
 
       // Resolve conflicts
       const conflicts = await this.resolveScheduleConflicts(
@@ -345,11 +345,10 @@ export class IntelligentSessionManagerService implements IntelligentSessionManag
   }
 
   // Save resolved schedule to database
-  // eslint-disable-next-line no-unused-vars
+
   async saveResolvedSchedule(
-    // eslint-disable-next-line no-unused-vars
     schedule: AutomaticSchedule,
-    // eslint-disable-next-line no-unused-vars
+
     userId: string
   ): Promise<void> {
     try {
@@ -380,7 +379,9 @@ export class IntelligentSessionManagerService implements IntelligentSessionManag
   private getWeekNumber(date: string): number {
     const dateObj = new Date(date);
     const startOfYear = new Date(dateObj.getFullYear(), 0, 1);
-    const days = Math.floor((dateObj.getTime() - startOfYear.getTime()) / (1000 * 60 * 60 * 24));
+    const days = Math.floor(
+      (dateObj.getTime() - startOfYear.getTime()) / (1000 * 60 * 60 * 24)
+    );
     return Math.ceil((days + startOfYear.getDay() + 1) / 7);
   }
 }

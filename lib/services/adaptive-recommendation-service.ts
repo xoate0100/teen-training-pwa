@@ -105,31 +105,67 @@ export class AdaptiveRecommendationService {
     availableEquipment: string[] = []
   ): ExerciseRecommendation[] {
     const recommendations: ExerciseRecommendation[] = [];
-    
+
     // Analyze user preferences and patterns
     const preferences = this.analyzeUserPreferences(behaviorInsights);
-    const currentLevel = this.assessCurrentLevel(behaviorInsights, performanceForecast);
-    // eslint-disable-next-line no-unused-vars
-    const focusAreas = this.identifyFocusAreas(behaviorInsights, performanceForecast);
-    
+    const currentLevel = this.assessCurrentLevel(
+      behaviorInsights,
+      performanceForecast
+    );
+
+    const focusAreas = this.identifyFocusAreas(
+      behaviorInsights,
+      performanceForecast
+    );
+
     // Generate recommendations based on phase and preferences
     if (currentPhase === 'foundation') {
-      recommendations.push(...this.generateFoundationExercises(preferences, currentLevel, availableEquipment));
+      recommendations.push(
+        ...this.generateFoundationExercises(
+          preferences,
+          currentLevel,
+          availableEquipment
+        )
+      );
     } else if (currentPhase === 'build') {
-      recommendations.push(...this.generateBuildExercises(preferences, currentLevel, availableEquipment));
+      recommendations.push(
+        ...this.generateBuildExercises(
+          preferences,
+          currentLevel,
+          availableEquipment
+        )
+      );
     } else if (currentPhase === 'peak') {
-      recommendations.push(...this.generatePeakExercises(preferences, currentLevel, availableEquipment));
+      recommendations.push(
+        ...this.generatePeakExercises(
+          preferences,
+          currentLevel,
+          availableEquipment
+        )
+      );
     } else if (currentPhase === 'deload') {
-      recommendations.push(...this.generateDeloadExercises(preferences, currentLevel, availableEquipment));
+      recommendations.push(
+        ...this.generateDeloadExercises(
+          preferences,
+          currentLevel,
+          availableEquipment
+        )
+      );
     }
-    
+
     // Filter by available equipment
-    const filteredRecommendations = recommendations.filter(rec => 
-      rec.equipment.every(eq => availableEquipment.includes(eq) || eq === 'bodyweight')
+    const filteredRecommendations = recommendations.filter(rec =>
+      rec.equipment.every(
+        eq => availableEquipment.includes(eq) || eq === 'bodyweight'
+      )
     );
-    
+
     // Sort by relevance and difficulty
-    return this.sortRecommendations(filteredRecommendations, preferences, currentLevel);
+    return this.sortRecommendations(
+      filteredRecommendations,
+      preferences,
+      currentLevel
+    );
   }
 
   // Generate complete session recommendation
@@ -145,16 +181,26 @@ export class AdaptiveRecommendationService {
       currentPhase,
       availableEquipment
     );
-    
+
     // Determine session type based on phase and fatigue
-    const sessionType = this.determineSessionType(performanceForecast, currentPhase);
-    
+    const sessionType = this.determineSessionType(
+      performanceForecast,
+      currentPhase
+    );
+
     // Calculate optimal duration
-    const duration = this.calculateOptimalDuration(behaviorInsights, performanceForecast, currentPhase);
-    
+    const duration = this.calculateOptimalDuration(
+      behaviorInsights,
+      performanceForecast,
+      currentPhase
+    );
+
     // Determine intensity level
-    const intensity = this.determineIntensityLevel(performanceForecast, currentPhase);
-    
+    const intensity = this.determineIntensityLevel(
+      performanceForecast,
+      currentPhase
+    );
+
     // Select exercises for the session
     const selectedExercises = this.selectExercisesForSession(
       exerciseRecommendations,
@@ -162,20 +208,27 @@ export class AdaptiveRecommendationService {
       intensity,
       behaviorInsights.patterns.exercisePreferences
     );
-    
+
     // Generate warm-up and cool-down
     const warmUp = this.generateWarmUp(sessionType, intensity);
     const coolDown = this.generateCoolDown(sessionType, intensity);
-    
+
     // Identify focus areas
-    const focus = this.identifySessionFocus(behaviorInsights, performanceForecast, currentPhase);
-    
+    const focus = this.identifySessionFocus(
+      behaviorInsights,
+      performanceForecast,
+      currentPhase
+    );
+
     // Generate warnings
-    const warnings = this.generateWarnings(performanceForecast, behaviorInsights);
-    
+    const warnings = this.generateWarnings(
+      performanceForecast,
+      behaviorInsights
+    );
+
     // Calculate expected RPE
     const expectedRPE = this.calculateExpectedRPE(selectedExercises, intensity);
-    
+
     return {
       type: sessionType,
       duration,
@@ -195,11 +248,27 @@ export class AdaptiveRecommendationService {
     behaviorInsights: BehaviorInsights,
     performanceForecast: PerformanceForecast
   ): PersonalizedAdjustments {
-    const repAdjustments = this.calculateRepAdjustments(currentSession, behaviorInsights, performanceForecast);
-    const weightAdjustments = this.calculateWeightAdjustments(currentSession, behaviorInsights, performanceForecast);
-    const restTimeAdjustments = this.calculateRestTimeAdjustments(currentSession, behaviorInsights, performanceForecast);
-    const sessionModifications = this.calculateSessionModifications(currentSession, behaviorInsights, performanceForecast);
-    
+    const repAdjustments = this.calculateRepAdjustments(
+      currentSession,
+      behaviorInsights,
+      performanceForecast
+    );
+    const weightAdjustments = this.calculateWeightAdjustments(
+      currentSession,
+      behaviorInsights,
+      performanceForecast
+    );
+    const restTimeAdjustments = this.calculateRestTimeAdjustments(
+      currentSession,
+      behaviorInsights,
+      performanceForecast
+    );
+    const sessionModifications = this.calculateSessionModifications(
+      currentSession,
+      behaviorInsights,
+      performanceForecast
+    );
+
     return {
       repAdjustments,
       weightAdjustments,
@@ -216,13 +285,21 @@ export class AdaptiveRecommendationService {
   ): RestTimeOptimization[] {
     return exercises.map(exercise => {
       const currentRestTime = exercise.progression.restTime;
-      const recommendedRestTime = this.calculateOptimalRestTime(exercise, behaviorInsights, performanceForecast);
-      
+      const recommendedRestTime = this.calculateOptimalRestTime(
+        exercise,
+        behaviorInsights,
+        performanceForecast
+      );
+
       return {
         exercise: exercise.name,
         currentRestTime,
         recommendedRestTime,
-        reason: this.getRestTimeReason(exercise, recommendedRestTime, currentRestTime),
+        reason: this.getRestTimeReason(
+          exercise,
+          recommendedRestTime,
+          currentRestTime
+        ),
         factors: {
           intensity: this.calculateExerciseIntensity(exercise),
           muscleGroup: exercise.targetMuscles[0] || 'general',
@@ -246,16 +323,21 @@ export class AdaptiveRecommendationService {
       performanceForecast,
       currentPhase
     );
-    
+
     let modulation: 'increase' | 'decrease' | 'maintain' = 'maintain';
     if (recommendedIntensity > currentIntensity + 0.5) modulation = 'increase';
-    else if (recommendedIntensity < currentIntensity - 0.5) modulation = 'decrease';
-    
+    else if (recommendedIntensity < currentIntensity - 0.5)
+      modulation = 'decrease';
+
     return {
       currentIntensity,
       recommendedIntensity: Math.round(recommendedIntensity * 10) / 10,
       modulation,
-      reason: this.getIntensityModulationReason(recommendedIntensity, currentIntensity, performanceForecast),
+      reason: this.getIntensityModulationReason(
+        recommendedIntensity,
+        currentIntensity,
+        performanceForecast
+      ),
       factors: {
         fatigue: performanceForecast.fatigue.currentFatigue / 10,
         recovery: performanceForecast.fatigue.timeToRecovery / 7, // Normalize to 0-1
@@ -278,36 +360,43 @@ export class AdaptiveRecommendationService {
       currentPhase,
       availableEquipment
     );
-    
+
     const sessionRecommendation = this.generateSessionRecommendation(
       behaviorInsights,
       performanceForecast,
       currentPhase,
       availableEquipment
     );
-    
+
     const personalizedAdjustments = this.generatePersonalizedAdjustments(
       sessionRecommendation as any, // Type conversion for compatibility
       behaviorInsights,
       performanceForecast
     );
-    
+
     const restTimeOptimization = this.optimizeRestTimes(
       exerciseRecommendations,
       behaviorInsights,
       performanceForecast
     );
-    
+
     const intensityModulation = this.modulateSessionIntensity(
       sessionRecommendation.expectedRPE,
       behaviorInsights,
       performanceForecast,
       currentPhase
     );
-    
-    const nextSessionFocus = this.identifyNextSessionFocus(behaviorInsights, performanceForecast, currentPhase);
-    const longTermGoals = this.generateLongTermGoals(behaviorInsights, performanceForecast);
-    
+
+    const nextSessionFocus = this.identifyNextSessionFocus(
+      behaviorInsights,
+      performanceForecast,
+      currentPhase
+    );
+    const longTermGoals = this.generateLongTermGoals(
+      behaviorInsights,
+      performanceForecast
+    );
+
     return {
       exerciseRecommendations,
       sessionRecommendation,
@@ -327,27 +416,33 @@ export class AdaptiveRecommendationService {
     experienceLevel: 'beginner' | 'intermediate' | 'advanced';
   } {
     const patterns = behaviorInsights.patterns;
-    
+
     // Determine preferred exercise types
     const preferredTypes = Object.entries(patterns.exercisePreferences)
-      .sort(([,a], [,b]) => b - a)
+      .sort(([, a], [, b]) => b - a)
       .slice(0, 2)
       .map(([type]) => type);
-    
+
     // Determine preferred intensity
     const preferredIntensity = patterns.intensityPattern.averageRPE / 10;
-    
+
     // Determine preferred duration
     const preferredDuration = patterns.sessionDuration.average;
-    
+
     // Determine experience level
     let experienceLevel: 'beginner' | 'intermediate' | 'advanced' = 'beginner';
-    if (patterns.consistency.weeklyFrequency >= 4 && patterns.consistency.streakLength >= 30) {
+    if (
+      patterns.consistency.weeklyFrequency >= 4 &&
+      patterns.consistency.streakLength >= 30
+    ) {
       experienceLevel = 'advanced';
-    } else if (patterns.consistency.weeklyFrequency >= 3 && patterns.consistency.streakLength >= 14) {
+    } else if (
+      patterns.consistency.weeklyFrequency >= 3 &&
+      patterns.consistency.streakLength >= 14
+    ) {
       experienceLevel = 'intermediate';
     }
-    
+
     return {
       preferredTypes,
       preferredIntensity: Math.round(preferredIntensity * 100) / 100,
@@ -363,13 +458,13 @@ export class AdaptiveRecommendationService {
     const strengthLevel = performanceForecast.strength.currentLevel;
     const consistency = behaviorInsights.patterns.consistency.weeklyFrequency;
     const experience = behaviorInsights.habits.workoutHabit.strength;
-    
+
     if (strengthLevel >= 70 && consistency >= 4 && experience >= 0.8) {
       return 'advanced';
     } else if (strengthLevel >= 40 && consistency >= 3 && experience >= 0.6) {
       return 'intermediate';
     }
-    
+
     return 'beginner';
   }
 
@@ -378,29 +473,32 @@ export class AdaptiveRecommendationService {
     performanceForecast: PerformanceForecast
   ): string[] {
     const focusAreas: string[] = [];
-    
+
     // Based on performance trends
     if (performanceForecast.strength.trend === 'plateau') {
       focusAreas.push('Progressive overload');
     }
-    
+
     if (performanceForecast.fatigue.riskLevel === 'high') {
       focusAreas.push('Recovery');
     }
-    
-    if (performanceForecast.injuryRisk.overallRisk === 'medium' || performanceForecast.injuryRisk.overallRisk === 'high') {
+
+    if (
+      performanceForecast.injuryRisk.overallRisk === 'medium' ||
+      performanceForecast.injuryRisk.overallRisk === 'high'
+    ) {
       focusAreas.push('Injury prevention');
     }
-    
+
     // Based on behavior patterns
     if (behaviorInsights.patterns.consistency.missedSessionRate > 20) {
       focusAreas.push('Consistency');
     }
-    
+
     if (behaviorInsights.habits.recoveryHabit.sleepQuality < 0.6) {
       focusAreas.push('Sleep quality');
     }
-    
+
     return focusAreas;
   }
 
@@ -447,8 +545,12 @@ export class AdaptiveRecommendationService {
         notes: ['Keep core engaged', 'Maintain neutral spine'],
       },
     ];
-    
-    return exercises.filter(ex => ex.equipment.every(eq => availableEquipment.includes(eq) || eq === 'bodyweight'));
+
+    return exercises.filter(ex =>
+      ex.equipment.every(
+        eq => availableEquipment.includes(eq) || eq === 'bodyweight'
+      )
+    );
   }
 
   private static generateBuildExercises(
@@ -494,8 +596,10 @@ export class AdaptiveRecommendationService {
         notes: ['Keep back straight', 'Hip hinge movement'],
       },
     ];
-    
-    return exercises.filter(ex => ex.equipment.every(eq => availableEquipment.includes(eq)));
+
+    return exercises.filter(ex =>
+      ex.equipment.every(eq => availableEquipment.includes(eq))
+    );
   }
 
   private static generatePeakExercises(
@@ -529,8 +633,10 @@ export class AdaptiveRecommendationService {
         notes: ['Spotter recommended', 'High intensity'],
       },
     ];
-    
-    return exercises.filter(ex => ex.equipment.every(eq => availableEquipment.includes(eq)));
+
+    return exercises.filter(ex =>
+      ex.equipment.every(eq => availableEquipment.includes(eq))
+    );
   }
 
   private static generateDeloadExercises(
@@ -564,8 +670,12 @@ export class AdaptiveRecommendationService {
         notes: ['Recovery focused', 'Movement quality'],
       },
     ];
-    
-    return exercises.filter(ex => ex.equipment.every(eq => availableEquipment.includes(eq) || eq === 'bodyweight'));
+
+    return exercises.filter(ex =>
+      ex.equipment.every(
+        eq => availableEquipment.includes(eq) || eq === 'bodyweight'
+      )
+    );
   }
 
   private static sortRecommendations(
@@ -577,24 +687,33 @@ export class AdaptiveRecommendationService {
       // Prioritize by preferred types
       const aTypeMatch = preferences.preferredTypes.includes(a.type) ? 1 : 0;
       const bTypeMatch = preferences.preferredTypes.includes(b.type) ? 1 : 0;
-      
+
       if (aTypeMatch !== bTypeMatch) return bTypeMatch - aTypeMatch;
-      
+
       // Then by difficulty appropriateness
-      const aDifficultyMatch = this.getDifficultyScore(a.difficulty, currentLevel);
-      const bDifficultyMatch = this.getDifficultyScore(b.difficulty, currentLevel);
-      
+      const aDifficultyMatch = this.getDifficultyScore(
+        a.difficulty,
+        currentLevel
+      );
+      const bDifficultyMatch = this.getDifficultyScore(
+        b.difficulty,
+        currentLevel
+      );
+
       return bDifficultyMatch - aDifficultyMatch;
     });
   }
 
-  private static getDifficultyScore(difficulty: string, currentLevel: string): number {
+  private static getDifficultyScore(
+    difficulty: string,
+    currentLevel: string
+  ): number {
     const difficultyMap = { beginner: 1, intermediate: 2, advanced: 3 };
     const levelMap = { beginner: 1, intermediate: 2, advanced: 3 };
-    
+
     const diffScore = difficultyMap[difficulty as keyof typeof difficultyMap];
     const levelScore = levelMap[currentLevel as keyof typeof levelMap];
-    
+
     // Closer match = higher score
     return 3 - Math.abs(diffScore - levelScore);
   }
@@ -603,18 +722,21 @@ export class AdaptiveRecommendationService {
     performanceForecast: PerformanceForecast,
     currentPhase: string
   ): 'strength' | 'volleyball' | 'conditioning' | 'rest' {
-    if (performanceForecast.fatigue.riskLevel === 'high' || performanceForecast.injuryRisk.overallRisk === 'high') {
+    if (
+      performanceForecast.fatigue.riskLevel === 'high' ||
+      performanceForecast.injuryRisk.overallRisk === 'high'
+    ) {
       return 'rest';
     }
-    
+
     if (currentPhase === 'deload') {
       return 'conditioning';
     }
-    
+
     if (currentPhase === 'peak') {
       return 'strength';
     }
-    
+
     return 'strength'; // Default
   }
 
@@ -624,14 +746,14 @@ export class AdaptiveRecommendationService {
     currentPhase: string
   ): number {
     const baseDuration = behaviorInsights.patterns.sessionDuration.average;
-    
+
     // Adjust based on fatigue
     if (performanceForecast.fatigue.riskLevel === 'high') {
       return Math.round(baseDuration * 0.7);
     } else if (performanceForecast.fatigue.riskLevel === 'low') {
       return Math.round(baseDuration * 1.1);
     }
-    
+
     // Adjust based on phase
     const phaseMultipliers = {
       foundation: 0.9,
@@ -639,8 +761,9 @@ export class AdaptiveRecommendationService {
       peak: 1.1,
       deload: 0.8,
     };
-    
-    const multiplier = phaseMultipliers[currentPhase as keyof typeof phaseMultipliers] || 1.0;
+
+    const multiplier =
+      phaseMultipliers[currentPhase as keyof typeof phaseMultipliers] || 1.0;
     return Math.round(baseDuration * multiplier);
   }
 
@@ -648,18 +771,24 @@ export class AdaptiveRecommendationService {
     performanceForecast: PerformanceForecast,
     currentPhase: string
   ): 'low' | 'moderate' | 'high' {
-    if (performanceForecast.fatigue.riskLevel === 'high' || performanceForecast.injuryRisk.overallRisk === 'high') {
+    if (
+      performanceForecast.fatigue.riskLevel === 'high' ||
+      performanceForecast.injuryRisk.overallRisk === 'high'
+    ) {
       return 'low';
     }
-    
-    if (currentPhase === 'peak' && performanceForecast.fatigue.riskLevel === 'low') {
+
+    if (
+      currentPhase === 'peak' &&
+      performanceForecast.fatigue.riskLevel === 'low'
+    ) {
       return 'high';
     }
-    
+
     if (currentPhase === 'deload') {
       return 'low';
     }
-    
+
     return 'moderate';
   }
 
@@ -671,46 +800,61 @@ export class AdaptiveRecommendationService {
   ): ExerciseRecommendation[] {
     const maxExercises = Math.floor(duration / 15); // ~15 minutes per exercise
     const selectedExercises: ExerciseRecommendation[] = [];
-    
+
     // Prioritize by preferences and intensity
     const sortedRecommendations = recommendations.sort((a, b) => {
       const aPreference = preferences[a.type] || 0;
       const bPreference = preferences[b.type] || 0;
       return bPreference - aPreference;
     });
-    
+
     // Select exercises based on duration and intensity
     let totalDuration = 0;
     for (const exercise of sortedRecommendations) {
-      if (totalDuration + exercise.estimatedDuration <= duration && selectedExercises.length < maxExercises) {
+      if (
+        totalDuration + exercise.estimatedDuration <= duration &&
+        selectedExercises.length < maxExercises
+      ) {
         selectedExercises.push(exercise);
         totalDuration += exercise.estimatedDuration;
       }
     }
-    
+
     return selectedExercises;
   }
 
-  private static generateWarmUp(sessionType: string, /* eslint-disable-next-line no-unused-vars */ intensity: string): string[] {
+  private static generateWarmUp(
+    sessionType: string,
+    intensity: string
+  ): string[] {
     const warmUps = {
       strength: ['Dynamic stretching', 'Light cardio', 'Movement prep'],
-      volleyball: ['Ball handling', 'Dynamic warm-up', 'Sport-specific movements'],
+      volleyball: [
+        'Ball handling',
+        'Dynamic warm-up',
+        'Sport-specific movements',
+      ],
       conditioning: ['Light jogging', 'Dynamic stretching', 'Movement prep'],
       rest: ['Gentle stretching', 'Breathing exercises', 'Mobility work'],
     };
-    
+
     return warmUps[sessionType as keyof typeof warmUps] || warmUps.strength;
   }
 
-  private static generateCoolDown(sessionType: string, /* eslint-disable-next-line no-unused-vars */ intensity: string): string[] {
+  private static generateCoolDown(
+    sessionType: string,
+    intensity: string
+  ): string[] {
     const coolDowns = {
       strength: ['Static stretching', 'Foam rolling', 'Deep breathing'],
       volleyball: ['Static stretching', 'Ball handling', 'Recovery walk'],
       conditioning: ['Light walking', 'Static stretching', 'Hydration'],
       rest: ['Gentle stretching', 'Meditation', 'Breathing exercises'],
     };
-    
-    return coolDowns[sessionType as keyof typeof coolDowns] || coolDowns.strength;
+
+    return (
+      coolDowns[sessionType as keyof typeof coolDowns] || coolDowns.strength
+    );
   }
 
   private static identifySessionFocus(
@@ -719,7 +863,7 @@ export class AdaptiveRecommendationService {
     currentPhase: string
   ): string[] {
     const focus: string[] = [];
-    
+
     if (currentPhase === 'foundation') {
       focus.push('Form development', 'Movement patterns');
     } else if (currentPhase === 'build') {
@@ -729,15 +873,18 @@ export class AdaptiveRecommendationService {
     } else if (currentPhase === 'deload') {
       focus.push('Recovery', 'Movement quality');
     }
-    
+
     if (performanceForecast.fatigue.riskLevel === 'high') {
       focus.push('Recovery');
     }
-    
-    if (performanceForecast.injuryRisk.overallRisk === 'medium' || performanceForecast.injuryRisk.overallRisk === 'high') {
+
+    if (
+      performanceForecast.injuryRisk.overallRisk === 'medium' ||
+      performanceForecast.injuryRisk.overallRisk === 'high'
+    ) {
       focus.push('Injury prevention');
     }
-    
+
     return focus;
   }
 
@@ -746,43 +893,48 @@ export class AdaptiveRecommendationService {
     behaviorInsights: BehaviorInsights
   ): string[] {
     const warnings: string[] = [];
-    
+
     if (performanceForecast.fatigue.riskLevel === 'high') {
       warnings.push('High fatigue detected - consider reducing intensity');
     }
-    
+
     if (performanceForecast.injuryRisk.overallRisk === 'high') {
       warnings.push('High injury risk - focus on form and consider rest');
     }
-    
+
     if (behaviorInsights.patterns.consistency.missedSessionRate > 30) {
       warnings.push('High missed session rate - consider more realistic goals');
     }
-    
+
     return warnings;
   }
 
-  private static calculateExpectedRPE(exercises: ExerciseRecommendation[], intensity: string): number {
+  private static calculateExpectedRPE(
+    exercises: ExerciseRecommendation[],
+    intensity: string
+  ): number {
     if (exercises.length === 0) return 5;
-    
+
     const intensityMultipliers = { low: 0.7, moderate: 1.0, high: 1.3 };
-    const multiplier = intensityMultipliers[intensity as keyof typeof intensityMultipliers] || 1.0;
-    
-    const avgRPE = exercises.reduce((sum, ex) => {
-      const midRPE = (ex.rpeRange[0] + ex.rpeRange[1]) / 2;
-      return sum + midRPE;
-    }, 0) / exercises.length;
-    
+    const multiplier =
+      intensityMultipliers[intensity as keyof typeof intensityMultipliers] ||
+      1.0;
+
+    const avgRPE =
+      exercises.reduce((sum, ex) => {
+        const midRPE = (ex.rpeRange[0] + ex.rpeRange[1]) / 2;
+        return sum + midRPE;
+      }, 0) / exercises.length;
+
     return Math.round(avgRPE * multiplier * 10) / 10;
   }
 
   // Additional helper methods for adjustments and optimizations
   private static calculateRepAdjustments(
-    // eslint-disable-next-line no-unused-vars
     currentSession: SessionData,
-    // eslint-disable-next-line no-unused-vars
+
     behaviorInsights: BehaviorInsights,
-    // eslint-disable-next-line no-unused-vars
+
     performanceForecast: PerformanceForecast
   ): any[] {
     // Implementation for rep adjustments
@@ -790,11 +942,10 @@ export class AdaptiveRecommendationService {
   }
 
   private static calculateWeightAdjustments(
-    // eslint-disable-next-line no-unused-vars
     currentSession: SessionData,
-    // eslint-disable-next-line no-unused-vars
+
     behaviorInsights: BehaviorInsights,
-    // eslint-disable-next-line no-unused-vars
+
     performanceForecast: PerformanceForecast
   ): any[] {
     // Implementation for weight adjustments
@@ -802,11 +953,10 @@ export class AdaptiveRecommendationService {
   }
 
   private static calculateRestTimeAdjustments(
-    // eslint-disable-next-line no-unused-vars
     currentSession: SessionData,
-    // eslint-disable-next-line no-unused-vars
+
     behaviorInsights: BehaviorInsights,
-    // eslint-disable-next-line no-unused-vars
+
     performanceForecast: PerformanceForecast
   ): any[] {
     // Implementation for rest time adjustments
@@ -814,11 +964,10 @@ export class AdaptiveRecommendationService {
   }
 
   private static calculateSessionModifications(
-    // eslint-disable-next-line no-unused-vars
     currentSession: SessionData,
-    // eslint-disable-next-line no-unused-vars
+
     behaviorInsights: BehaviorInsights,
-    // eslint-disable-next-line no-unused-vars
+
     performanceForecast: PerformanceForecast
   ): any[] {
     // Implementation for session modifications
@@ -832,18 +981,18 @@ export class AdaptiveRecommendationService {
   ): number {
     // Base rest time
     let restTime = exercise.progression.restTime;
-    
+
     // Adjust based on fatigue
     if (performanceForecast.fatigue.currentFatigue > 7) {
       restTime *= 1.2;
     }
-    
+
     // Adjust based on intensity
     const avgRPE = (exercise.rpeRange[0] + exercise.rpeRange[1]) / 2;
     if (avgRPE > 8) {
       restTime *= 1.3;
     }
-    
+
     return Math.round(restTime);
   }
 
@@ -860,11 +1009,15 @@ export class AdaptiveRecommendationService {
     return 'Rest time is optimal';
   }
 
-  private static calculateExerciseIntensity(exercise: ExerciseRecommendation): number {
+  private static calculateExerciseIntensity(
+    exercise: ExerciseRecommendation
+  ): number {
     return (exercise.rpeRange[0] + exercise.rpeRange[1]) / 2 / 10;
   }
 
-  private static assessExperienceLevel(behaviorInsights: BehaviorInsights): number {
+  private static assessExperienceLevel(
+    behaviorInsights: BehaviorInsights
+  ): number {
     return behaviorInsights.habits.workoutHabit.strength;
   }
 
@@ -875,14 +1028,14 @@ export class AdaptiveRecommendationService {
     currentPhase: string
   ): number {
     let recommended = currentIntensity;
-    
+
     // Adjust based on fatigue
     if (performanceForecast.fatigue.riskLevel === 'high') {
       recommended *= 0.8;
     } else if (performanceForecast.fatigue.riskLevel === 'low') {
       recommended *= 1.1;
     }
-    
+
     // Adjust based on phase
     const phaseMultipliers = {
       foundation: 0.8,
@@ -890,17 +1043,18 @@ export class AdaptiveRecommendationService {
       peak: 1.2,
       deload: 0.6,
     };
-    
-    const multiplier = phaseMultipliers[currentPhase as keyof typeof phaseMultipliers] || 1.0;
+
+    const multiplier =
+      phaseMultipliers[currentPhase as keyof typeof phaseMultipliers] || 1.0;
     recommended *= multiplier;
-    
+
     return Math.min(10, Math.max(1, recommended));
   }
 
   private static getIntensityModulationReason(
     recommended: number,
     current: number,
-    // eslint-disable-next-line no-unused-vars
+
     performanceForecast: PerformanceForecast
   ): string {
     if (recommended > current) {
@@ -914,23 +1068,23 @@ export class AdaptiveRecommendationService {
   private static identifyNextSessionFocus(
     behaviorInsights: BehaviorInsights,
     performanceForecast: PerformanceForecast,
-    // eslint-disable-next-line no-unused-vars
+
     currentPhase: string
   ): string[] {
     const focus: string[] = [];
-    
+
     if (performanceForecast.strength.trend === 'plateau') {
       focus.push('Progressive overload');
     }
-    
+
     if (performanceForecast.fatigue.riskLevel === 'high') {
       focus.push('Recovery');
     }
-    
+
     if (behaviorInsights.patterns.consistency.missedSessionRate > 20) {
       focus.push('Consistency');
     }
-    
+
     return focus;
   }
 
@@ -939,7 +1093,7 @@ export class AdaptiveRecommendationService {
     performanceForecast: PerformanceForecast
   ): string[] {
     const goals: string[] = [];
-    
+
     if (performanceForecast.strength.currentLevel < 50) {
       goals.push('Build foundational strength');
     } else if (performanceForecast.strength.currentLevel < 80) {
@@ -947,15 +1101,15 @@ export class AdaptiveRecommendationService {
     } else {
       goals.push('Achieve advanced strength levels');
     }
-    
+
     if (behaviorInsights.patterns.consistency.weeklyFrequency < 4) {
       goals.push('Increase training frequency');
     }
-    
+
     if (behaviorInsights.habits.recoveryHabit.sleepQuality < 0.7) {
       goals.push('Improve recovery habits');
     }
-    
+
     return goals;
   }
 }

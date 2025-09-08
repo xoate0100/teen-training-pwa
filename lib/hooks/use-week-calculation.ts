@@ -13,9 +13,13 @@ import {
 export function useWeekCalculation() {
   const { currentUser } = useUser();
   const { sessions, checkIns } = useDatabase();
-  const [weekCalculation, setWeekCalculation] = useState<WeekCalculation | null>(null);
-  const [sessionRecommendation, setSessionRecommendation] = useState<SessionRecommendation | null>(null);
-  const [programConfig, setProgramConfig] = useState<ProgramConfig | null>(null);
+  const [weekCalculation, setWeekCalculation] =
+    useState<WeekCalculation | null>(null);
+  const [sessionRecommendation, setSessionRecommendation] =
+    useState<SessionRecommendation | null>(null);
+  const [programConfig, setProgramConfig] = useState<ProgramConfig | null>(
+    null
+  );
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -51,11 +55,12 @@ export function useWeekCalculation() {
       setWeekCalculation(calculation);
 
       // Generate session recommendation
-      const recommendation = WeekCalculationService.generateSessionRecommendation(
-        calculation,
-        checkIns,
-        sessions
-      );
+      const recommendation =
+        WeekCalculationService.generateSessionRecommendation(
+          calculation,
+          checkIns,
+          sessions
+        );
 
       setSessionRecommendation(recommendation);
     } catch (err) {
@@ -67,23 +72,26 @@ export function useWeekCalculation() {
   }, [currentUser, programConfig, sessions, checkIns]);
 
   // Update program configuration
-  const updateProgramConfig = useCallback(async (newConfig: Partial<ProgramConfig>) => {
-    if (!currentUser) return;
+  const updateProgramConfig = useCallback(
+    async (newConfig: Partial<ProgramConfig>) => {
+      if (!currentUser) return;
 
-    try {
-      const updatedConfig = WeekCalculationService.updateProgramConfig(
-        currentUser.id,
-        newConfig
-      );
-      setProgramConfig(updatedConfig);
-      
-      // Recalculate week with new config
-      await calculateWeek();
-    } catch (err) {
-      console.error('Error updating program config:', err);
-      setError('Failed to update program configuration');
-    }
-  }, [currentUser, calculateWeek]);
+      try {
+        const updatedConfig = WeekCalculationService.updateProgramConfig(
+          currentUser.id,
+          newConfig
+        );
+        setProgramConfig(updatedConfig);
+
+        // Recalculate week with new config
+        await calculateWeek();
+      } catch (err) {
+        console.error('Error updating program config:', err);
+        setError('Failed to update program configuration');
+      }
+    },
+    [currentUser, calculateWeek]
+  );
 
   // Get next session date
   const getNextSessionDate = useCallback((): string | null => {
@@ -94,7 +102,9 @@ export function useWeekCalculation() {
   // Check if today is a training day
   const isTrainingDay = useCallback((): boolean => {
     if (!weekCalculation) return false;
-    return !weekCalculation.isRestDay && weekCalculation.sessionsThisWeek.length < 3;
+    return (
+      !weekCalculation.isRestDay && weekCalculation.sessionsThisWeek.length < 3
+    );
   }, [weekCalculation]);
 
   // Get missed sessions count
@@ -116,7 +126,10 @@ export function useWeekCalculation() {
   }, [weekCalculation]);
 
   // Get recommended intensity
-  const getRecommendedIntensity = useCallback((): 'low' | 'moderate' | 'high' => {
+  const getRecommendedIntensity = useCallback(():
+    | 'low'
+    | 'moderate'
+    | 'high' => {
     if (!weekCalculation) return 'moderate';
     return weekCalculation.recommendedIntensity;
   }, [weekCalculation]);

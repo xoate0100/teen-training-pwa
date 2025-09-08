@@ -2,12 +2,12 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { youtubeAPIIntegration } from '@/lib/services/youtube-api-integration';
-import { 
-  YouTubeVideo, 
-  YouTubeSearchResult, 
-  VideoRecommendationContext, 
+import {
+  YouTubeVideo,
+  YouTubeSearchResult,
+  VideoRecommendationContext,
   VideoRecommendation,
-  YouTubeAPIConfig 
+  YouTubeAPIConfig,
 } from '@/lib/services/youtube-api-integration';
 
 export interface UseYouTubeAPIIntegrationReturn {
@@ -15,19 +15,29 @@ export interface UseYouTubeAPIIntegrationReturn {
   videos: YouTubeVideo[];
   recommendations: VideoRecommendation[];
   searchResults: YouTubeSearchResult | null;
-  
+
   // Search and recommendations
-  searchVideos: (query: string, context: VideoRecommendationContext, pageToken?: string) => Promise<YouTubeSearchResult>;
-  getContextualRecommendations: (context: VideoRecommendationContext) => Promise<VideoRecommendation[]>;
+  searchVideos: (
+    query: string,
+    context: VideoRecommendationContext,
+    pageToken?: string
+  ) => Promise<YouTubeSearchResult>;
+  getContextualRecommendations: (
+    context: VideoRecommendationContext
+  ) => Promise<VideoRecommendation[]>;
   getVideoDetails: (videoId: string) => Promise<YouTubeVideo | null>;
-  
+
   // Configuration
   updateConfig: (config: Partial<YouTubeAPIConfig>) => void;
-  
+
   // Cache management
   clearCache: () => void;
-  getCacheStats: () => { videoCount: number; searchCount: number; memoryUsage: number };
-  
+  getCacheStats: () => {
+    videoCount: number;
+    searchCount: number;
+    memoryUsage: number;
+  };
+
   // Loading states
   isLoading: boolean;
   error: string | null;
@@ -35,51 +45,67 @@ export interface UseYouTubeAPIIntegrationReturn {
 
 export function useYouTubeAPIIntegration(): UseYouTubeAPIIntegrationReturn {
   const [videos, setVideos] = useState<YouTubeVideo[]>([]);
-  const [recommendations, setRecommendations] = useState<VideoRecommendation[]>([]);
-  const [searchResults, setSearchResults] = useState<YouTubeSearchResult | null>(null);
+  const [recommendations, setRecommendations] = useState<VideoRecommendation[]>(
+    []
+  );
+  const [searchResults, setSearchResults] =
+    useState<YouTubeSearchResult | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   // Search videos
-  const searchVideos = useCallback(async (
-    query: string, 
-    context: VideoRecommendationContext, 
-    pageToken?: string
-  ) => {
-    try {
-      setIsLoading(true);
-      setError(null);
-      
-      const result = await youtubeAPIIntegration.searchVideos(query, context, pageToken);
-      setSearchResults(result);
-      setVideos(result.videos);
-      return result;
-    } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Search failed';
-      setError(errorMessage);
-      throw new Error(errorMessage);
-    } finally {
-      setIsLoading(false);
-    }
-  }, []);
+  const searchVideos = useCallback(
+    async (
+      query: string,
+      context: VideoRecommendationContext,
+      pageToken?: string
+    ) => {
+      try {
+        setIsLoading(true);
+        setError(null);
+
+        const result = await youtubeAPIIntegration.searchVideos(
+          query,
+          context,
+          pageToken
+        );
+        setSearchResults(result);
+        setVideos(result.videos);
+        return result;
+      } catch (err) {
+        const errorMessage =
+          err instanceof Error ? err.message : 'Search failed';
+        setError(errorMessage);
+        throw new Error(errorMessage);
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    []
+  );
 
   // Get contextual recommendations
-  const getContextualRecommendations = useCallback(async (context: VideoRecommendationContext) => {
-    try {
-      setIsLoading(true);
-      setError(null);
-      
-      const result = await youtubeAPIIntegration.getContextualRecommendations(context);
-      setRecommendations(result);
-      return result;
-    } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Failed to get recommendations';
-      setError(errorMessage);
-      throw new Error(errorMessage);
-    } finally {
-      setIsLoading(false);
-    }
-  }, []);
+  const getContextualRecommendations = useCallback(
+    async (context: VideoRecommendationContext) => {
+      try {
+        setIsLoading(true);
+        setError(null);
+
+        const result =
+          await youtubeAPIIntegration.getContextualRecommendations(context);
+        setRecommendations(result);
+        return result;
+      } catch (err) {
+        const errorMessage =
+          err instanceof Error ? err.message : 'Failed to get recommendations';
+        setError(errorMessage);
+        throw new Error(errorMessage);
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    []
+  );
 
   // Get video details
   const getVideoDetails = useCallback(async (videoId: string) => {
@@ -87,7 +113,8 @@ export function useYouTubeAPIIntegration(): UseYouTubeAPIIntegrationReturn {
       setError(null);
       return await youtubeAPIIntegration.getVideoDetails(videoId);
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Failed to get video details';
+      const errorMessage =
+        err instanceof Error ? err.message : 'Failed to get video details';
       setError(errorMessage);
       return null;
     }

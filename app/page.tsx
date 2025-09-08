@@ -41,7 +41,12 @@ import {
   OneHandedNavigation,
   useOneHandedNavigation,
 } from '@/components/one-handed-navigation';
-import { PrimaryAction, SecondaryAction } from '@/components/visual-hierarchy';
+// import { PrimaryAction, SecondaryAction } from '@/components/visual-hierarchy'; // Replaced with PrimaryActionButton
+import {
+  PrimaryActionButton,
+  FloatingActionButton,
+  usePrimaryActions,
+} from '@/components/primary-actions';
 import {
   Container,
   Section,
@@ -52,7 +57,7 @@ import {
 import {
   ExpandableSection,
   ContextualHelp,
-  useProgressiveDisclosure,
+  // useProgressiveDisclosure, // Will be used in future implementations
 } from '@/components/progressive-disclosure';
 import { useUser } from '@/lib/contexts/user-context';
 import { useDatabase } from '@/lib/hooks/use-database';
@@ -127,6 +132,7 @@ export default function Dashboard() {
   const { activeHints, hideHint } = useGestureHints();
   const { isEnabled: oneHandedEnabled, updateSettings } =
     useOneHandedNavigation();
+  const { getActionState } = usePrimaryActions();
   // const { isSectionExpanded, toggleSection, startTour, endTour, isTourActive } = useProgressiveDisclosure(); // Will be used in future implementations
   // const { getSpacing } = useSpacing(); // Will be used in future implementations
   const [announcements, setAnnouncements] = useState('');
@@ -315,37 +321,40 @@ export default function Dashboard() {
 
               {/* Prominent Primary Action Buttons with Visual Hierarchy */}
               <Flex direction='col' className='sm:flex-row gap-4 mt-6'>
-                <PrimaryAction
+                <PrimaryActionButton
+                  variant='start-session'
                   onClick={() => handleStartSession()}
-                  className='flex-1 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white'
-                >
-                  <Play className='w-6 h-6' />
-                  <span className='text-xl font-bold'>
-                    Start Today's Session
-                  </span>
-                </PrimaryAction>
+                  state={
+                    getActionState('start-session') as
+                      | 'idle'
+                      | 'loading'
+                      | 'success'
+                      | 'error'
+                      | 'disabled'
+                  }
+                  className='flex-1'
+                  size='lg'
+                  animated={true}
+                />
 
-                <SecondaryAction
+                <PrimaryActionButton
+                  variant='daily-checkin'
                   onClick={handleCheckInSubmit}
-                  className='flex-1 bg-white/10 border-white/20 text-white hover:bg-white/20'
                   disabled={checkInCompleted}
-                >
-                  {checkInCompleted ? (
-                    <>
-                      <Check className='w-5 h-5' />
-                      <span className='text-lg font-semibold'>
-                        Check-in Complete
-                      </span>
-                    </>
-                  ) : (
-                    <>
-                      <Target className='w-5 h-5' />
-                      <span className='text-lg font-semibold'>
-                        Daily Check-in
-                      </span>
-                    </>
-                  )}
-                </SecondaryAction>
+                  state={
+                    checkInCompleted
+                      ? 'success'
+                      : (getActionState('daily-checkin') as
+                          | 'idle'
+                          | 'loading'
+                          | 'success'
+                          | 'error'
+                          | 'disabled')
+                  }
+                  className='flex-1'
+                  size='lg'
+                  animated={true}
+                />
               </Flex>
 
               {simpleMode && (
@@ -1327,16 +1336,21 @@ export default function Dashboard() {
 
           {/* Floating Action Button for Mobile */}
           {isMobile && (
-            <div className='fixed bottom-20 right-4 z-50'>
-              <Button
-                onClick={() => handleStartSession()}
-                size='lg'
-                className='w-14 h-14 rounded-full bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-110'
-                aria-label='Quick start training session'
-              >
-                <Play className='w-6 h-6' />
-              </Button>
-            </div>
+            <FloatingActionButton
+              icon='session'
+              label='Quick start training session'
+              onClick={() => handleStartSession()}
+              state={
+                getActionState('start-session') as
+                  | 'idle'
+                  | 'loading'
+                  | 'success'
+                  | 'error'
+              }
+              position='bottom-right'
+              size='lg'
+              animated={true}
+            />
           )}
 
           {/* Mobile Bottom Navigation */}

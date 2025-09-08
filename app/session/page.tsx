@@ -12,9 +12,15 @@ import {
   SessionProgram,
 } from '@/lib/services/session-program-integration';
 import { useUser } from '@/lib/contexts/user-context';
+import {
+  HierarchicalNavigation,
+  MobileBottomNavigation,
+} from '@/components/navigation/hierarchical-navigation';
+import { useResponsiveNavigation } from '@/hooks/use-responsive-navigation';
 
 export default function SessionPage() {
   const { currentUser } = useUser();
+  const { isMobile, currentTab, handleTabChange } = useResponsiveNavigation();
   const [sessionStartTime, setSessionStartTime] = useState<Date | null>(null);
   const [sessionDuration, setSessionDuration] = useState(0);
   const [currentExercise, setCurrentExercise] = useState(0);
@@ -231,7 +237,20 @@ export default function SessionPage() {
   }
 
   return (
-    <div className='min-h-screen bg-background p-4'>
+    <div className='min-h-screen bg-background p-4 pb-20'>
+      {/* Navigation */}
+      {isMobile ? (
+        <MobileBottomNavigation
+          currentTab={currentTab}
+          onTabChange={handleTabChange}
+        />
+      ) : (
+        <HierarchicalNavigation
+          currentTab={currentTab}
+          onTabChange={handleTabChange}
+          className='mb-6'
+        />
+      )}
       {showAutoAdvance && (
         <div className='fixed inset-0 bg-black/50 flex items-center justify-center z-50'>
           <Card className='w-full max-w-sm text-center border-2 border-primary shadow-2xl'>

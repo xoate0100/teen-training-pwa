@@ -52,6 +52,11 @@ import {
   useOneHandedNavigation,
 } from '@/components/one-handed-navigation';
 import { cn } from '@/lib/utils';
+import {
+  HierarchicalNavigation,
+  MobileBottomNavigation,
+} from '@/components/navigation/hierarchical-navigation';
+import { useResponsiveNavigation } from '@/hooks/use-responsive-navigation';
 import { SettingsSearch } from '@/components/settings-search';
 import { SettingsPreview } from '@/components/settings-preview';
 import { SettingsHelp } from '@/components/settings-help';
@@ -124,6 +129,7 @@ interface SettingsData {
 export default function SettingsPage() {
   const { currentUser } = useUser();
   const { preferences, updatePreferences } = usePersonalization();
+  const { isMobile, currentTab, handleTabChange } = useResponsiveNavigation();
 
   const [activeTab, setActiveTab] = useState('profile');
   const [searchQuery, setSearchQuery] = useState('');
@@ -391,6 +397,20 @@ export default function SettingsPage() {
 
   return (
     <div className='min-h-screen bg-background p-4 pb-20'>
+      {/* Navigation */}
+      {isMobile ? (
+        <MobileBottomNavigation
+          currentTab={currentTab}
+          onTabChange={handleTabChange}
+        />
+      ) : (
+        <HierarchicalNavigation
+          currentTab={currentTab}
+          onTabChange={handleTabChange}
+          className='mb-6'
+        />
+      )}
+      
       <div className='max-w-4xl mx-auto space-y-6'>
         {/* Header */}
         <div className='text-center space-y-2'>

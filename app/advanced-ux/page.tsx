@@ -26,6 +26,11 @@ import { UXAnalytics } from '@/components/ux-analytics';
 import { ABTesting } from '@/components/ab-testing';
 import { UserFeedback } from '@/components/user-feedback';
 import { cn } from '@/lib/utils';
+import {
+  HierarchicalNavigation,
+  MobileBottomNavigation,
+} from '@/components/navigation/hierarchical-navigation';
+import { useResponsiveNavigation } from '@/hooks/use-responsive-navigation';
 
 interface AdvancedUXPageProps {
   className?: string;
@@ -34,6 +39,7 @@ interface AdvancedUXPageProps {
 export default function AdvancedUXPage({ className }: AdvancedUXPageProps) {
   const [activeTab, setActiveTab] = useState('smart-defaults');
   const [userId] = useState('user_123'); // Mock user ID
+  const { isMobile, currentTab, handleTabChange } = useResponsiveNavigation();
 
   const tabs = [
     {
@@ -88,6 +94,20 @@ export default function AdvancedUXPage({ className }: AdvancedUXPageProps) {
 
   return (
     <div className={cn('min-h-screen bg-background p-4 pb-20', className)}>
+      {/* Navigation */}
+      {isMobile ? (
+        <MobileBottomNavigation
+          currentTab={currentTab}
+          onTabChange={handleTabChange}
+        />
+      ) : (
+        <HierarchicalNavigation
+          currentTab={currentTab}
+          onTabChange={handleTabChange}
+          className='mb-6'
+        />
+      )}
+      
       <div className='max-w-6xl mx-auto space-y-6'>
         {/* Header */}
         <div className='text-center space-y-2'>

@@ -9,10 +9,32 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { User, Trophy } from 'lucide-react';
+import {
+  HierarchicalNavigation,
+  MobileBottomNavigation,
+} from '@/components/navigation/hierarchical-navigation';
+import { useResponsiveNavigation } from '@/hooks/use-responsive-navigation';
 
 export default function ProfilePage() {
+  const { isMobile, currentTab, handleTabChange } = useResponsiveNavigation();
+
   return (
-    <div className='container mx-auto p-4 space-y-6'>
+    <div className='min-h-screen bg-background p-4 pb-20'>
+      {/* Navigation */}
+      {isMobile ? (
+        <MobileBottomNavigation
+          currentTab={currentTab}
+          onTabChange={handleTabChange}
+        />
+      ) : (
+        <HierarchicalNavigation
+          currentTab={currentTab}
+          onTabChange={handleTabChange}
+          className='mb-6'
+        />
+      )}
+      
+      <div className='container mx-auto space-y-6'>
       <div className='text-center space-y-2'>
         <h1 className='text-3xl font-bold'>My Profile</h1>
         <p className='text-muted-foreground'>
@@ -77,6 +99,7 @@ export default function ProfilePage() {
           </div>
         </CardContent>
       </Card>
+      </div>
     </div>
   );
 }

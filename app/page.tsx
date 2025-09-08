@@ -41,6 +41,13 @@ import {
   OneHandedNavigation,
   useOneHandedNavigation,
 } from '@/components/one-handed-navigation';
+import {
+  VisualHierarchyManager,
+  PrimaryAction,
+  SecondaryAction,
+  TertiaryAction,
+  SettingsAccess,
+} from '@/components/visual-hierarchy';
 import { useUser } from '@/lib/contexts/user-context';
 import { useDatabase } from '@/lib/hooks/use-database';
 import { Play, Check } from 'lucide-react';
@@ -301,41 +308,39 @@ export default function Dashboard() {
                 </div>
               </div>
 
-              {/* Prominent Primary Action Buttons */}
+              {/* Prominent Primary Action Buttons with Visual Hierarchy */}
               <div className='flex flex-col sm:flex-row gap-4 mt-6'>
-                <Button
+                <PrimaryAction
                   onClick={() => handleStartSession()}
-                  size='lg'
-                  className='flex-1 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white font-semibold py-4 px-8 rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105'
-                  aria-label="Start today's training session"
+                  className='flex-1 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white'
                 >
-                  <Play className='w-5 h-5 mr-2' />
-                  Start Today's Session
-                </Button>
-                <Button
+                  <Play className='w-6 h-6' />
+                  <span className='text-xl font-bold'>
+                    Start Today's Session
+                  </span>
+                </PrimaryAction>
+
+                <SecondaryAction
                   onClick={handleCheckInSubmit}
-                  variant='outline'
-                  size='lg'
-                  className='flex-1 bg-white/10 border-white/20 text-white hover:bg-white/20 font-semibold py-4 px-8 rounded-xl shadow-lg hover:shadow-xl transition-all duration-200'
+                  className='flex-1 bg-white/10 border-white/20 text-white hover:bg-white/20'
                   disabled={checkInCompleted}
-                  aria-label={
-                    checkInCompleted
-                      ? 'Daily check-in completed'
-                      : 'Complete daily check-in'
-                  }
                 >
                   {checkInCompleted ? (
                     <>
-                      <Check className='w-5 h-5 mr-2' />
-                      Check-in Complete
+                      <Check className='w-5 h-5' />
+                      <span className='text-lg font-semibold'>
+                        Check-in Complete
+                      </span>
                     </>
                   ) : (
                     <>
-                      <Target className='w-5 h-5 mr-2' />
-                      Daily Check-in
+                      <Target className='w-5 h-5' />
+                      <span className='text-lg font-semibold'>
+                        Daily Check-in
+                      </span>
                     </>
                   )}
-                </Button>
+                </SecondaryAction>
               </div>
 
               {simpleMode && (

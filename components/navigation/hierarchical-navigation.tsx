@@ -4,27 +4,13 @@ import React, { useState } from 'react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import {
-  Home,
-  Play,
-  TrendingUp,
-  Settings,
-  Trophy,
-  Users,
-  Brain,
-  Heart,
-  Zap,
-  Palette,
-  Touch,
-  User,
-  ChevronDown,
-  ChevronUp,
-} from 'lucide-react';
+import { Icon } from '@/components/svg-icons';
+import { ChevronDown, ChevronUp } from 'lucide-react';
 
 interface NavigationItem {
   id: string;
   label: string;
-  icon: React.ComponentType<{ className?: string }>;
+  icon: keyof typeof import('@/components/svg-icons').iconRegistry;
   isPrimary: boolean;
   isSecondary?: boolean;
   badge?: string | number;
@@ -53,28 +39,28 @@ export function HierarchicalNavigation({
     {
       id: 'dashboard',
       label: 'Dashboard',
-      icon: Home,
+      icon: 'dashboard',
       isPrimary: true,
       href: '/',
     },
     {
       id: 'session',
       label: 'Session',
-      icon: Play,
+      icon: 'session',
       isPrimary: true,
       href: '/session',
     },
     {
       id: 'progress',
       label: 'Progress',
-      icon: TrendingUp,
+      icon: 'progress',
       isPrimary: true,
       href: '/progress',
     },
     {
       id: 'settings',
       label: 'Settings',
-      icon: Settings,
+      icon: 'settings',
       isPrimary: true,
       href: '/settings',
     },
@@ -84,7 +70,7 @@ export function HierarchicalNavigation({
     {
       id: 'achievements',
       label: 'Achievements',
-      icon: Trophy,
+      icon: 'achievements',
       isPrimary: false,
       isSecondary: true,
       badge: '3',
@@ -92,35 +78,35 @@ export function HierarchicalNavigation({
     {
       id: 'social',
       label: 'Social',
-      icon: Users,
+      icon: 'social',
       isPrimary: false,
       isSecondary: true,
     },
     {
       id: 'ai',
       label: 'AI',
-      icon: Brain,
+      icon: 'ai',
       isPrimary: false,
       isSecondary: true,
     },
     {
       id: 'wellness',
       label: 'Wellness',
-      icon: Heart,
+      icon: 'wellness',
       isPrimary: false,
       isSecondary: true,
     },
     {
       id: 'smart',
       label: 'Smart',
-      icon: Zap,
+      icon: 'goals',
       isPrimary: false,
       isSecondary: true,
     },
     {
       id: 'interactive',
       label: 'Interactive',
-      icon: Touch,
+      icon: 'sync',
       isPrimary: false,
       isSecondary: true,
     },
@@ -135,7 +121,7 @@ export function HierarchicalNavigation({
       {/* Primary Navigation */}
       <div className='grid grid-cols-4 gap-2 mb-4'>
         {primaryNavigation.map(item => {
-          const Icon = item.icon;
+          // const Icon = item.icon;
           const isActive = currentTab === item.id;
 
           return (
@@ -152,7 +138,7 @@ export function HierarchicalNavigation({
               )}
               aria-label={`Navigate to ${item.label}`}
             >
-              <Icon className='h-4 w-4' />
+              <Icon name={item.icon} size={16} />
               <span className='truncate'>{item.label}</span>
             </Button>
           );
@@ -189,7 +175,7 @@ export function HierarchicalNavigation({
       {showSecondary && (
         <div className='grid grid-cols-2 gap-2 animate-in slide-in-from-top-2 duration-200'>
           {secondaryNavigation.map(item => {
-            const Icon = item.icon;
+            // const Icon = item.icon;
             const isActive = currentTab === item.id;
 
             return (
@@ -206,7 +192,7 @@ export function HierarchicalNavigation({
                 )}
                 aria-label={`Navigate to ${item.label}`}
               >
-                <Icon className='h-4 w-4' />
+                <Icon name={item.icon} size={16} />
                 <span className='truncate'>{item.label}</span>
                 {item.badge && (
                   <Badge
@@ -241,21 +227,21 @@ export function MobileBottomNavigation({
     {
       id: 'session',
       label: 'Session',
-      icon: Play,
+      icon: 'session',
       isPrimary: true,
       href: '/session',
     },
     {
       id: 'progress',
       label: 'Progress',
-      icon: TrendingUp,
+      icon: 'progress',
       isPrimary: true,
       href: '/progress',
     },
     {
       id: 'settings',
       label: 'Settings',
-      icon: Settings,
+      icon: 'settings',
       isPrimary: true,
       href: '/settings',
     },
@@ -279,7 +265,7 @@ export function MobileBottomNavigation({
     <div className='fixed bottom-0 left-0 right-0 bg-background/95 backdrop-blur-sm border-t border-border px-4 py-2 pb-safe'>
       <div className='grid grid-cols-4 gap-1 max-w-md mx-auto'>
         {mobileNavigation.map(item => {
-          const Icon = item.icon;
+          // const Icon = item.icon;
           const isActive = currentTab === item.id;
 
           return (

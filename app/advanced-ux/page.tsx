@@ -22,6 +22,9 @@ import { ContextualHelp } from '@/components/contextual-help';
 import { UserJourneyOptimization } from '@/components/user-journey-optimization';
 import { PerformanceOptimization } from '@/components/performance-optimization';
 import { ErrorPreventionRecovery } from '@/components/error-prevention-recovery';
+import { UXAnalytics } from '@/components/ux-analytics';
+import { ABTesting } from '@/components/ab-testing';
+import { UserFeedback } from '@/components/user-feedback';
 import { cn } from '@/lib/utils';
 
 interface AdvancedUXPageProps {
@@ -62,6 +65,24 @@ export default function AdvancedUXPage({ className }: AdvancedUXPageProps) {
       label: 'Error Recovery',
       icon: Shield,
       description: 'Error prevention and recovery systems',
+    },
+    {
+      id: 'analytics',
+      label: 'Analytics',
+      icon: BarChart3,
+      description: 'UX analytics and user behavior tracking',
+    },
+    {
+      id: 'ab-testing',
+      label: 'A/B Testing',
+      icon: Target,
+      description: 'Controlled experiments and optimization',
+    },
+    {
+      id: 'feedback',
+      label: 'User Feedback',
+      icon: Activity,
+      description: 'Feedback collection and analysis',
     },
   ];
 
@@ -140,7 +161,7 @@ export default function AdvancedUXPage({ className }: AdvancedUXPageProps) {
 
         {/* Main Content */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className='w-full'>
-          <TabsList className='grid w-full grid-cols-2 md:grid-cols-5'>
+          <TabsList className='grid w-full grid-cols-2 md:grid-cols-4 lg:grid-cols-8'>
             {tabs.map(tab => {
               const Icon = tab.icon;
               return (
@@ -225,6 +246,48 @@ export default function AdvancedUXPage({ className }: AdvancedUXPageProps) {
               </CardHeader>
               <CardContent>
                 <ErrorPreventionRecovery />
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value='analytics' className='space-y-6'>
+            <Card>
+              <CardHeader>
+                <CardTitle className='flex items-center gap-2'>
+                  <BarChart3 className='h-5 w-5' />
+                  UX Analytics Dashboard
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <UXAnalytics userId={userId} />
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value='ab-testing' className='space-y-6'>
+            <Card>
+              <CardHeader>
+                <CardTitle className='flex items-center gap-2'>
+                  <Target className='h-5 w-5' />
+                  A/B Testing Framework
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <ABTesting />
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value='feedback' className='space-y-6'>
+            <Card>
+              <CardHeader>
+                <CardTitle className='flex items-center gap-2'>
+                  <Activity className='h-5 w-5' />
+                  User Feedback Collection
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <UserFeedback userId={userId} />
               </CardContent>
             </Card>
           </TabsContent>

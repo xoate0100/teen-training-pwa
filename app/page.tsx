@@ -41,13 +41,14 @@ import {
   OneHandedNavigation,
   useOneHandedNavigation,
 } from '@/components/one-handed-navigation';
+import { PrimaryAction, SecondaryAction } from '@/components/visual-hierarchy';
 import {
-  VisualHierarchyManager,
-  PrimaryAction,
-  SecondaryAction,
-  TertiaryAction,
-  SettingsAccess,
-} from '@/components/visual-hierarchy';
+  Container,
+  Section,
+  Flex,
+  Heading1,
+  BodyText,
+} from '@/components/spacing-typography';
 import { useUser } from '@/lib/contexts/user-context';
 import { useDatabase } from '@/lib/hooks/use-database';
 import { Play, Check } from 'lucide-react';
@@ -57,8 +58,8 @@ const Trophy = () => (
     🏆
   </span>
 );
-const Target = () => (
-  <span role='img' aria-label='Target'>
+const Target = ({ className }: { className?: string }) => (
+  <span role='img' aria-label='Target' className={className}>
     🎯
   </span>
 );
@@ -118,13 +119,10 @@ export default function Dashboard() {
   } = useUser();
   const { saveCheckIn, checkIns } = useDatabase();
   const { isMobile, currentTab, handleTabChange } = useResponsiveNavigation();
-  const { activeHints, showHint, hideHint } = useGestureHints();
-  const {
-    isEnabled: oneHandedEnabled,
-    currentHand,
-    showThumbZones,
-    updateSettings,
-  } = useOneHandedNavigation();
+  const { activeHints, hideHint } = useGestureHints();
+  const { isEnabled: oneHandedEnabled, updateSettings } =
+    useOneHandedNavigation();
+  // const { getSpacing } = useSpacing(); // Will be used in future implementations
   const [announcements, setAnnouncements] = useState('');
   const [mood, setMood] = useState(4);
   const [energy, setEnergy] = useState([7]);
@@ -267,25 +265,26 @@ export default function Dashboard() {
   return (
     <PersonalizationProvider userId={currentUser?.id || 'default-user'}>
       <AdaptiveInterface>
-        <div
-          className={`min-h-screen bg-background p-4 ${isMobile ? 'pb-24' : 'pb-20'}`}
+        <Container
+          size='full'
+          className={`min-h-screen bg-background ${isMobile ? 'pb-24' : 'pb-20'}`}
         >
           <div aria-live='polite' aria-atomic='true' className='sr-only'>
             {announcements}
           </div>
 
           <HeroBackground context='dashboard' className='mb-6 rounded-lg'>
-            <header className='p-6'>
-              <div className='flex justify-between items-start mb-4'>
+            <Section spacing='lg' className='p-6'>
+              <Flex justify='between' align='start' className='mb-4'>
                 <div>
-                  <h1 className='text-3xl font-bold text-white mb-2 leading-tight drop-shadow-lg'>
+                  <Heading1 className='text-white mb-2 drop-shadow-lg'>
                     Teen Training Hub
-                  </h1>
-                  <p className='text-lg text-white/90 leading-relaxed drop-shadow-md'>
+                  </Heading1>
+                  <BodyText className='text-lg text-white/90 drop-shadow-md'>
                     {currentUser
                       ? `Welcome back, ${currentUser.full_name}! • Week ${currentUser.current_week || 1} of 11 • Let's crush today! 💪`
                       : 'Loading...'}
-                  </p>
+                  </BodyText>
                 </div>
                 <div className='flex items-center gap-3'>
                   <Button
@@ -306,10 +305,10 @@ export default function Dashboard() {
                   <OfflineStatus />
                   <ProfileSwitcher />
                 </div>
-              </div>
+              </Flex>
 
               {/* Prominent Primary Action Buttons with Visual Hierarchy */}
-              <div className='flex flex-col sm:flex-row gap-4 mt-6'>
+              <Flex direction='col' className='sm:flex-row gap-4 mt-6'>
                 <PrimaryAction
                   onClick={() => handleStartSession()}
                   className='flex-1 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white'
@@ -341,7 +340,7 @@ export default function Dashboard() {
                     </>
                   )}
                 </SecondaryAction>
-              </div>
+              </Flex>
 
               {simpleMode && (
                 <div
@@ -354,7 +353,7 @@ export default function Dashboard() {
                   </div>
                 </div>
               )}
-            </header>
+            </Section>
           </HeroBackground>
 
           {showCelebration && (
@@ -1302,7 +1301,7 @@ export default function Dashboard() {
               }}
             />
           )}
-        </div>
+        </Container>
       </AdaptiveInterface>
     </PersonalizationProvider>
   );

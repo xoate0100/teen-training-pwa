@@ -92,8 +92,8 @@ export function UserOnboarding({ onComplete }: OnboardingProps) {
     age: 16,
     sport: '',
     experience_level: 'beginner',
-    height: 0,
-    weight: 0,
+    height: 170, // Default height in cm
+    weight: 65,  // Default weight in kg
     goals: [],
     workout_duration: 45,
     preferred_times: [],
@@ -180,13 +180,14 @@ export function UserOnboarding({ onComplete }: OnboardingProps) {
     switch (currentStep) {
       case 1:
         return (
-          formData.full_name.trim() &&
-          formData.sport.trim() &&
+          formData.full_name.trim().length > 0 &&
+          formData.sport.trim().length > 0 &&
           formData.age >= 13 &&
           formData.age <= 19
         );
       case 2:
-        return formData.height > 0 && formData.weight > 0;
+        return formData.height >= 100 && formData.height <= 250 && 
+               formData.weight >= 30 && formData.weight <= 150;
       case 3:
         return formData.goals.length > 0;
       case 4:

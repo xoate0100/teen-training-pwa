@@ -295,7 +295,7 @@ export function MobileBottomNavigation({
                 minWidth: '64px',
               }}
             >
-              <Icon className='h-6 w-6' />
+              <Icon name={item.icon} size={24} />
               <span className='truncate text-xs'>{item.label}</span>
             </Button>
           );

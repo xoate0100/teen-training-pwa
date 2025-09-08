@@ -56,6 +56,9 @@ export function useResponsiveNavigation() {
       case 'interactive':
         // Keep on same page but change tab
         break;
+      case 'advanced-ux':
+        router.push('/advanced-ux');
+        break;
       default:
         break;
     }

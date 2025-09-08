@@ -6,7 +6,12 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Tabs, TabsContent } from '@/components/ui/tabs';
+import {
+  HierarchicalNavigation,
+  MobileBottomNavigation,
+} from '@/components/navigation/hierarchical-navigation';
+import { useResponsiveNavigation } from '@/hooks/use-responsive-navigation';
 import { Slider } from '@/components/ui/slider';
 import { ProfileSwitcher } from '@/components/profile-switcher';
 import { UserOnboarding } from '@/components/user-onboarding';
@@ -107,6 +112,7 @@ export default function Dashboard() {
     refreshUsers,
   } = useUser();
   const { saveCheckIn, checkIns } = useDatabase();
+  const { isMobile, currentTab, handleTabChange } = useResponsiveNavigation();
   const [announcements, setAnnouncements] = useState('');
   const [mood, setMood] = useState(4);
   const [energy, setEnergy] = useState([7]);
@@ -249,7 +255,9 @@ export default function Dashboard() {
   return (
     <PersonalizationProvider userId={currentUser?.id || 'default-user'}>
       <AdaptiveInterface>
-        <div className='min-h-screen bg-background p-4 pb-20'>
+        <div
+          className={`min-h-screen bg-background p-4 ${isMobile ? 'pb-24' : 'pb-20'}`}
+        >
           <div aria-live='polite' aria-atomic='true' className='sr-only'>
             {announcements}
           </div>
@@ -330,59 +338,21 @@ export default function Dashboard() {
             </div>
           )}
 
-          <Tabs defaultValue='dashboard' className='w-full'>
-            <TabsList
-              className='grid w-full grid-cols-12 mb-6 h-12'
-              role='tablist'
-              aria-label='Main navigation'
-            >
-              <TabsTrigger value='dashboard' className='text-base font-medium'>
-                Dashboard
-              </TabsTrigger>
-              <TabsTrigger value='session' className='text-base font-medium'>
-                Session
-              </TabsTrigger>
-              <TabsTrigger value='progress' className='text-base font-medium'>
-                Progress
-              </TabsTrigger>
-              <TabsTrigger value='themes' className='text-base font-medium'>
-                Themes
-              </TabsTrigger>
-              <TabsTrigger
-                value='achievements'
-                className='text-base font-medium'
-              >
-                Achievements
-              </TabsTrigger>
-              <TabsTrigger
-                value='interactive'
-                className='text-base font-medium'
-              >
-                Interactive
-              </TabsTrigger>
-              <TabsTrigger
-                value='personalization'
-                className='text-base font-medium'
-              >
-                Personal
-              </TabsTrigger>
-              <TabsTrigger value='smart' className='text-base font-medium'>
-                Smart
-              </TabsTrigger>
-              <TabsTrigger value='ai' className='text-base font-medium'>
-                AI
-              </TabsTrigger>
-              <TabsTrigger value='coaching' className='text-base font-medium'>
-                Coaching
-              </TabsTrigger>
-              <TabsTrigger value='wellness' className='text-base font-medium'>
-                Wellness
-              </TabsTrigger>
-              <TabsTrigger value='profile' className='text-base font-medium'>
-                Profile
-              </TabsTrigger>
-            </TabsList>
+          {/* Hierarchical Navigation */}
+          {isMobile ? (
+            <MobileBottomNavigation
+              currentTab={currentTab}
+              onTabChange={handleTabChange}
+            />
+          ) : (
+            <HierarchicalNavigation
+              currentTab={currentTab}
+              onTabChange={handleTabChange}
+              className='mb-6'
+            />
+          )}
 
+          <Tabs value={currentTab} className='w-full'>
             <TabsContent value='dashboard' className='space-y-6'>
               <section aria-labelledby='checkin-title'>
                 <Card className='border-2 border-primary/20 shadow-sm'>
@@ -1257,6 +1227,14 @@ export default function Dashboard() {
               />
             </TabsContent>
           </Tabs>
+
+          {/* Mobile Bottom Navigation */}
+          {isMobile && (
+            <MobileBottomNavigation
+              currentTab={currentTab}
+              onTabChange={handleTabChange}
+            />
+          )}
         </div>
       </AdaptiveInterface>
     </PersonalizationProvider>

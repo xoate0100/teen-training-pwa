@@ -32,6 +32,12 @@ The Teen Training PWA is a cutting-edge athletic training application that combi
 - Supabase account
 - OpenAI API key
 
+### Git Configuration
+
+This project has been configured to prevent git commands from getting stuck in pager mode. See [GIT_ALIASES.md](./GIT_ALIASES.md) for available aliases and configuration details.
+
+**For chat agents**: Use `git --no-pager` commands or the provided PowerShell aliases to avoid hanging on long output.
+
 ### Installation
 
 ```bash

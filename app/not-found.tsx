@@ -23,15 +23,16 @@ export default function NotFound() {
             Page Not Found
           </CardTitle>
           <CardDescription className='text-gray-600'>
-            The page you're looking for doesn't exist or has been moved.
+            The page you&apos;re looking for doesn&apos;t exist or has been
+            moved.
           </CardDescription>
         </CardHeader>
 
         <CardContent className='space-y-4'>
           <div className='text-center space-y-2'>
             <p className='text-sm text-gray-500'>
-              Don't worry, it happens to the best of us! Let's get you back on
-              track.
+              Don&apos;t worry, it happens to the best of us! Let&apos;s get you
+              back on track.
             </p>
           </div>
 

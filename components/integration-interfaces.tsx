@@ -2,6 +2,7 @@
 
 import type React from 'react';
 import { useState, useRef } from 'react';
+import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Camera, Video, Share2, Calendar, Download } from 'lucide-react';
@@ -85,9 +86,11 @@ export function PhotoVideoCapture() {
                   key={index}
                   className='aspect-square bg-muted rounded-lg overflow-hidden'
                 >
-                  <img
+                  <Image
                     src={url || '/placeholder.svg'}
                     alt={`Capture ${index + 1}`}
+                    width={200}
+                    height={200}
                     className='w-full h-full object-cover'
                   />
                 </div>

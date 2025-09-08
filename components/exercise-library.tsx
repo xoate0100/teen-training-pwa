@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import Image from 'next/image';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -253,9 +254,11 @@ function ExerciseCard({ exercise, onSelect }: ExerciseCardProps) {
     >
       <CardHeader className='pb-2'>
         <div className='relative'>
-          <img
+          <Image
             src={exercise.videoUrl || '/placeholder.svg'}
             alt={exercise.name}
+            width={400}
+            height={128}
             className='w-full h-32 object-cover rounded-md bg-muted'
           />
           <Button

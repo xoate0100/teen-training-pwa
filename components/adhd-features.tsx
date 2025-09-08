@@ -195,7 +195,7 @@ export function RandomCueDisplay() {
     }, 15000); // New cue every 15 seconds
 
     return () => clearInterval(interval);
-  }, []);
+  }, [motivationalCues.length]);
 
   const cue = motivationalCues[currentCue];
 

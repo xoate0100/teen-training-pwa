@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import Image from 'next/image';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -420,9 +421,11 @@ export function YouTubeAPIDashboard() {
                   }}
                 >
                   <div className='flex gap-3'>
-                    <img
+                    <Image
                       src={video.thumbnail}
                       alt={video.title}
+                      width={80}
+                      height={60}
                       className='w-20 h-15 object-cover rounded'
                     />
                     <div className='flex-1 min-w-0'>
@@ -467,9 +470,11 @@ export function YouTubeAPIDashboard() {
               <div className='space-y-4'>
                 {/* Video Info */}
                 <div>
-                  <img
+                  <Image
                     src={selectedVideo.video.thumbnail}
                     alt={selectedVideo.video.title}
+                    width={400}
+                    height={192}
                     className='w-full h-48 object-cover rounded-lg mb-3'
                   />
                   <h3 className='text-lg font-semibold'>
@@ -615,9 +620,11 @@ export function YouTubeAPIDashboard() {
                   onClick={() => handleVideoSelect(recommendation)}
                 >
                   <div className='flex gap-3'>
-                    <img
+                    <Image
                       src={recommendation.video.thumbnail}
                       alt={recommendation.video.title}
+                      width={64}
+                      height={48}
                       className='w-16 h-12 object-cover rounded'
                     />
                     <div className='flex-1 min-w-0'>

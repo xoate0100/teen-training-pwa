@@ -48,14 +48,14 @@ export function PerformanceOptimizationDashboard() {
       type: cacheStrategy,
       evictionPolicy: evictionPolicy,
     });
-  }, [cacheStrategy, evictionPolicy]);
+  }, [cacheStrategy, evictionPolicy, setCacheStrategy]);
 
   useEffect(() => {
     setQueryOptimization({
       batchSize: batchSize,
       debounceDelay: debounceDelay,
     });
-  }, [batchSize, debounceDelay]);
+  }, [batchSize, debounceDelay, setQueryOptimization]);
 
   const formatBytes = (bytes: number) => {
     if (bytes < 1024) return `${bytes} B`;

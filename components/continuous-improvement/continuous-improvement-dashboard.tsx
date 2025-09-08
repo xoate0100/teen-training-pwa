@@ -144,6 +144,9 @@ import {
   CalendarWind2 as CalendarWind2Icon,
   CalendarBrain as CalendarBrainIcon,
   CalendarLightbulb as CalendarLightbulbIcon,
+  Plus,
+  MessageSquare,
+  Lightbulb,
 } from 'lucide-react';
 import { useContinuousImprovement } from '@/lib/hooks/use-continuous-improvement';
 

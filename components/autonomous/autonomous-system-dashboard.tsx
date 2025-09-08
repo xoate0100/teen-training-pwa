@@ -31,6 +31,7 @@ import {
   Clock,
   Users,
   TestTube,
+  Plus,
 } from 'lucide-react';
 import { useAutonomousSystemManagement } from '@/lib/hooks/use-autonomous-system-management';
 import {

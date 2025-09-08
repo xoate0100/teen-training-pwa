@@ -3,6 +3,12 @@
   "rules": {
     "prefer-const": "error",
     "no-var": "error",
-    "no-unused-vars": "off"
+    "no-unused-vars": "off",
+    "react-hooks/exhaustive-deps": "warn",
+    "react/no-unescaped-entities": "warn",
+    "react/jsx-no-undef": "error",
+    "@next/next/no-img-element": "warn",
+    "no-console": "off",
+    "no-debugger": "error"
   }
 }

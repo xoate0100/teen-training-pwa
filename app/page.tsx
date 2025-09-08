@@ -32,6 +32,11 @@ import { MicroInteractionDemo } from '@/components/micro-interactions';
 import { ImmersiveFeedbackDemo } from '@/components/immersive-feedback';
 import { PersonalizationProvider } from '@/components/personalization-provider';
 import { AdaptiveInterface } from '@/components/adaptive-interface';
+import {
+  MobileGestureGuidance,
+  GestureHint,
+  useGestureHints,
+} from '@/components/mobile-gesture-guidance';
 import { useUser } from '@/lib/contexts/user-context';
 import { useDatabase } from '@/lib/hooks/use-database';
 import { Play, Check } from 'lucide-react';
@@ -102,6 +107,7 @@ export default function Dashboard() {
   } = useUser();
   const { saveCheckIn, checkIns } = useDatabase();
   const { isMobile, currentTab, handleTabChange } = useResponsiveNavigation();
+  const { activeHints, showHint, hideHint } = useGestureHints();
   const [announcements, setAnnouncements] = useState('');
   const [mood, setMood] = useState(4);
   const [energy, setEnergy] = useState([7]);
@@ -1227,6 +1233,30 @@ export default function Dashboard() {
               currentTab={currentTab}
               onTabChange={handleTabChange}
             />
+          )}
+
+          {/* Mobile Gesture Guidance */}
+          {isMobile && (
+            <MobileGestureGuidance
+              showOnFirstVisit={true}
+              onComplete={() => {
+                console.log('Gesture guidance completed');
+              }}
+            />
+          )}
+
+          {/* Gesture Hints */}
+          {isMobile && activeHints.size > 0 && (
+            <div className='fixed bottom-20 left-4 right-4 z-40 space-y-2'>
+              {Array.from(activeHints).map(gesture => (
+                <GestureHint
+                  key={gesture}
+                  gesture={gesture}
+                  isVisible={true}
+                  onDismiss={() => hideHint(gesture)}
+                />
+              ))}
+            </div>
           )}
         </div>
       </AdaptiveInterface>

@@ -267,9 +267,17 @@ export function MobileBottomNavigation({
     className: 'flex-1 h-16 flex-col gap-1',
   }));
 
+  const handleTabClick = (tabId: string) => {
+    // Add haptic feedback for mobile devices
+    if ('vibrate' in navigator) {
+      navigator.vibrate(50); // Short vibration for touch feedback
+    }
+    onTabChange(tabId);
+  };
+
   return (
-    <div className='fixed bottom-0 left-0 right-0 bg-background border-t border-border px-4 py-2 safe-area-pb'>
-      <div className='grid grid-cols-4 gap-1'>
+    <div className='fixed bottom-0 left-0 right-0 bg-background/95 backdrop-blur-sm border-t border-border px-4 py-2 pb-safe'>
+      <div className='grid grid-cols-4 gap-1 max-w-md mx-auto'>
         {mobileNavigation.map(item => {
           const Icon = item.icon;
           const isActive = currentTab === item.id;
@@ -279,17 +287,22 @@ export function MobileBottomNavigation({
               key={item.id}
               variant='ghost'
               size='sm'
-              onClick={() => onTabChange(item.id)}
+              onClick={() => handleTabClick(item.id)}
               className={cn(
-                'h-16 flex flex-col items-center justify-center gap-1 text-xs font-medium transition-all duration-200',
+                'h-16 flex flex-col items-center justify-center gap-1 text-xs font-medium transition-all duration-200 touch-manipulation',
+                'active:scale-95 active:bg-primary/20',
                 isActive
                   ? 'text-primary bg-primary/10'
-                  : 'text-muted-foreground hover:text-foreground'
+                  : 'text-muted-foreground hover:text-foreground hover:bg-accent/50'
               )}
               aria-label={`Navigate to ${item.label}`}
+              style={{
+                minHeight: '64px', // Ensure minimum touch target size
+                minWidth: '64px',
+              }}
             >
-              <Icon className='h-5 w-5' />
-              <span className='truncate'>{item.label}</span>
+              <Icon className='h-6 w-6' />
+              <span className='truncate text-xs'>{item.label}</span>
             </Button>
           );
         })}

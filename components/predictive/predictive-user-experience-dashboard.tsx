@@ -162,6 +162,7 @@ import {
   CalendarWind2 as CalendarWind2Icon,
   CalendarBrain as CalendarBrainIcon,
   CalendarLightbulb as CalendarLightbulbIcon,
+  Bell,
 } from 'lucide-react';
 import { usePredictiveUserExperience } from '@/lib/hooks/use-predictive-user-experience';
 import {

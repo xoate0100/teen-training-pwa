@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import Image from 'next/image';
 import { VisualAssetsService } from '@/lib/services/visual-assets-service';
 import { cn } from '@/lib/utils';
 
@@ -67,10 +68,11 @@ export function HeroBackground({
     >
       {/* Background Image */}
       {asset && !imageError && (
-        <img
+        <Image
           src={asset.path}
           alt={asset.alt}
-          className='absolute inset-0 w-full h-full object-cover'
+          fill
+          className='object-cover'
           onLoad={handleImageLoad}
           onError={handleImageError}
           style={{ opacity: imageLoaded ? 1 : 0 }}
@@ -155,10 +157,11 @@ export function SessionCardBackground({
     >
       {/* Background Image */}
       {asset && !imageError && (
-        <img
+        <Image
           src={asset.path}
           alt={asset.alt}
-          className='absolute inset-0 w-full h-full object-cover'
+          fill
+          className='object-cover'
           onLoad={handleImageLoad}
           onError={handleImageError}
           style={{ opacity: imageLoaded ? 1 : 0 }}
@@ -254,11 +257,12 @@ export function VisualAssetDisplay({
 
   return (
     <div className={cn('relative', className)}>
-      <img
+      <Image
         src={asset.path}
         alt={asset.alt}
+        fill
         className={cn(
-          'w-full h-full object-cover transition-opacity duration-300',
+          'object-cover transition-opacity duration-300',
           imageLoaded ? 'opacity-100' : 'opacity-0'
         )}
         onLoad={handleImageLoad}

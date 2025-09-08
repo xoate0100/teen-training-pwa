@@ -48,6 +48,21 @@ import {
   usePrimaryActions,
 } from '@/components/primary-actions';
 import {
+  AchievementBadge,
+  StreakVisualization,
+  GoalProgressIndicator,
+  StatusIndicator,
+  useProgressVisualization,
+} from '@/components/progress-visualization';
+import {
+  ConnectionStatus,
+  useNotificationSystem,
+} from '@/components/notification-system';
+import {
+  CelebrationModal,
+  useCelebrationSystem,
+} from '@/components/celebration-animations';
+import {
   Container,
   Section,
   Flex,
@@ -133,6 +148,10 @@ export default function Dashboard() {
   const { isEnabled: oneHandedEnabled, updateSettings } =
     useOneHandedNavigation();
   const { getActionState } = usePrimaryActions();
+  const { unlockAchievement, getAchievementStatus } =
+    useProgressVisualization();
+  const { addNotification } = useNotificationSystem();
+  const { triggerCelebration } = useCelebrationSystem();
   // const { isSectionExpanded, toggleSection, startTour, endTour, isTourActive } = useProgressiveDisclosure(); // Will be used in future implementations
   // const { getSpacing } = useSpacing(); // Will be used in future implementations
   const [announcements, setAnnouncements] = useState('');
@@ -140,8 +159,12 @@ export default function Dashboard() {
   const [energy, setEnergy] = useState([7]);
   const [sleepHours, setSleepHours] = useState(8);
   const [muscleSoreness, setMuscleSoreness] = useState([2]);
-  const [checkInCompleted, setCheckInCompleted] = useState(false);
   const [showCelebration, setShowCelebration] = useState(false);
+  const [celebrationType] =
+    useState<
+      keyof typeof import('@/components/celebration-animations').celebrationTypes
+    >('exercise-complete');
+  const [checkInCompleted, setCheckInCompleted] = useState(false);
   const [simpleMode, setSimpleMode] = useState(false);
   const [showAdvancedProgress, setShowAdvancedProgress] = useState(false);
   const [showAllBadges, setShowAllBadges] = useState(false);
@@ -505,6 +528,95 @@ export default function Dashboard() {
                     </div>
                   </div>
                 </ExpandableSection>
+              </div>
+
+              {/* Progress Visualization Section */}
+              <div className='space-y-6'>
+                <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4'>
+                  {/* Achievement Badges */}
+                  <div className='space-y-3'>
+                    <h3 className='text-lg font-semibold'>Achievements</h3>
+                    <div className='flex flex-wrap gap-2'>
+                      <AchievementBadge
+                        type='first-session'
+                        unlocked={getAchievementStatus('first-session')}
+                        size='sm'
+                        onClick={() => {
+                          unlockAchievement('first-session');
+                          addNotification(
+                            'achievement',
+                            'Achievement Unlocked!',
+                            'First Steps achievement unlocked!'
+                          );
+                        }}
+                      />
+                      <AchievementBadge
+                        type='week-streak'
+                        unlocked={getAchievementStatus('week-streak')}
+                        size='sm'
+                        onClick={() => {
+                          unlockAchievement('week-streak');
+                          addNotification(
+                            'achievement',
+                            'Achievement Unlocked!',
+                            'Week Warrior achievement unlocked!'
+                          );
+                        }}
+                      />
+                      <AchievementBadge
+                        type='goal-crusher'
+                        unlocked={getAchievementStatus('goal-crusher')}
+                        size='sm'
+                        onClick={() => {
+                          unlockAchievement('goal-crusher');
+                          addNotification(
+                            'achievement',
+                            'Achievement Unlocked!',
+                            'Goal Crusher achievement unlocked!'
+                          );
+                        }}
+                      />
+                    </div>
+                  </div>
+
+                  {/* Streak Visualization */}
+                  <div className='space-y-3'>
+                    <h3 className='text-lg font-semibold'>Streak</h3>
+                    <StreakVisualization
+                      currentStreak={7}
+                      longestStreak={14}
+                      size='md'
+                    />
+                  </div>
+
+                  {/* Goal Progress */}
+                  <div className='space-y-3'>
+                    <h3 className='text-lg font-semibold'>Goals</h3>
+                    <div className='space-y-3'>
+                      <GoalProgressIndicator
+                        type='reps'
+                        current={45}
+                        target={50}
+                        unit='reps'
+                        showPercentage={true}
+                      />
+                      <GoalProgressIndicator
+                        type='time'
+                        current={25}
+                        target={30}
+                        unit='min'
+                        showPercentage={true}
+                      />
+                    </div>
+                  </div>
+
+                  {/* Status Indicator */}
+                  <div className='space-y-3'>
+                    <h3 className='text-lg font-semibold'>Status</h3>
+                    <StatusIndicator status='on-track' showLabel={true} />
+                    <ConnectionStatus status='online' showLabel={true} />
+                  </div>
+                </div>
               </div>
 
               <section aria-labelledby='checkin-title'>
@@ -1413,6 +1525,14 @@ export default function Dashboard() {
               }}
             />
           )}
+
+          {/* Celebration Modal */}
+          <CelebrationModal
+            type={celebrationType}
+            show={showCelebration}
+            onClose={() => setShowCelebration(false)}
+            showConfetti={true}
+          />
         </Container>
       </AdaptiveInterface>
     </PersonalizationProvider>

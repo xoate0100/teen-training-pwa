@@ -1,349 +1,457 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { ReactNode, useState, useEffect } from 'react';
+import { cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import {
-  LineChart,
-  Line,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
-} from 'recharts';
-import { TrendingUp, TrendingDown, Target, Award } from 'lucide-react';
-import { StorageManager } from '@/lib/storage';
+import { Progress } from '@/components/ui/progress';
+import { AccessibleIcon } from '@/components/accessible-icons';
+import { AnimatedIcon } from '@/components/animated-icons';
 
-interface ProgressData {
-  date: string;
-  broadJump: number;
-  verticalReach: number;
-  sprintTime: number;
-  serveAccuracy: number;
-  passingQuality: number;
-  avgRPE: number;
-  totalVolume: number;
+// Achievement badge types
+export const achievementTypes = {
+  'first-session': {
+    icon: 'session',
+    title: 'First Steps',
+    description: 'Completed your first training session',
+    color: 'bg-green-500',
+    gradient: 'from-green-400 to-green-600',
+  },
+  'week-streak': {
+    icon: 'achievements',
+    title: 'Week Warrior',
+    description: 'Completed 7 days in a row',
+    color: 'bg-blue-500',
+    gradient: 'from-blue-400 to-blue-600',
+  },
+  'month-streak': {
+    icon: 'achievements',
+    title: 'Monthly Master',
+    description: 'Completed 30 days in a row',
+    color: 'bg-purple-500',
+    gradient: 'from-purple-400 to-purple-600',
+  },
+  'goal-crusher': {
+    icon: 'goals',
+    title: 'Goal Crusher',
+    description: 'Achieved your first major goal',
+    color: 'bg-yellow-500',
+    gradient: 'from-yellow-400 to-yellow-600',
+  },
+  'social-butterfly': {
+    icon: 'social',
+    title: 'Social Butterfly',
+    description: 'Connected with 5 friends',
+    color: 'bg-pink-500',
+    gradient: 'from-pink-400 to-pink-600',
+  },
+  'ai-enthusiast': {
+    icon: 'ai',
+    title: 'AI Enthusiast',
+    description: 'Used AI coach 10 times',
+    color: 'bg-indigo-500',
+    gradient: 'from-indigo-400 to-indigo-600',
+  },
+  'wellness-warrior': {
+    icon: 'wellness',
+    title: 'Wellness Warrior',
+    description: 'Completed 50 wellness check-ins',
+    color: 'bg-emerald-500',
+    gradient: 'from-emerald-400 to-emerald-600',
+  },
+  'progress-tracker': {
+    icon: 'progress',
+    title: 'Progress Tracker',
+    description: 'Tracked progress for 30 days',
+    color: 'bg-orange-500',
+    gradient: 'from-orange-400 to-orange-600',
+  },
+  'early-bird': {
+    icon: 'session',
+    title: 'Early Bird',
+    description: 'Completed 10 morning sessions',
+    color: 'bg-cyan-500',
+    gradient: 'from-cyan-400 to-cyan-600',
+  },
+  'night-owl': {
+    icon: 'session',
+    title: 'Night Owl',
+    description: 'Completed 10 evening sessions',
+    color: 'bg-violet-500',
+    gradient: 'from-violet-400 to-violet-600',
+  },
+  'consistency-king': {
+    icon: 'achievements',
+    title: 'Consistency King',
+    description: 'No missed days for 2 weeks',
+    color: 'bg-rose-500',
+    gradient: 'from-rose-400 to-rose-600',
+  },
+  'all-star': {
+    icon: 'achievements',
+    title: 'All-Star',
+    description: 'Unlocked all other achievements',
+    color: 'bg-gradient-to-r from-yellow-400 via-red-500 to-pink-500',
+    gradient: 'from-yellow-400 via-red-500 to-pink-500',
+  },
+} as const;
+
+// Achievement Badge Component
+interface AchievementBadgeProps {
+  type: keyof typeof achievementTypes;
+  unlocked?: boolean;
+  unlockedAt?: Date;
+  className?: string;
+  size?: 'sm' | 'md' | 'lg' | 'xl';
+  showAnimation?: boolean;
+  onClick?: () => void;
 }
 
-export function ProgressVisualization() {
-  const [progressData, setProgressData] = useState<ProgressData[]>([]);
-  const [selectedMetric, setSelectedMetric] =
-    useState<keyof ProgressData>('broadJump');
-  const [timeRange, setTimeRange] = useState<'week' | 'month' | 'all'>('month');
+export function AchievementBadge({
+  type,
+  unlocked = false,
+  unlockedAt,
+  className,
+  size = 'md',
+  showAnimation = true,
+  onClick,
+}: AchievementBadgeProps) {
+  const [isAnimating, setIsAnimating] = useState(false);
+  const config = achievementTypes[type];
 
-  const metrics = [
-    {
-      key: 'broadJump',
-      label: 'Broad Jump',
-      unit: 'inches',
-      icon: '🦘',
-      target: 60,
-    },
-    {
-      key: 'verticalReach',
-      label: 'Vertical Reach',
-      unit: 'inches',
-      icon: '⬆️',
-      target: 24,
-    },
-    {
-      key: 'sprintTime',
-      label: '10-Yard Sprint',
-      unit: 'seconds',
-      icon: '🏃',
-      target: 2.5,
-      inverse: true,
-    },
-    {
-      key: 'serveAccuracy',
-      label: 'Serve Accuracy',
-      unit: '%',
-      icon: '🎯',
-      target: 80,
-    },
-    {
-      key: 'passingQuality',
-      label: 'Passing Quality',
-      unit: '/3',
-      icon: '🏐',
-      target: 2.5,
-    },
-    { key: 'avgRPE', label: 'Average RPE', unit: '/10', icon: '💪', target: 6 },
-  ];
+  const sizeClasses = {
+    sm: 'h-16 w-16',
+    md: 'h-20 w-20',
+    lg: 'h-24 w-24',
+    xl: 'h-32 w-32',
+  };
+
+  const iconSizes = {
+    sm: 'md',
+    md: 'lg',
+    lg: 'xl',
+    xl: '2xl',
+  } as const;
 
   useEffect(() => {
-    // Generate mock progress data based on stored sessions
-    const storage = StorageManager.getInstance();
-    const sessions = storage.getAllSessions();
-    const checkIns = storage.getAllCheckIns();
-
-    // Create weekly progress data
-    const weeks = [];
-    const startDate = new Date();
-    startDate.setDate(startDate.getDate() - 84); // 12 weeks ago
-
-    for (let i = 0; i < 12; i++) {
-      const weekDate = new Date(startDate);
-      weekDate.setDate(weekDate.getDate() + i * 7);
-
-      // Simulate progressive improvement
-      const progress = i / 11; // 0 to 1 over 12 weeks
-
-      weeks.push({
-        date: weekDate.toISOString().split('T')[0],
-        broadJump: Math.round(45 + progress * 20 + (Math.random() * 4 - 2)), // 45-65 inches
-        verticalReach: Math.round(18 + progress * 8 + (Math.random() * 2 - 1)), // 18-26 inches
-        sprintTime: Number(
-          (3.2 - progress * 0.7 + (Math.random() * 0.2 - 0.1)).toFixed(2)
-        ), // 3.2-2.5 seconds
-        serveAccuracy: Math.round(
-          60 + progress * 25 + (Math.random() * 10 - 5)
-        ), // 60-85%
-        passingQuality: Number(
-          (1.5 + progress * 1.2 + (Math.random() * 0.3 - 0.15)).toFixed(1)
-        ), // 1.5-2.7
-        avgRPE: Number(
-          (7 - progress * 1.5 + (Math.random() * 1 - 0.5)).toFixed(1)
-        ), // 7-5.5
-        totalVolume: Math.round(
-          1000 + progress * 800 + (Math.random() * 200 - 100)
-        ), // 1000-1800 lbs
-      });
+    if (unlocked && showAnimation) {
+      setIsAnimating(true);
+      setTimeout(() => setIsAnimating(false), 1000);
     }
-
-    setProgressData(weeks);
-  }, []);
-
-  const getFilteredData = () => {
-    const now = new Date();
-    const cutoffDate = new Date();
-
-    switch (timeRange) {
-      case 'week':
-        cutoffDate.setDate(now.getDate() - 7);
-        break;
-      case 'month':
-        cutoffDate.setDate(now.getDate() - 30);
-        break;
-      case 'all':
-        cutoffDate.setDate(now.getDate() - 365);
-        break;
-    }
-
-    return progressData.filter(d => new Date(d.date) >= cutoffDate);
-  };
-
-  const getCurrentMetric = () => {
-    return metrics.find(m => m.key === selectedMetric)!;
-  };
-
-  const getLatestValue = () => {
-    const data = getFilteredData();
-    return data.length > 0 ? data[data.length - 1][selectedMetric] : 0;
-  };
-
-  const getTrend = () => {
-    const data = getFilteredData();
-    if (data.length < 2) return 0;
-
-    const latest = data[data.length - 1][selectedMetric] as number;
-    const previous = data[data.length - 2][selectedMetric] as number;
-    const metric = getCurrentMetric();
-
-    if (metric.inverse) {
-      return previous - latest; // For metrics where lower is better
-    }
-    return latest - previous;
-  };
-
-  const getProgressToTarget = () => {
-    const latest = getLatestValue() as number;
-    const metric = getCurrentMetric();
-    const target = metric.target;
-
-    if (metric.inverse) {
-      return Math.max(0, Math.min(100, ((target - latest) / target) * 100));
-    }
-    return Math.max(0, Math.min(100, (latest / target) * 100));
-  };
-
-  const trend = getTrend();
-  const progressPercent = getProgressToTarget();
+  }, [unlocked, showAnimation]);
 
   return (
-    <div className='space-y-6'>
-      {/* Metric Selection */}
-      <div className='grid grid-cols-2 md:grid-cols-3 gap-2'>
-        {metrics.map(metric => (
-          <Button
-            key={metric.key}
-            variant={selectedMetric === metric.key ? 'default' : 'outline'}
+    <div
+      className={cn(
+        'relative group cursor-pointer transition-all duration-300',
+        sizeClasses[size],
+        className
+      )}
+      onClick={onClick}
+    >
+      {/* Badge background */}
+      <div
+        className={cn(
+          'absolute inset-0 rounded-full transition-all duration-300',
+          unlocked
+            ? `bg-gradient-to-br ${config.gradient} shadow-lg`
+            : 'bg-gray-300 dark:bg-gray-700',
+          isAnimating && 'animate-pulse scale-110',
+          'group-hover:scale-105 group-hover:shadow-xl'
+        )}
+      />
+
+      {/* Icon */}
+      <div className='relative z-10 flex items-center justify-center h-full'>
+        {showAnimation && unlocked ? (
+          <AnimatedIcon
+            name={
+              config.icon as keyof typeof import('@/components/svg-icons').iconRegistry
+            }
+            size={iconSizes[size]}
+            state={isAnimating ? 'success' : 'idle'}
+            variant='default'
+            highContrast={true}
+          />
+        ) : (
+          <AccessibleIcon
+            name={
+              config.icon as keyof typeof import('@/components/svg-icons').iconRegistry
+            }
+            size={iconSizes[size]}
+            variant={unlocked ? 'default' : 'muted'}
+            highContrast={unlocked}
+          />
+        )}
+      </div>
+
+      {/* Unlock indicator */}
+      {unlocked && (
+        <div className='absolute -top-1 -right-1 h-6 w-6 bg-green-500 rounded-full flex items-center justify-center'>
+          <AccessibleIcon
+            name='check-in'
             size='sm'
-            onClick={() => setSelectedMetric(metric.key as keyof ProgressData)}
-            className='h-auto p-2 flex flex-col items-center'
-          >
-            <span className='text-lg mb-1'>{metric.icon}</span>
-            <span className='text-xs text-center'>{metric.label}</span>
-          </Button>
-        ))}
-      </div>
+            variant='default'
+            highContrast={true}
+          />
+        </div>
+      )}
 
-      {/* Time Range Selection */}
-      <div className='flex justify-center space-x-2'>
-        {(['week', 'month', 'all'] as const).map(range => (
-          <Button
-            key={range}
-            variant={timeRange === range ? 'default' : 'outline'}
-            size='sm'
-            onClick={() => setTimeRange(range)}
-          >
-            {range === 'week'
-              ? '7 Days'
-              : range === 'month'
-                ? '30 Days'
-                : 'All Time'}
-          </Button>
-        ))}
-      </div>
-
-      {/* Current Stats */}
-      <div className='grid grid-cols-1 md:grid-cols-3 gap-4'>
-        <Card>
-          <CardContent className='p-4'>
-            <div className='flex items-center justify-between'>
-              <div>
-                <p className='text-sm text-muted-foreground'>Current</p>
-                <p className='text-2xl font-bold'>
-                  {getLatestValue()} {getCurrentMetric().unit}
-                </p>
-              </div>
-              <span className='text-2xl'>{getCurrentMetric().icon}</span>
+      {/* Tooltip */}
+      <div className='absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none'>
+        <div className='bg-gray-900 text-white text-xs rounded px-2 py-1 whitespace-nowrap'>
+          <div className='font-semibold'>{config.title}</div>
+          <div className='text-gray-300'>{config.description}</div>
+          {unlockedAt && (
+            <div className='text-gray-400 text-xs'>
+              Unlocked {unlockedAt.toLocaleDateString()}
             </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent className='p-4'>
-            <div className='flex items-center justify-between'>
-              <div>
-                <p className='text-sm text-muted-foreground'>Trend</p>
-                <p
-                  className={`text-2xl font-bold flex items-center ${trend >= 0 ? 'text-green-500' : 'text-red-500'}`}
-                >
-                  {trend >= 0 ? (
-                    <TrendingUp className='w-5 h-5 mr-1' />
-                  ) : (
-                    <TrendingDown className='w-5 h-5 mr-1' />
-                  )}
-                  {Math.abs(trend).toFixed(1)}
-                </p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent className='p-4'>
-            <div className='flex items-center justify-between'>
-              <div>
-                <p className='text-sm text-muted-foreground'>Target Progress</p>
-                <p className='text-2xl font-bold'>
-                  {progressPercent.toFixed(0)}%
-                </p>
-                <div className='w-full bg-muted rounded-full h-2 mt-2'>
-                  <div
-                    className='bg-primary rounded-full h-2 transition-all duration-300'
-                    style={{ width: `${progressPercent}%` }}
-                  />
-                </div>
-              </div>
-              <Target className='w-6 h-6 text-muted-foreground' />
-            </div>
-          </CardContent>
-        </Card>
+          )}
+        </div>
       </div>
-
-      {/* Progress Chart */}
-      <Card>
-        <CardHeader>
-          <CardTitle className='flex items-center'>
-            <span className='mr-2'>{getCurrentMetric().icon}</span>
-            {getCurrentMetric().label} Progress
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className='h-64'>
-            <ResponsiveContainer width='100%' height='100%'>
-              <LineChart data={getFilteredData()}>
-                <CartesianGrid strokeDasharray='3 3' />
-                <XAxis
-                  dataKey='date'
-                  tickFormatter={date => new Date(date).toLocaleDateString()}
-                />
-                <YAxis />
-                <Tooltip
-                  labelFormatter={date => new Date(date).toLocaleDateString()}
-                  formatter={value => [
-                    `${value} ${getCurrentMetric().unit}`,
-                    getCurrentMetric().label,
-                  ]}
-                />
-                <Line
-                  type='monotone'
-                  dataKey={selectedMetric}
-                  stroke='hsl(var(--primary))'
-                  strokeWidth={3}
-                  dot={{ fill: 'hsl(var(--primary))', strokeWidth: 2, r: 4 }}
-                />
-              </LineChart>
-            </ResponsiveContainer>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Achievement Badges */}
-      <Card>
-        <CardHeader>
-          <CardTitle className='flex items-center'>
-            <Award className='w-5 h-5 mr-2' />
-            Recent Achievements
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className='grid grid-cols-2 md:grid-cols-4 gap-2'>
-            <Badge
-              variant='secondary'
-              className='p-2 flex flex-col items-center'
-            >
-              <span className='text-lg mb-1'>🎯</span>
-              <span className='text-xs'>Target Hit</span>
-            </Badge>
-            <Badge
-              variant='secondary'
-              className='p-2 flex flex-col items-center'
-            >
-              <span className='text-lg mb-1'>📈</span>
-              <span className='text-xs'>Personal Best</span>
-            </Badge>
-            <Badge
-              variant='secondary'
-              className='p-2 flex flex-col items-center'
-            >
-              <span className='text-lg mb-1'>🔥</span>
-              <span className='text-xs'>7-Day Streak</span>
-            </Badge>
-            <Badge
-              variant='secondary'
-              className='p-2 flex flex-col items-center'
-            >
-              <span className='text-lg mb-1'>💪</span>
-              <span className='text-xs'>Consistency</span>
-            </Badge>
-          </div>
-        </CardContent>
-      </Card>
     </div>
   );
+}
+
+// Streak Visualization Component
+interface StreakVisualizationProps {
+  currentStreak: number;
+  longestStreak: number;
+  className?: string;
+  size?: 'sm' | 'md' | 'lg';
+  showAnimation?: boolean;
+}
+
+export function StreakVisualization({
+  currentStreak,
+  longestStreak,
+  className,
+  size = 'md',
+  showAnimation = true,
+}: StreakVisualizationProps) {
+  const [isAnimating, setIsAnimating] = useState(false);
+
+  useEffect(() => {
+    if (currentStreak > 0 && showAnimation) {
+      setIsAnimating(true);
+      setTimeout(() => setIsAnimating(false), 500);
+    }
+  }, [currentStreak, showAnimation]);
+
+  const sizeClasses = {
+    sm: 'h-8 w-8',
+    md: 'h-12 w-12',
+    lg: 'h-16 w-16',
+  };
+
+  const textSizes = {
+    sm: 'text-sm',
+    md: 'text-lg',
+    lg: 'text-2xl',
+  };
+
+  return (
+    <div className={cn('flex items-center gap-2', className)}>
+      {/* Current streak */}
+      <div className='flex flex-col items-center'>
+        <div
+          className={cn(
+            'relative rounded-full bg-gradient-to-br from-orange-400 to-red-500 flex items-center justify-center text-white font-bold shadow-lg transition-all duration-300',
+            sizeClasses[size],
+            isAnimating && 'animate-bounce scale-110'
+          )}
+        >
+          <span className={textSizes[size]}>{currentStreak}</span>
+          <div className='absolute inset-0 rounded-full bg-gradient-to-br from-orange-400 to-red-500 opacity-50 animate-ping' />
+        </div>
+        <span className='text-xs text-muted-foreground mt-1'>Current</span>
+      </div>
+
+      {/* Longest streak */}
+      <div className='flex flex-col items-center'>
+        <div
+          className={cn(
+            'rounded-full bg-gradient-to-br from-gray-400 to-gray-600 flex items-center justify-center text-white font-bold shadow-lg',
+            sizeClasses[size]
+          )}
+        >
+          <span className={textSizes[size]}>{longestStreak}</span>
+        </div>
+        <span className='text-xs text-muted-foreground mt-1'>Best</span>
+      </div>
+    </div>
+  );
+}
+
+// Goal Progress Indicator Component
+interface GoalProgressIndicatorProps {
+  type: 'distance' | 'reps' | 'time' | 'weight';
+  current: number;
+  target: number;
+  unit: string;
+  className?: string;
+  showPercentage?: boolean;
+  showAnimation?: boolean;
+}
+
+export function GoalProgressIndicator({
+  type,
+  current,
+  target,
+  unit,
+  className,
+  showPercentage = true,
+  showAnimation = true,
+}: GoalProgressIndicatorProps) {
+  const [isAnimating, setIsAnimating] = useState(false);
+  const percentage = Math.min(100, (current / target) * 100);
+
+  const typeConfig = {
+    distance: { icon: 'progress', color: 'bg-blue-500', label: 'Distance' },
+    reps: { icon: 'session', color: 'bg-green-500', label: 'Reps' },
+    time: { icon: 'progress', color: 'bg-purple-500', label: 'Time' },
+    weight: { icon: 'goals', color: 'bg-orange-500', label: 'Weight' },
+  };
+
+  const config = typeConfig[type];
+
+  useEffect(() => {
+    if (percentage >= 100 && showAnimation) {
+      setIsAnimating(true);
+      setTimeout(() => setIsAnimating(false), 1000);
+    }
+  }, [percentage, showAnimation]);
+
+  return (
+    <div className={cn('space-y-2', className)}>
+      <div className='flex items-center justify-between'>
+        <div className='flex items-center gap-2'>
+          <AccessibleIcon
+            name={
+              config.icon as keyof typeof import('@/components/svg-icons').iconRegistry
+            }
+            size='sm'
+            variant='default'
+          />
+          <span className='text-sm font-medium'>{config.label}</span>
+        </div>
+        {showPercentage && (
+          <span className='text-sm text-muted-foreground'>
+            {Math.round(percentage)}%
+          </span>
+        )}
+      </div>
+
+      <Progress
+        value={percentage}
+        className={cn('h-2', isAnimating && 'animate-pulse')}
+      />
+
+      <div className='flex justify-between text-xs text-muted-foreground'>
+        <span>
+          {current} {unit}
+        </span>
+        <span>
+          {target} {unit}
+        </span>
+      </div>
+    </div>
+  );
+}
+
+// Status Indicator Component
+interface StatusIndicatorProps {
+  status: 'on-track' | 'behind' | 'ahead' | 'new-user';
+  className?: string;
+  showLabel?: boolean;
+}
+
+export function StatusIndicator({
+  status,
+  className,
+  showLabel = true,
+}: StatusIndicatorProps) {
+  const statusConfig = {
+    'on-track': {
+      color: 'bg-green-500',
+      icon: 'goals',
+      label: 'On Track',
+      description: "You're doing great!",
+    },
+    behind: {
+      color: 'bg-yellow-500',
+      icon: 'progress',
+      label: 'Behind',
+      description: 'Catch up to stay on track',
+    },
+    ahead: {
+      color: 'bg-blue-500',
+      icon: 'achievements',
+      label: 'Ahead',
+      description: "You're ahead of schedule!",
+    },
+    'new-user': {
+      color: 'bg-gray-500',
+      icon: 'session',
+      label: 'New User',
+      description: 'Welcome! Start your journey',
+    },
+  };
+
+  const config = statusConfig[status];
+
+  return (
+    <div className={cn('flex items-center gap-2', className)}>
+      <div className={cn('w-3 h-3 rounded-full', config.color)} />
+      {showLabel && (
+        <div>
+          <div className='text-sm font-medium'>{config.label}</div>
+          <div className='text-xs text-muted-foreground'>
+            {config.description}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// Progress Visualization Hook
+export function useProgressVisualization() {
+  const [achievements, setAchievements] = useState<Map<string, boolean>>(
+    new Map()
+  );
+  const [streaks, setStreaks] = useState({ current: 0, longest: 0 });
+  const [goals, setGoals] = useState<
+    Map<string, { current: number; target: number }>
+  >(new Map());
+
+  const unlockAchievement = (achievementId: string) => {
+    setAchievements(prev => new Map(prev.set(achievementId, true)));
+  };
+
+  const updateStreak = (current: number, longest: number) => {
+    setStreaks({ current, longest });
+  };
+
+  const updateGoal = (goalId: string, current: number, target: number) => {
+    setGoals(prev => new Map(prev.set(goalId, { current, target })));
+  };
+
+  const getAchievementStatus = (achievementId: string) => {
+    return achievements.get(achievementId) || false;
+  };
+
+  const getGoalProgress = (goalId: string) => {
+    return goals.get(goalId) || { current: 0, target: 100 };
+  };
+
+  return {
+    unlockAchievement,
+    updateStreak,
+    updateGoal,
+    getAchievementStatus,
+    getGoalProgress,
+    achievements,
+    streaks,
+    goals,
+  };
 }

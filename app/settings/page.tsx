@@ -41,11 +41,10 @@ import {
   Check,
   AlertCircle,
   HelpCircle,
-  Brain,
   CheckCircle,
   History,
 } from 'lucide-react';
-import { usePersonalization } from '@/lib/hooks/use-personalization';
+import { useDeepPersonalization } from '@/lib/hooks/use-deep-personalization';
 import { useUser } from '@/lib/contexts/user-context';
 import {
   OneHandedSettings,
@@ -128,8 +127,20 @@ interface SettingsData {
 
 export default function SettingsPage() {
   const { currentUser } = useUser();
-  const { preferences, updatePreferences } = usePersonalization();
   const { isMobile, currentTab, handleTabChange } = useResponsiveNavigation();
+  
+  // Mock personalization preferences for now
+  const preferences = {
+    theme: 'auto',
+    language: 'en',
+    timezone: 'UTC',
+    units: 'metric'
+  };
+  
+  const updatePreferences = async (category: string, data: any) => {
+    console.log('Updating preferences:', category, data);
+    // TODO: Implement actual preference updating
+  };
 
   const [activeTab, setActiveTab] = useState('profile');
   const [searchQuery, setSearchQuery] = useState('');

@@ -13,7 +13,7 @@ import {
   Info,
   Wifi,
   WifiOff,
-  Sync,
+  RefreshCw,
 } from 'lucide-react';
 
 // Notification types
@@ -114,7 +114,7 @@ export const connectionStatusTypes = {
     label: 'Offline',
   },
   syncing: {
-    icon: Sync,
+    icon: RefreshCw,
     color: 'text-blue-600',
     bgColor: 'bg-blue-50',
     borderColor: 'border-blue-200',

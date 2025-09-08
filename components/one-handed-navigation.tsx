@@ -10,7 +10,7 @@ import {
   Volume2,
   VolumeX,
   Hand,
-  Touch,
+  MousePointer,
   ArrowUp,
   ArrowDown,
   ArrowLeft,
@@ -79,7 +79,7 @@ const thumbZones: ThumbZone[] = [
     description: 'Reachable by both thumbs',
     position: 'center',
     color: 'bg-purple-500',
-    icon: Touch,
+    icon: MousePointer,
   },
 ];
 

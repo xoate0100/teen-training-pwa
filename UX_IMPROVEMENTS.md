@@ -32,11 +32,11 @@ _Dependencies: None | Timeline: 2-3 weeks_
   - [x] Migrate theme settings from "Themes" tab to Settings
   - [x] Move personalization settings from "Personal" tab to Settings
   - [x] Consolidate profile settings from "Profile" tab to Settings
-- [ ] **1.1.3** Implement prominent primary action buttons
-  - [ ] Add "Start Today's Session" primary button to dashboard header
-  - [ ] Create floating action button for quick session access
-  - [ ] Implement "Daily Check-in" quick access button
-  - [ ] Add contextual primary actions based on user state
+- [x] **1.1.3** Implement prominent primary action buttons
+  - [x] Add "Start Today's Session" primary button to dashboard header
+  - [x] Create floating action button for quick session access
+  - [x] Implement "Daily Check-in" quick access button
+  - [x] Add contextual primary actions based on user state
 
 ### 1.2 Mobile-First Navigation Optimization
 

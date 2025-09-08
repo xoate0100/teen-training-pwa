@@ -18,13 +18,13 @@ The following aliases are available in PowerShell sessions:
 
 Additional aliases for maintaining code quality:
 
-| Alias           | Command                                      | Description                    |
-| --------------- | -------------------------------------------- | ------------------------------ |
-| `glint`         | `npx eslint . --ext .js,.jsx,.ts,.tsx`       | Run ESLint to check for errors |
-| `glint:fix`     | `npx eslint . --ext .js,.jsx,.ts,.tsx --fix` | Run ESLint and auto-fix errors |
-| `gtest`         | `npm test`                                   | Run tests before committing    |
-| `gformat`       | `npm run format`                             | Format code with Prettier      |
-| `gformat:check` | `npm run format:check`                       | Check code formatting          |
+| Alias           | Command                | Description                    |
+| --------------- | ---------------------- | ------------------------------ |
+| `glint`         | `npm run lint`         | Run ESLint to check for errors |
+| `glint:fix`     | `npm run lint:fix`     | Run ESLint and auto-fix errors |
+| `gtest`         | `npm test`             | Run tests before committing    |
+| `gformat`       | `npm run format`       | Format code with Prettier      |
+| `gformat:check` | `npm run format:check` | Check code formatting          |
 
 ## Usage Examples
 
@@ -87,6 +87,12 @@ gtest
 # Check git status
 gst
 ```
+
+**⚠️ IMPORTANT: Always run quality checks before committing!**
+
+- ESLint errors will cause build failures
+- Unformatted code creates unnecessary diffs
+- Tests ensure functionality works correctly
 
 ## Global Git Configuration
 

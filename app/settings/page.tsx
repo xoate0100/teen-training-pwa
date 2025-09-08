@@ -41,6 +41,7 @@ import {
   Check,
   AlertCircle,
   HelpCircle,
+  Brain,
 } from 'lucide-react';
 import { usePersonalization } from '@/lib/hooks/use-personalization';
 import { useUser } from '@/lib/contexts/user-context';
@@ -52,6 +53,8 @@ import { cn } from '@/lib/utils';
 import { SettingsSearch } from '@/components/settings-search';
 import { SettingsPreview } from '@/components/settings-preview';
 import { SettingsHelp } from '@/components/settings-help';
+import { ThemeSelector } from '@/components/theme-selector';
+import { PersonalizationSettings } from '@/components/personalization-settings';
 
 interface SettingsData {
   profile: {
@@ -346,7 +349,7 @@ export default function SettingsPage() {
     setSearchQuery(query);
     // Filter tabs based on search query
     if (query) {
-      const matchingTabs = ['profile', 'preferences', 'notifications', 'training', 'accessibility', 'privacy'].filter(tab => 
+      const matchingTabs = ['profile', 'preferences', 'theming', 'notifications', 'training', 'accessibility', 'privacy'].filter(tab => 
         tab.toLowerCase().includes(query.toLowerCase())
       );
       if (matchingTabs.length > 0) {
@@ -455,7 +458,7 @@ export default function SettingsPage() {
 
         {/* Settings Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className='w-full'>
-          <TabsList className='grid w-full grid-cols-2 md:grid-cols-3 lg:grid-cols-6'>
+          <TabsList className='grid w-full grid-cols-2 md:grid-cols-3 lg:grid-cols-7'>
             <TabsTrigger value='profile' className='flex items-center gap-2'>
               <User className='h-4 w-4' />
               <span className='hidden sm:inline'>Profile</span>
@@ -466,6 +469,13 @@ export default function SettingsPage() {
             >
               <Palette className='h-4 w-4' />
               <span className='hidden sm:inline'>Preferences</span>
+            </TabsTrigger>
+            <TabsTrigger
+              value='theming'
+              className='flex items-center gap-2'
+            >
+              <Palette className='h-4 w-4' />
+              <span className='hidden sm:inline'>Theming</span>
             </TabsTrigger>
             <TabsTrigger
               value='notifications'
@@ -672,6 +682,39 @@ export default function SettingsPage() {
                     </Select>
                   </div>
                 </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* Advanced Theming Settings */}
+          <TabsContent value='theming' className='space-y-6'>
+            <Card>
+              <CardHeader>
+                <CardTitle className='flex items-center gap-2'>
+                  <Palette className='h-5 w-5' />
+                  Advanced Theming
+                </CardTitle>
+                <CardDescription>
+                  Customize themes based on session type, training phase, progress level, and mood
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <ThemeSelector showPreview={true} />
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle className='flex items-center gap-2'>
+                  <Brain className='h-5 w-5' />
+                  Personalization Settings
+                </CardTitle>
+                <CardDescription>
+                  Advanced personalization based on your usage patterns and preferences
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <PersonalizationSettings showPreview={true} />
               </CardContent>
             </Card>
           </TabsContent>

@@ -44,6 +44,7 @@ const settingsCategories = [
   { id: 'all', label: 'All Settings', icon: SettingsIcon, count: 0 },
   { id: 'profile', label: 'Profile & Goals', icon: User, count: 0 },
   { id: 'preferences', label: 'Preferences', icon: Palette, count: 0 },
+  { id: 'theming', label: 'Theming', icon: Palette, count: 0 },
   { id: 'notifications', label: 'Notifications', icon: Bell, count: 0 },
   { id: 'training', label: 'Training', icon: Activity, count: 0 },
   { id: 'accessibility', label: 'Accessibility', icon: Eye, count: 0 },
@@ -95,6 +96,28 @@ const sampleSettings: SettingItem[] = [
     description: 'Control how your data is shared',
     category: 'privacy',
     keywords: ['data', 'sharing', 'privacy', 'analytics'],
+  },
+  {
+    id: 'sessionThemes',
+    title: 'Session Themes',
+    description: 'Customize themes for different session types',
+    category: 'theming',
+    keywords: ['session', 'themes', 'customization', 'appearance'],
+    recommended: true,
+  },
+  {
+    id: 'moodThemes',
+    title: 'Mood Themes',
+    description: 'Themes that adapt to your current mood',
+    category: 'theming',
+    keywords: ['mood', 'themes', 'adaptive', 'emotion'],
+  },
+  {
+    id: 'personalization',
+    title: 'Personalization',
+    description: 'AI-powered personalization settings',
+    category: 'theming',
+    keywords: ['personalization', 'ai', 'adaptive', 'learning'],
   },
 ];
 

@@ -40,6 +40,7 @@ import {
   RotateCcw,
   Check,
   AlertCircle,
+  HelpCircle,
 } from 'lucide-react';
 import { usePersonalization } from '@/lib/hooks/use-personalization';
 import { useUser } from '@/lib/contexts/user-context';
@@ -48,6 +49,9 @@ import {
   useOneHandedNavigation,
 } from '@/components/one-handed-navigation';
 import { cn } from '@/lib/utils';
+import { SettingsSearch } from '@/components/settings-search';
+import { SettingsPreview } from '@/components/settings-preview';
+import { SettingsHelp } from '@/components/settings-help';
 
 interface SettingsData {
   profile: {
@@ -104,6 +108,9 @@ export default function SettingsPage() {
   const { preferences, updatePreferences } = usePersonalization();
 
   const [activeTab, setActiveTab] = useState('profile');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [activeCategory, setActiveCategory] = useState('all');
+  const [showHelp, setShowHelp] = useState(false);
   const [settings, setSettings] = useState<SettingsData>({
     profile: {
       name: currentUser?.name || '',
@@ -335,15 +342,51 @@ export default function SettingsPage() {
     }
   };
 
+  const handleSearch = (query: string) => {
+    setSearchQuery(query);
+    // Filter tabs based on search query
+    if (query) {
+      const matchingTabs = ['profile', 'preferences', 'notifications', 'training', 'accessibility', 'privacy'].filter(tab => 
+        tab.toLowerCase().includes(query.toLowerCase())
+      );
+      if (matchingTabs.length > 0) {
+        setActiveTab(matchingTabs[0]);
+      }
+    }
+  };
+
+  const handleFilter = (category: string) => {
+    setActiveCategory(category);
+    if (category !== 'all') {
+      setActiveTab(category);
+    }
+  };
+
+  const handleClear = () => {
+    setSearchQuery('');
+    setActiveCategory('all');
+  };
+
   return (
     <div className='min-h-screen bg-background p-4 pb-20'>
       <div className='max-w-4xl mx-auto space-y-6'>
         {/* Header */}
         <div className='text-center space-y-2'>
-          <h1 className='text-3xl font-bold flex items-center justify-center gap-2'>
-            <Settings className='h-8 w-8' />
-            Settings
-          </h1>
+          <div className='flex items-center justify-center gap-2'>
+            <h1 className='text-3xl font-bold flex items-center gap-2'>
+              <Settings className='h-8 w-8' />
+              Settings
+            </h1>
+            <Button
+              variant='outline'
+              size='sm'
+              onClick={() => setShowHelp(!showHelp)}
+              className='ml-2'
+            >
+              <HelpCircle className='h-4 w-4 mr-1' />
+              Help
+            </Button>
+          </div>
           <p className='text-muted-foreground'>
             Customize your Teen Training experience
           </p>
@@ -387,6 +430,28 @@ export default function SettingsPage() {
             />
           </label>
         </div>
+
+        {/* Search and Help */}
+        <div className='space-y-4'>
+          <SettingsSearch
+            onSearch={handleSearch}
+            onFilter={handleFilter}
+            onClear={handleClear}
+            searchQuery={searchQuery}
+            activeCategory={activeCategory}
+          />
+          
+          {showHelp && (
+            <SettingsHelp />
+          )}
+        </div>
+
+        {/* Settings Preview */}
+        <SettingsPreview
+          settings={settings}
+          onSettingChange={updateSetting}
+          onReset={handleReset}
+        />
 
         {/* Settings Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className='w-full'>

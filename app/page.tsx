@@ -24,7 +24,6 @@ import { AIIntelligenceDisplay } from '@/components/ai-intelligence-display';
 import { LLMIntegrationDisplay } from '@/components/llm-integration-display';
 import { WellnessIntelligenceDisplay } from '@/components/wellness-intelligence-display';
 import { HeroBackground } from '@/components/hero-background';
-import { SessionTypeShowcase } from '@/components/session-type-showcase';
 import { ThemedSessionCard } from '@/components/themed-session-card';
 import { GamificationDashboard } from '@/components/gamification-dashboard';
 import { ThemeProvider } from '@/components/theme-provider';
@@ -32,10 +31,10 @@ import { ThemeSelector } from '@/components/theme-selector';
 import { MicroInteractionDemo } from '@/components/micro-interactions';
 import { ImmersiveFeedbackDemo } from '@/components/immersive-feedback';
 import { PersonalizationProvider } from '@/components/personalization-provider';
-import { PersonalizationDashboard } from '@/components/personalization-dashboard';
 import { AdaptiveInterface } from '@/components/adaptive-interface';
 import { useUser } from '@/lib/contexts/user-context';
 import { useDatabase } from '@/lib/hooks/use-database';
+import { Play, Check } from 'lucide-react';
 
 const Trophy = () => (
   <span role='img' aria-label='Trophy'>
@@ -55,16 +54,6 @@ const Zap = () => (
 const Heart = () => (
   <span role='img' aria-label='Heart'>
     ❤️
-  </span>
-);
-const Play = () => (
-  <span role='img' aria-label='Play'>
-    ▶️
-  </span>
-);
-const Check = () => (
-  <span role='img' aria-label='Check'>
-    ✓
   </span>
 );
 const Star = () => (
@@ -294,6 +283,43 @@ export default function Dashboard() {
                   <OfflineStatus />
                   <ProfileSwitcher />
                 </div>
+              </div>
+
+              {/* Prominent Primary Action Buttons */}
+              <div className='flex flex-col sm:flex-row gap-4 mt-6'>
+                <Button
+                  onClick={() => handleStartSession()}
+                  size='lg'
+                  className='flex-1 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white font-semibold py-4 px-8 rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105'
+                  aria-label="Start today's training session"
+                >
+                  <Play className='w-5 h-5 mr-2' />
+                  Start Today's Session
+                </Button>
+                <Button
+                  onClick={handleCheckInSubmit}
+                  variant='outline'
+                  size='lg'
+                  className='flex-1 bg-white/10 border-white/20 text-white hover:bg-white/20 font-semibold py-4 px-8 rounded-xl shadow-lg hover:shadow-xl transition-all duration-200'
+                  disabled={checkInCompleted}
+                  aria-label={
+                    checkInCompleted
+                      ? 'Daily check-in completed'
+                      : 'Complete daily check-in'
+                  }
+                >
+                  {checkInCompleted ? (
+                    <>
+                      <Check className='w-5 h-5 mr-2' />
+                      Check-in Complete
+                    </>
+                  ) : (
+                    <>
+                      <Target className='w-5 h-5 mr-2' />
+                      Daily Check-in
+                    </>
+                  )}
+                </Button>
               </div>
 
               {simpleMode && (
@@ -1089,7 +1115,6 @@ export default function Dashboard() {
               <RealTimeAchievements />
             </TabsContent>
 
-
             <TabsContent value='smart' className='space-y-6'>
               <div className='grid gap-6 md:grid-cols-2'>
                 <WeekCalculationDisplay />
@@ -1123,7 +1148,6 @@ export default function Dashboard() {
                 currentPhase='build'
               />
             </TabsContent>
-
 
             <TabsContent value='achievements' className='space-y-6'>
               <GamificationDashboard sessions={[]} checkIns={[]} />
@@ -1168,7 +1192,6 @@ export default function Dashboard() {
               </ThemeProvider>
             </TabsContent>
 
-
             <TabsContent value='wellness' className='space-y-6'>
               <WellnessIntelligenceDisplay
                 sessions={[]}
@@ -1183,6 +1206,20 @@ export default function Dashboard() {
               />
             </TabsContent>
           </Tabs>
+
+          {/* Floating Action Button for Mobile */}
+          {isMobile && (
+            <div className='fixed bottom-20 right-4 z-50'>
+              <Button
+                onClick={() => handleStartSession()}
+                size='lg'
+                className='w-14 h-14 rounded-full bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-110'
+                aria-label='Quick start training session'
+              >
+                <Play className='w-6 h-6' />
+              </Button>
+            </div>
+          )}
 
           {/* Mobile Bottom Navigation */}
           {isMobile && (

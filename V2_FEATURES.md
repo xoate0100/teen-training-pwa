@@ -27,11 +27,11 @@ _Dependencies: None | Timeline: 6-8 weeks_
   - [x] Design collapsible secondary navigation for advanced features
   - [x] Implement responsive navigation that adapts to screen size
   - [x] Add visual hierarchy indicators (primary vs secondary actions)
-- [ ] **0.1.2** Consolidate scattered settings into unified hub
-  - [ ] Create centralized Settings page with category organization
-  - [ ] Migrate theme settings from "Themes" tab to Settings
-  - [ ] Move personalization settings from "Personal" tab to Settings
-  - [ ] Consolidate profile settings from "Profile" tab to Settings
+- [x] **0.1.2** Consolidate scattered settings into unified hub
+  - [x] Create centralized Settings page with category organization
+  - [x] Migrate theme settings from "Themes" tab to Settings
+  - [x] Move personalization settings from "Personal" tab to Settings
+  - [x] Consolidate profile settings from "Profile" tab to Settings
 - [ ] **0.1.3** Implement prominent primary action buttons
   - [ ] Add "Start Today's Session" primary button to dashboard header
   - [ ] Create floating action button for quick session access

@@ -110,6 +110,14 @@ export function HierarchicalNavigation({
       isPrimary: false,
       isSecondary: true,
     },
+    {
+      id: 'advanced-ux',
+      label: 'Advanced UX',
+      icon: 'settings',
+      isPrimary: false,
+      isSecondary: true,
+      href: '/advanced-ux',
+    },
   ];
 
   const handleTabClick = (tabId: string) => {

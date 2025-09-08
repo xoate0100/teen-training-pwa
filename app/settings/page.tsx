@@ -42,6 +42,8 @@ import {
   AlertCircle,
   HelpCircle,
   Brain,
+  CheckCircle,
+  History,
 } from 'lucide-react';
 import { usePersonalization } from '@/lib/hooks/use-personalization';
 import { useUser } from '@/lib/contexts/user-context';
@@ -55,6 +57,19 @@ import { SettingsPreview } from '@/components/settings-preview';
 import { SettingsHelp } from '@/components/settings-help';
 import { ThemeSelector } from '@/components/theme-selector';
 import { PersonalizationSettings } from '@/components/personalization-settings';
+import { 
+  FormField, 
+  ToggleSwitch, 
+  SliderControl, 
+  SelectField, 
+  TextInput, 
+  MultiSelect, 
+  FormSection, 
+  FormActions,
+  useFormValidation 
+} from '@/components/settings-form-components';
+import { SettingsValidation } from '@/components/settings-validation';
+import { SettingsUndoRedo } from '@/components/settings-undo-redo';
 
 interface SettingsData {
   profile: {
@@ -166,6 +181,10 @@ export default function SettingsPage() {
 
   const [hasChanges, setHasChanges] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const [showValidation, setShowValidation] = useState(false);
+  const [showHistory, setShowHistory] = useState(false);
+  
+  const { validation, validateField, clearError, clearAllErrors } = useFormValidation();
 
   // Load settings from localStorage on mount
   useEffect(() => {
@@ -380,15 +399,35 @@ export default function SettingsPage() {
               <Settings className='h-8 w-8' />
               Settings
             </h1>
-            <Button
-              variant='outline'
-              size='sm'
-              onClick={() => setShowHelp(!showHelp)}
-              className='ml-2'
-            >
-              <HelpCircle className='h-4 w-4 mr-1' />
-              Help
-            </Button>
+            <div className='flex items-center gap-2'>
+              <Button
+                variant='outline'
+                size='sm'
+                onClick={() => setShowValidation(!showValidation)}
+                className={showValidation ? 'bg-primary text-primary-foreground' : ''}
+              >
+                <CheckCircle className='h-4 w-4 mr-1' />
+                Validation
+              </Button>
+              <Button
+                variant='outline'
+                size='sm'
+                onClick={() => setShowHistory(!showHistory)}
+                className={showHistory ? 'bg-primary text-primary-foreground' : ''}
+              >
+                <History className='h-4 w-4 mr-1' />
+                History
+              </Button>
+              <Button
+                variant='outline'
+                size='sm'
+                onClick={() => setShowHelp(!showHelp)}
+                className={showHelp ? 'bg-primary text-primary-foreground' : ''}
+              >
+                <HelpCircle className='h-4 w-4 mr-1' />
+                Help
+              </Button>
+            </div>
           </div>
           <p className='text-muted-foreground'>
             Customize your Teen Training experience
@@ -455,6 +494,28 @@ export default function SettingsPage() {
           onSettingChange={updateSetting}
           onReset={handleReset}
         />
+
+        {/* Settings Validation */}
+        {showValidation && (
+          <SettingsValidation
+            settings={settings}
+            onValidationChange={(isValid, results) => {
+              console.log('Validation results:', { isValid, results });
+            }}
+          />
+        )}
+
+        {/* Settings History */}
+        {showHistory && (
+          <SettingsUndoRedo
+            currentSettings={settings}
+            onSettingsChange={(newSettings) => {
+              setSettings(newSettings);
+              setHasChanges(true);
+            }}
+            onSave={handleSave}
+          />
+        )}
 
         {/* Settings Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className='w-full'>

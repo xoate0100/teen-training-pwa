@@ -51,6 +51,13 @@ export function HierarchicalNavigation({
       href: '/session',
     },
     {
+      id: 'exercises',
+      label: 'Exercises',
+      icon: 'exercises',
+      isPrimary: true,
+      href: '/exercises',
+    },
+    {
       id: 'progress',
       label: 'Progress',
       icon: 'progress',
@@ -127,7 +134,7 @@ export function HierarchicalNavigation({
   return (
     <div className={cn('w-full', className)}>
       {/* Primary Navigation */}
-      <div className='grid grid-cols-4 gap-2 mb-4'>
+      <div className='grid grid-cols-5 gap-2 mb-4'>
         {primaryNavigation.map(item => {
           // const Icon = item.icon;
           const isActive = currentTab === item.id;
@@ -240,6 +247,13 @@ export function MobileBottomNavigation({
       href: '/session',
     },
     {
+      id: 'exercises',
+      label: 'Exercises',
+      icon: 'exercises',
+      isPrimary: true,
+      href: '/exercises',
+    },
+    {
       id: 'progress',
       label: 'Progress',
       icon: 'progress',
@@ -271,7 +285,7 @@ export function MobileBottomNavigation({
 
   return (
     <div className='fixed bottom-0 left-0 right-0 bg-background/95 backdrop-blur-sm border-t border-border px-4 py-2 pb-safe'>
-      <div className='grid grid-cols-4 gap-1 max-w-md mx-auto'>
+      <div className='grid grid-cols-5 gap-1 max-w-md mx-auto'>
         {mobileNavigation.map(item => {
           // const Icon = item.icon;
           const isActive = currentTab === item.id;

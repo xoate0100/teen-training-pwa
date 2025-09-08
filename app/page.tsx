@@ -141,6 +141,7 @@ export default function Dashboard() {
     isLoading: userLoading,
     users,
     refreshUsers,
+    error: userError,
   } = useUser();
   const { saveCheckIn, checkIns } = useDatabase();
   const { isMobile, currentTab, handleTabChange } = useResponsiveNavigation();
@@ -271,6 +272,27 @@ export default function Dashboard() {
         <div className='text-center space-y-4'>
           <div className='w-16 h-16 bg-primary/20 rounded-full animate-pulse mx-auto' />
           <p className='text-muted-foreground'>Loading user data...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Show error state if there's a user loading error
+  if (userError) {
+    return (
+      <div className='min-h-screen bg-background p-4 pb-20 flex items-center justify-center'>
+        <div className='text-center space-y-4 max-w-md'>
+          <div className='text-destructive text-6xl'>⚠️</div>
+          <h2 className='text-2xl font-bold'>Connection Error</h2>
+          <p className='text-muted-foreground'>
+            Unable to connect to the database. This might be a temporary issue.
+          </p>
+          <p className='text-sm text-muted-foreground'>
+            Error: {userError}
+          </p>
+          <Button onClick={refreshUsers} className='mt-4'>
+            Try Again
+          </Button>
         </div>
       </div>
     );

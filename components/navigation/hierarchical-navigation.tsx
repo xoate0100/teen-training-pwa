@@ -132,7 +132,7 @@ export function HierarchicalNavigation({
   };
 
   return (
-    <div className={cn('w-full', className)}>
+    <div className={cn('w-full', className)} data-testid="desktop-navigation">
       {/* Primary Navigation */}
       <div className='grid grid-cols-5 gap-2 mb-4'>
         {primaryNavigation.map(item => {
@@ -235,7 +235,7 @@ export function MobileBottomNavigation({
     {
       id: 'dashboard',
       label: 'Dashboard',
-      icon: Home,
+      icon: 'dashboard',
       isPrimary: true,
       href: '/',
     },
@@ -284,7 +284,7 @@ export function MobileBottomNavigation({
   };
 
   return (
-    <div className='fixed bottom-0 left-0 right-0 bg-background/95 backdrop-blur-sm border-t border-border px-4 py-2 pb-safe'>
+    <div className='fixed bottom-0 left-0 right-0 bg-background/95 backdrop-blur-sm border-t border-border px-4 py-2 pb-safe' data-testid="mobile-navigation">
       <div className='grid grid-cols-5 gap-1 max-w-md mx-auto'>
         {mobileNavigation.map(item => {
           // const Icon = item.icon;

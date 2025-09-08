@@ -32,6 +32,9 @@ export function useResponsiveNavigation() {
       case 'session':
         router.push('/session');
         break;
+      case 'exercises':
+        router.push('/exercises');
+        break;
       case 'progress':
         router.push('/progress');
         break;

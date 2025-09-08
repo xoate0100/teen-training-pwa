@@ -19,7 +19,7 @@ test.describe('Homepage', () => {
 
   test('should navigate to exercises page', async ({ page }) => {
     // Look for navigation to exercises - check both desktop and mobile navigation
-    const exercisesLink = page.locator('button:has-text("Exercises")').first();
+    const exercisesLink = page.locator('[data-testid="desktop-navigation"] button:has-text("Exercises"), [data-testid="mobile-navigation"] button:has-text("Exercises")').first();
 
     // Wait for the link to be visible
     await expect(exercisesLink).toBeVisible({ timeout: 10000 });
@@ -40,7 +40,7 @@ test.describe('Homepage', () => {
     await expect(page.locator('body')).toBeVisible();
     
     // Check if mobile navigation is present
-    const mobileNav = page.locator('.fixed.bottom-0, [data-testid="mobile-navigation"]');
+    const mobileNav = page.locator('[data-testid="mobile-navigation"]');
     await expect(mobileNav).toBeVisible();
   });
 
@@ -49,7 +49,7 @@ test.describe('Homepage', () => {
     await expect(page.locator('body')).toBeVisible();
     
     // Test session page navigation
-    const sessionLink = page.locator('button:has-text("Session")').first();
+    const sessionLink = page.locator('[data-testid="desktop-navigation"] button:has-text("Session"), [data-testid="mobile-navigation"] button:has-text("Session")').first();
     if (await sessionLink.isVisible()) {
       await sessionLink.click();
       await page.waitForURL('**/session', { timeout: 10000 });
@@ -57,7 +57,7 @@ test.describe('Homepage', () => {
     }
     
     // Test progress page navigation
-    const progressLink = page.locator('button:has-text("Progress")').first();
+    const progressLink = page.locator('[data-testid="desktop-navigation"] button:has-text("Progress"), [data-testid="mobile-navigation"] button:has-text("Progress")').first();
     if (await progressLink.isVisible()) {
       await progressLink.click();
       await page.waitForURL('**/progress', { timeout: 10000 });
@@ -65,7 +65,7 @@ test.describe('Homepage', () => {
     }
     
     // Test settings page navigation
-    const settingsLink = page.locator('button:has-text("Settings")').first();
+    const settingsLink = page.locator('[data-testid="desktop-navigation"] button:has-text("Settings"), [data-testid="mobile-navigation"] button:has-text("Settings")').first();
     if (await settingsLink.isVisible()) {
       await settingsLink.click();
       await page.waitForURL('**/settings', { timeout: 10000 });

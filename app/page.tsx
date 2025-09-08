@@ -37,6 +37,10 @@ import {
   GestureHint,
   useGestureHints,
 } from '@/components/mobile-gesture-guidance';
+import {
+  OneHandedNavigation,
+  useOneHandedNavigation,
+} from '@/components/one-handed-navigation';
 import { useUser } from '@/lib/contexts/user-context';
 import { useDatabase } from '@/lib/hooks/use-database';
 import { Play, Check } from 'lucide-react';
@@ -108,6 +112,12 @@ export default function Dashboard() {
   const { saveCheckIn, checkIns } = useDatabase();
   const { isMobile, currentTab, handleTabChange } = useResponsiveNavigation();
   const { activeHints, showHint, hideHint } = useGestureHints();
+  const {
+    isEnabled: oneHandedEnabled,
+    currentHand,
+    showThumbZones,
+    updateSettings,
+  } = useOneHandedNavigation();
   const [announcements, setAnnouncements] = useState('');
   const [mood, setMood] = useState(4);
   const [energy, setEnergy] = useState([7]);
@@ -1257,6 +1267,35 @@ export default function Dashboard() {
                 />
               ))}
             </div>
+          )}
+
+          {/* One-Handed Navigation */}
+          {isMobile && oneHandedEnabled && (
+            <OneHandedNavigation
+              isEnabled={oneHandedEnabled}
+              onToggle={enabled => updateSettings({ isEnabled: enabled })}
+              onVoiceCommand={command => {
+                console.log('Voice command:', command);
+                // Handle voice commands here
+                if (command.includes('start session')) {
+                  handleStartSession();
+                } else if (command.includes('check in')) {
+                  handleCheckInSubmit();
+                }
+              }}
+              onSwipeGesture={direction => {
+                console.log('Swipe gesture:', direction);
+                // Handle swipe gestures here
+                if (direction === 'left' && currentTab !== 'progress') {
+                  handleTabChange('progress');
+                } else if (
+                  direction === 'right' &&
+                  currentTab !== 'dashboard'
+                ) {
+                  handleTabChange('dashboard');
+                }
+              }}
+            />
           )}
         </div>
       </AdaptiveInterface>

@@ -43,6 +43,10 @@ import {
 } from 'lucide-react';
 import { usePersonalization } from '@/lib/hooks/use-personalization';
 import { useUser } from '@/lib/contexts/user-context';
+import {
+  OneHandedSettings,
+  useOneHandedNavigation,
+} from '@/components/one-handed-navigation';
 import { cn } from '@/lib/utils';
 
 interface SettingsData {
@@ -899,9 +903,37 @@ export default function SettingsPage() {
 
                   <Separator />
 
+                  {/* One-Handed Navigation Settings */}
+                  <OneHandedSettings
+                    isEnabled={settings.accessibility.oneHandedMode || false}
+                    onToggle={enabled =>
+                      updateSetting('accessibility', 'oneHandedMode', enabled)
+                    }
+                    currentHand={settings.accessibility.preferredHand || 'auto'}
+                    onHandChange={hand =>
+                      updateSetting('accessibility', 'preferredHand', hand)
+                    }
+                    showThumbZones={
+                      settings.accessibility.showThumbZones || false
+                    }
+                    onToggleThumbZones={show =>
+                      updateSetting('accessibility', 'showThumbZones', show)
+                    }
+                  />
+
+                  <Separator />
+
                   <div className='space-y-4'>
                     {Object.entries(settings.accessibility)
-                      .filter(([key]) => key !== 'fontSize')
+                      .filter(
+                        ([key]) =>
+                          ![
+                            'fontSize',
+                            'oneHandedMode',
+                            'preferredHand',
+                            'showThumbZones',
+                          ].includes(key)
+                      )
                       .map(([key, value]) => (
                         <div
                           key={key}

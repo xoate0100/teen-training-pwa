@@ -49,9 +49,14 @@ import {
   Heading1,
   BodyText,
 } from '@/components/spacing-typography';
+import {
+  ExpandableSection,
+  ContextualHelp,
+  useProgressiveDisclosure,
+} from '@/components/progressive-disclosure';
 import { useUser } from '@/lib/contexts/user-context';
 import { useDatabase } from '@/lib/hooks/use-database';
-import { Play, Check } from 'lucide-react';
+import { Play, Check, Lightbulb, Settings, HelpCircle } from 'lucide-react';
 
 const Trophy = () => (
   <span role='img' aria-label='Trophy'>
@@ -122,6 +127,7 @@ export default function Dashboard() {
   const { activeHints, hideHint } = useGestureHints();
   const { isEnabled: oneHandedEnabled, updateSettings } =
     useOneHandedNavigation();
+  // const { isSectionExpanded, toggleSection, startTour, endTour, isTourActive } = useProgressiveDisclosure(); // Will be used in future implementations
   // const { getSpacing } = useSpacing(); // Will be used in future implementations
   const [announcements, setAnnouncements] = useState('');
   const [mood, setMood] = useState(4);
@@ -400,6 +406,98 @@ export default function Dashboard() {
 
           <Tabs value={currentTab} className='w-full'>
             <TabsContent value='dashboard' className='space-y-6'>
+              {/* Progressive Disclosure Sections */}
+              <div className='space-y-4'>
+                <ExpandableSection
+                  title='Quick Tips'
+                  variant='card'
+                  icon={<Lightbulb className='h-4 w-4' />}
+                  badge='New'
+                  defaultExpanded={false}
+                >
+                  <div className='space-y-3'>
+                    <div className='flex items-start gap-3'>
+                      <div className='w-2 h-2 bg-primary rounded-full mt-2 flex-shrink-0' />
+                      <div>
+                        <p className='text-sm font-medium'>
+                          Start with a check-in
+                        </p>
+                        <p className='text-xs text-muted-foreground'>
+                          Complete your daily check-in to get personalized
+                          recommendations
+                        </p>
+                      </div>
+                    </div>
+                    <div className='flex items-start gap-3'>
+                      <div className='w-2 h-2 bg-primary rounded-full mt-2 flex-shrink-0' />
+                      <div>
+                        <p className='text-sm font-medium'>
+                          Track your progress
+                        </p>
+                        <p className='text-xs text-muted-foreground'>
+                          Monitor your weekly progress and celebrate milestones
+                        </p>
+                      </div>
+                    </div>
+                    <div className='flex items-start gap-3'>
+                      <div className='w-2 h-2 bg-primary rounded-full mt-2 flex-shrink-0' />
+                      <div>
+                        <p className='text-sm font-medium'>Stay consistent</p>
+                        <p className='text-xs text-muted-foreground'>
+                          Aim for 3-4 sessions per week for best results
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </ExpandableSection>
+
+                <ExpandableSection
+                  title='Advanced Features'
+                  variant='card'
+                  icon={<Settings className='h-4 w-4' />}
+                  defaultExpanded={false}
+                >
+                  <div className='space-y-3'>
+                    <div className='flex items-center justify-between'>
+                      <span className='text-sm'>One-handed navigation</span>
+                      <ContextualHelp
+                        content='Enable one-handed mode for easier mobile use with voice commands and swipe gestures'
+                        title='One-Handed Mode'
+                        variant='info'
+                      >
+                        <Button variant='outline' size='sm'>
+                          <HelpCircle className='h-4 w-4' />
+                        </Button>
+                      </ContextualHelp>
+                    </div>
+                    <div className='flex items-center justify-between'>
+                      <span className='text-sm'>Gesture guidance</span>
+                      <ContextualHelp
+                        content='Learn mobile gestures for faster navigation and better user experience'
+                        title='Gesture Guidance'
+                        variant='tip'
+                      >
+                        <Button variant='outline' size='sm'>
+                          <HelpCircle className='h-4 w-4' />
+                        </Button>
+                      </ContextualHelp>
+                    </div>
+                    <div className='flex items-center justify-between'>
+                      <span className='text-sm'>Visual hierarchy</span>
+                      <ContextualHelp
+                        content='Customize the visual weight and prominence of different interface elements'
+                        title='Visual Hierarchy'
+                        variant='info'
+                      >
+                        <Button variant='outline' size='sm'>
+                          <HelpCircle className='h-4 w-4' />
+                        </Button>
+                      </ContextualHelp>
+                    </div>
+                  </div>
+                </ExpandableSection>
+              </div>
+
               <section aria-labelledby='checkin-title'>
                 <Card className='border-2 border-primary/20 shadow-sm'>
                   <CardHeader className='pb-4'>

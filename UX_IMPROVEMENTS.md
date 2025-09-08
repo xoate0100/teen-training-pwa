@@ -22,11 +22,11 @@ _Dependencies: None | Timeline: 2-3 weeks_
 
 ### 1.1 Primary Navigation Restructure
 
-- [ ] **1.1.1** Implement hierarchical navigation system
-  - [ ] Create primary navigation component (Dashboard, Session, Progress, Settings)
-  - [ ] Design collapsible secondary navigation for advanced features
-  - [ ] Implement responsive navigation that adapts to screen size
-  - [ ] Add visual hierarchy indicators (primary vs secondary actions)
+- [x] **1.1.1** Implement hierarchical navigation system
+  - [x] Create primary navigation component (Dashboard, Session, Progress, Settings)
+  - [x] Design collapsible secondary navigation for advanced features
+  - [x] Implement responsive navigation that adapts to screen size
+  - [x] Add visual hierarchy indicators (primary vs secondary actions)
 - [ ] **1.1.2** Consolidate scattered settings into unified hub
   - [ ] Create centralized Settings page with category organization
   - [ ] Migrate theme settings from "Themes" tab to Settings

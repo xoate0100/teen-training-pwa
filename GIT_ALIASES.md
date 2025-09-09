@@ -130,6 +130,116 @@ $env:GIT_MERGE_AUTOEDIT = "no"
 
 Or add them to your PowerShell profile for permanent effect.
 
+## Common Git CLI Issues and Solutions
+
+### ⚠️ Critical: Avoiding Git Hook and Push Errors
+
+**Problem 1: Missing Pre-Push Hook**
+```
+error: cannot spawn .husky/pre-push: No such file or directory
+error: waitpid for (NULL) failed: No child processes
+error: failed to push some refs to 'https://github.com/...'
+```
+
+**Solution:**
+```powershell
+# Check if pre-push hook exists
+dir .husky
+
+# If missing, recreate it
+echo "# Run tests before pushing" > .husky/pre-push
+echo "npm run test:run" >> .husky/pre-push
+```
+
+**Problem 2: No Upstream Branch**
+```
+fatal: The current branch feat/branch-name has no upstream branch.
+```
+
+**Solution:**
+```powershell
+# Set upstream and push
+git push -u origin feat/branch-name
+
+# Or for existing branches
+git push --set-upstream origin feat/branch-name
+```
+
+**Problem 3: Git Hooks Not Executing**
+```
+→ No staged files match any configured task.
+```
+
+**Solution:**
+```powershell
+# Reinitialize Husky
+npx husky init
+
+# Verify hooks exist
+dir .husky
+
+# Test hooks manually
+.husky/pre-commit
+.husky/pre-push
+```
+
+### 🔧 Pre-Push Checklist
+
+**Before pushing, always verify:**
+
+1. **Hooks exist:**
+   ```powershell
+   dir .husky
+   # Should show: pre-commit, pre-push, commit-msg
+   ```
+
+2. **Branch has upstream:**
+   ```powershell
+   git branch -vv
+   # Look for [origin/branch-name] in output
+   ```
+
+3. **Tests pass:**
+   ```powershell
+   npm run test:run
+   ```
+
+4. **Code quality checks:**
+   ```powershell
+   glint
+   glint:fix
+   ```
+
+### 🚨 Emergency Git Fixes
+
+**If Git commands hang or fail:**
+
+```powershell
+# Reset git configuration
+git config --global core.pager "cat"
+git config --global core.editor "notepad"
+
+# Clear any stuck processes
+taskkill /f /im git.exe 2>$null
+
+# Reset to clean state
+git status
+```
+
+**If hooks are completely broken:**
+
+```powershell
+# Remove and reinstall Husky
+rm -rf .husky
+npm install husky --save-dev
+npx husky init
+
+# Recreate hooks
+echo "npx lint-staged" > .husky/pre-commit
+echo "npm run test:run" > .husky/pre-push
+echo "npx --no -- commitlint --edit \${1}" > .husky/commit-msg
+```
+
 ## Loading Aliases in New Sessions
 
 To load the aliases in a new PowerShell session:

@@ -280,7 +280,7 @@ export default function Dashboard() {
   // Show error state if there's a user loading error
   if (userError) {
     return (
-      <div className='min-h-screen bg-background p-4 pb-20 flex items-center justify-center'>
+      <div className='min-h-screen bg-background p-4 pb-20 flex items-center justify-center' data-testid="error-message">
         <div className='text-center space-y-4 max-w-md'>
           <div className='text-destructive text-6xl'>⚠️</div>
           <h2 className='text-2xl font-bold'>Connection Error</h2>

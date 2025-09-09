@@ -52,13 +52,13 @@ export default defineConfig({
     timeout: 120000, // 2 minutes for server startup
     stdout: 'pipe',
     stderr: 'pipe',
-    env: {
-      NODE_ENV: 'test',
-      NEXT_PUBLIC_SUPABASE_URL: 'https://mock-supabase-url.supabase.co',
-      NEXT_PUBLIC_SUPABASE_ANON_KEY: 'mock-anon-key-for-testing',
-      SUPABASE_SERVICE_ROLE_KEY: 'mock-service-role-key-for-testing',
-      DISABLE_ANALYTICS: 'true',
-      DISABLE_TELEMETRY: 'true',
-    },
+            env: {
+              NODE_ENV: 'test',
+              NEXT_PUBLIC_SUPABASE_URL: 'https://invalid-url-that-will-fail.supabase.co',
+              NEXT_PUBLIC_SUPABASE_ANON_KEY: 'invalid-key-that-will-fail',
+              SUPABASE_SERVICE_ROLE_KEY: 'invalid-service-role-key-that-will-fail',
+              DISABLE_ANALYTICS: 'true',
+              DISABLE_TELEMETRY: 'true',
+            },
   },
 });

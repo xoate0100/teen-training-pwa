@@ -1,10 +1,24 @@
 import { test, expect } from '@playwright/test';
 
+// Run tests sequentially to avoid race conditions
+test.describe.configure({ mode: 'serial' });
+
 test.describe('Homepage', () => {
   test.beforeEach(async ({ page }) => {
     // Wait for the page to be fully loaded
     await page.goto('/', { waitUntil: 'domcontentloaded' });
-    // Wait a bit for the page to render
+    
+    // Wait for either error state or navigation to be present
+    await page.waitForFunction(() => {
+      const hasError = document.querySelector('[data-testid="error-message"]') || 
+                      document.querySelector('.text-destructive') || 
+                      document.body.textContent?.includes('Connection Error');
+      const hasNavigation = document.querySelector('[data-testid="desktop-navigation"]') || 
+                           document.querySelector('[data-testid="mobile-navigation"]');
+      return hasError || hasNavigation;
+    }, { timeout: 10000 });
+    
+    // Additional wait for stability
     await page.waitForTimeout(2000);
   });
 
@@ -21,11 +35,27 @@ test.describe('Homepage', () => {
     const hasErrorText = await page.locator('.text-destructive').count() > 0;
     const hasConnectionError = await page.locator('text=Connection Error').count() > 0;
 
+    // Get the page content for debugging
+    const bodyText = await page.textContent('body');
+    console.log('Body text length:', bodyText?.length);
+    console.log('Body contains "Teen Training":', bodyText?.includes('Teen Training'));
+    console.log('Body contains "Connection Error":', bodyText?.includes('Connection Error'));
+    console.log('Body contains "Dashboard":', bodyText?.includes('Dashboard'));
+
     // Debug output
     console.log('Navigation count:', await page.locator('[data-testid="desktop-navigation"], [data-testid="mobile-navigation"]').count());
     console.log('Error message count:', await page.locator('[data-testid="error-message"]').count());
     console.log('Text destructive count:', await page.locator('.text-destructive').count());
     console.log('Connection Error text count:', await page.locator('text=Connection Error').count());
+
+    // Check for data-testid elements
+    const dataTestIdElements = await page.locator('[data-testid]').count();
+    console.log('Elements with data-testid:', dataTestIdElements);
+    
+    if (dataTestIdElements > 0) {
+      const testIds = await page.locator('[data-testid]').allTextContents();
+      console.log('Found data-testids:', testIds);
+    }
 
     // At least one of these should be present
     expect(hasNavigation || hasError || hasErrorText || hasConnectionError).toBe(true);
@@ -58,6 +88,18 @@ test.describe('Homepage', () => {
   test('should be responsive on mobile', async ({ page }) => {
     await page.setViewportSize({ width: 375, height: 667 });
     await page.goto('/', { waitUntil: 'domcontentloaded' });
+    
+    // Wait for either error state or navigation to be present
+    await page.waitForFunction(() => {
+      const hasError = document.querySelector('[data-testid="error-message"]') || 
+                      document.querySelector('.text-destructive') || 
+                      document.body.textContent?.includes('Connection Error');
+      const hasNavigation = document.querySelector('[data-testid="desktop-navigation"]') || 
+                           document.querySelector('[data-testid="mobile-navigation"]');
+      return hasError || hasNavigation;
+    }, { timeout: 10000 });
+    
+    // Additional wait for stability
     await page.waitForTimeout(2000);
 
     // Check if content is visible on mobile

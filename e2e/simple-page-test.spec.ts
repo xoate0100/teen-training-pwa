@@ -4,8 +4,8 @@ test.describe('Simple Page Test', () => {
   test('should render something on the page', async ({ page }) => {
     await page.goto('/', { waitUntil: 'domcontentloaded' });
     
-    // Wait a bit for the page to load
-    await page.waitForTimeout(3000);
+    // Wait longer for the page to load and for any async operations to complete
+    await page.waitForTimeout(5000);
     
     // Get the page content
     const bodyText = await page.textContent('body');

@@ -1,1 +1,2 @@
+# Run tests before pushing
 npm run test:run

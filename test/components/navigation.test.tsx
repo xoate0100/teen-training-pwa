@@ -81,7 +81,91 @@ describe('HierarchicalNavigation', () => {
 
     expect(screen.getByText('Achievements')).toBeInTheDocument();
     expect(screen.getByText('Social')).toBeInTheDocument();
-    expect(screen.getByText('AI Intelligence')).toBeInTheDocument();
+    expect(screen.getByText('AI')).toBeInTheDocument();
+    expect(screen.getByText('Wellness')).toBeInTheDocument();
+    expect(screen.getByText('Smart')).toBeInTheDocument();
+    expect(screen.getByText('Interactive')).toBeInTheDocument();
+    expect(screen.getByText('Advanced UX')).toBeInTheDocument();
+  });
+
+  it('should show badge on achievements item', () => {
+    render(
+      <HierarchicalNavigation
+        currentTab="dashboard"
+        onTabChange={mockOnTabChange}
+      />
+    );
+
+    const toggleButton = screen.getByLabelText('Show advanced features');
+    fireEvent.click(toggleButton);
+
+    expect(screen.getByText('3')).toBeInTheDocument(); // Badge for achievements
+  });
+
+  it('should highlight active secondary tab', () => {
+    render(
+      <HierarchicalNavigation
+        currentTab="achievements"
+        onTabChange={mockOnTabChange}
+      />
+    );
+
+    const toggleButton = screen.getByLabelText('Show advanced features');
+    fireEvent.click(toggleButton);
+
+    const achievementsButton = screen.getByText('Achievements').closest('button');
+    expect(achievementsButton).toHaveClass('bg-secondary');
+  });
+
+  it('should call onTabChange when secondary tab is clicked', () => {
+    render(
+      <HierarchicalNavigation
+        currentTab="dashboard"
+        onTabChange={mockOnTabChange}
+      />
+    );
+
+    const toggleButton = screen.getByLabelText('Show advanced features');
+    fireEvent.click(toggleButton);
+
+    fireEvent.click(screen.getByText('Achievements'));
+    expect(mockOnTabChange).toHaveBeenCalledWith('achievements');
+  });
+
+  it('should have proper accessibility attributes', () => {
+    render(
+      <HierarchicalNavigation
+        currentTab="dashboard"
+        onTabChange={mockOnTabChange}
+      />
+    );
+
+    // Check aria-labels on buttons
+    expect(screen.getByLabelText('Navigate to Dashboard')).toBeInTheDocument();
+    expect(screen.getByLabelText('Navigate to Session')).toBeInTheDocument();
+    expect(screen.getByLabelText('Navigate to Exercises')).toBeInTheDocument();
+    expect(screen.getByLabelText('Navigate to Progress')).toBeInTheDocument();
+    expect(screen.getByLabelText('Navigate to Settings')).toBeInTheDocument();
+
+    // Check toggle button accessibility
+    const toggleButton = screen.getByLabelText('Show advanced features');
+    expect(toggleButton).toHaveAttribute('aria-expanded', 'false');
+  });
+
+  it('should render all primary navigation items with correct icons', () => {
+    render(
+      <HierarchicalNavigation
+        currentTab="dashboard"
+        onTabChange={mockOnTabChange}
+      />
+    );
+
+    // Check that icons are rendered
+    expect(screen.getByTestId('icon-dashboard')).toBeInTheDocument();
+    expect(screen.getByTestId('icon-session')).toBeInTheDocument();
+    expect(screen.getByTestId('icon-exercises')).toBeInTheDocument();
+    expect(screen.getByTestId('icon-progress')).toBeInTheDocument();
+    expect(screen.getByTestId('icon-settings')).toBeInTheDocument();
   });
 });
 
@@ -114,7 +198,7 @@ describe('MobileBottomNavigation', () => {
       />
     );
 
-    const container = screen.getByRole('navigation') || screen.getByText('Dashboard').closest('div');
+    const container = screen.getByTestId('mobile-navigation');
     expect(container).toHaveClass('fixed', 'bottom-0');
   });
 
@@ -145,5 +229,73 @@ describe('MobileBottomNavigation', () => {
         minWidth: '64px',
       });
     });
+  });
+
+  it('should highlight active mobile tab', () => {
+    render(
+      <MobileBottomNavigation
+        currentTab="session"
+        onTabChange={mockOnTabChange}
+      />
+    );
+
+    const sessionButton = screen.getByText('Session').closest('button');
+    expect(sessionButton).toHaveClass('text-primary', 'bg-primary/10');
+  });
+
+  it('should render all mobile navigation items with correct icons', () => {
+    render(
+      <MobileBottomNavigation
+        currentTab="dashboard"
+        onTabChange={mockOnTabChange}
+      />
+    );
+
+    // Check that icons are rendered with correct size
+    expect(screen.getByTestId('icon-dashboard')).toHaveAttribute('data-size', '24');
+    expect(screen.getByTestId('icon-session')).toHaveAttribute('data-size', '24');
+    expect(screen.getByTestId('icon-exercises')).toHaveAttribute('data-size', '24');
+    expect(screen.getByTestId('icon-progress')).toHaveAttribute('data-size', '24');
+    expect(screen.getByTestId('icon-settings')).toHaveAttribute('data-size', '24');
+  });
+
+  it('should have proper mobile accessibility attributes', () => {
+    render(
+      <MobileBottomNavigation
+        currentTab="dashboard"
+        onTabChange={mockOnTabChange}
+      />
+    );
+
+    // Check aria-labels on mobile buttons
+    expect(screen.getByLabelText('Navigate to Dashboard')).toBeInTheDocument();
+    expect(screen.getByLabelText('Navigate to Session')).toBeInTheDocument();
+    expect(screen.getByLabelText('Navigate to Exercises')).toBeInTheDocument();
+    expect(screen.getByLabelText('Navigate to Progress')).toBeInTheDocument();
+    expect(screen.getByLabelText('Navigate to Settings')).toBeInTheDocument();
+  });
+
+  it('should have proper mobile styling classes', () => {
+    render(
+      <MobileBottomNavigation
+        currentTab="dashboard"
+        onTabChange={mockOnTabChange}
+      />
+    );
+
+    const container = screen.getByTestId('mobile-navigation');
+    expect(container).toHaveClass('fixed', 'bottom-0', 'left-0', 'right-0', 'bg-background/95', 'backdrop-blur-sm', 'border-t', 'border-border');
+  });
+
+  it('should have proper grid layout for mobile buttons', () => {
+    render(
+      <MobileBottomNavigation
+        currentTab="dashboard"
+        onTabChange={mockOnTabChange}
+      />
+    );
+
+    const gridContainer = screen.getByTestId('mobile-navigation').querySelector('.grid');
+    expect(gridContainer).toHaveClass('grid-cols-5', 'gap-1', 'max-w-md', 'mx-auto');
   });
 });

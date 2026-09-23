@@ -1,0 +1,17 @@
+name: PR Checks
+on: [pull_request]
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Baseline merge gate
+        run: |
+          echo "pr_checks.yml required by FLEET_BASELINE (tiers above consumer_only)"
+          if [ -f CAPABILITIES.lock ]; then
+            echo "CAPABILITIES.lock present — capability-drift.yml must also exist"
+            test -f .github/workflows/capability-drift.yml
+          fi
